@@ -11,7 +11,7 @@ export class ControllerComponent extends components.BaseComponent {
 	container: DIContainer
 	as: string
 	name: string
-	subview: View 
+	factory: ControllerFactory
 	initialize () {
 		this.container = (<any>this.view)._container
 		if (this.attributes['name']) {
@@ -19,11 +19,10 @@ export class ControllerComponent extends components.BaseComponent {
 			this.as = this.attributes['as'] || this.name
 		}
 		
-		//this.__initController(this.name)
 		
-		let factory: ControllerFactory = (<any>this.view)._container.get(this.name);
+		this.factory = (<any>this.view)._container.get(this.name);
 		
-		if (!(factory instanceof ControllerFactory)) {
+		if (!(this.factory instanceof ControllerFactory)) {
 			throw new Error(this.name + ' is not a controller');
 		}
 		
@@ -32,27 +31,20 @@ export class ControllerComponent extends components.BaseComponent {
 			template = this.attributes['template'];
 		}
 		
-		factory.create({
+		this.factory.create({
 			template: template
 		}).then( controller => {
-			let template = factory.container.get('template');
+			let template = this.factory.container.get('template');
 			this.section.appendChild(template.render());
 		});
 		
 	}
 	
-	
-	
-	
-	
 	destroy () {
 		
 		super.destroy();
-		if (this.subview) {
-			this.subview.remove()
-			delete this.subview
-		}
-		//this.controller.destroy();
+		this.factory.destroy();
+		this.factory = void 0
 	}
 	
 

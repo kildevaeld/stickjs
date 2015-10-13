@@ -1,7 +1,7 @@
 import {IContext, ISubscriber, ProxyEvent} from './index'
 import {IModel, Collection, NestedModel} from 'collection'
 import * as utils from 'utilities'
-
+import {EventEmitter} from 'eventsjs'
 
 export const get_atributes = function(attributes:any) {
 
@@ -30,14 +30,27 @@ export const get_atributes = function(attributes:any) {
 
 
 export abstract class Context implements IContext {
+	static emitter: EventEmitter = new EventEmitter();
 	private __queue: number
 	protected __parent: IContext
 	protected __model: IModel
-	/*constructor (model?:IModel, parent?:IContext) {*/
 	constructor () {
 		this.__queue = 0;
-		//this.__parent = parent;
+		
 		this.__model = new NestedModel();
+		this.__onchange = utils.bind(this.__onchange, this);
+	}
+	
+	get $root (): IContext {
+		
+		let parent: Context = <Context>this.__parent;
+		
+		while (parent != null) {
+			if (!parent.__parent) return parent;
+			parent = <Context>parent.__parent;
+		}
+		
+		return this;
 	}
 	
 	$call(fn:Function, ctx?:any, args?:any[]) {
@@ -66,7 +79,9 @@ export abstract class Context implements IContext {
 	}
 	
 	$subscribe(event:string, handler:ISubscriber) {
-	
+		Context.emitter.on(event, (...args:any[]) => {
+			this.$call(handler, this, args);	
+		});
 	}
 	
 	$unsubsribe(event:string, handler:ISubscriber) {

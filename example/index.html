@@ -2,36 +2,60 @@
 <html>
 	<head>
 		<script src="../build/stick.js"></script>
-		
+			
 	</head>
 	<body>
-		<script id="main" type="text/template">
-			<h1>{{title}}</h1>
+		<script id="page1" type="text/template">
+			<h1>page 1: {{title}}</h1>
 		</script>
+		<script id="page2" type="text/template">
+			<h1>page2 : {{title}}</h1>
+		</script>
+		
 		<div id="app">
 			{{title}}
+			<ul class="menu">
+				<li><a href="#page1">page 1</a>
+				<li><a href="#page2">page 2</a>
+			</ul>
 			
 			<controller name="main">
 				{{title}}
 				<a href="#hello">Tryk</a>
 			</controller>
+			<div class="controller"></div>
 		</div>
 		
 		<script>
 			'use strict';
 			console.log(stick)
-			var factory = stick.module('app', function ($context, $router) {
+			var factory = stick.module('app', ['$context', '$router', function ($context, $router) {
 				$context.title = "Hey hoe"
-				$router.route('hello', function () {
-					$context.title = 'Hey joe'
-				})
-			});
+				//$router.route('hello', function () {
+					//$context.title = 'Hey joe'
+				//})//
+				$router.route('page1', {
+					controller: 'page1',
+					template: 'page1',
+					target: '.controller'
+				}).route('page2', {
+					controller: 'page2',
+					template: 'page2',
+					target: '.controller'
+				});
+			}]);
 			
 			factory.controller('main', {
 				initialize: function ($context) {
 					$context.title = 'test';
+					
 				}
 			})
+			.controller('page1', function ($context) {
+				$context.title = 'La lal la'
+			}).controller('page2', function ($context) {
+				$context.title = 'li li li'
+			});
 			factory.create({
 				el: document.querySelector('#app')
 			}).then(function (a) {

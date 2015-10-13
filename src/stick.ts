@@ -8,7 +8,7 @@ import {Container} from './container'
 
 import * as templ from 'templ';
  
-export interface IStick {
+export interface Stick {
 
 }
 

@@ -17,22 +17,26 @@ export class ControllerFactory {
 	controller: FunctionConstructor
 	container: Container
 	name: string
+
 	constructor (name:string, controller:FunctionConstructor, container:Container) {
 		this.container = container
 		this.controller = controller
 		this.name = name;
-		this.container.registerSingleton(name, controller);
+		
 		
 	}
 		
 	create (options?:ControllerCreateOptions): utils.IPromise<any> {
 		
 		if (this.container.hasInstance(this.name)) {
+			
 			return utils.Promise.resolve(this.container.get(this.name));
 		}
 		
-		let $context: IContext = this.container.get('$context');
+		this.container.registerSingleton(this.name, this.controller);
 		
+		let $context: IContext = this.container.get('$context');
+			
 
 		this.container.registerInstance('$context', $context.$createChild(), true);
 		
@@ -81,7 +85,8 @@ export class ControllerFactory {
 		})
 	}
 	
-	destroy () {
+	destroy () {		
 		this.container.clear();
+		this.container.entries.clear()
 	}
 }

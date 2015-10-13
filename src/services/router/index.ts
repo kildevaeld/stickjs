@@ -21,6 +21,7 @@ export class RouterService {
 	router: Router
 	context: IContext
 	container:Container
+	_currentController: ControllerFactory
 	constructor (ctx:IContext, container: Container) {
 		this.router = new Router({
 			execute: utils.bind(this.__execute, this)
@@ -68,9 +69,17 @@ export class RouterService {
 				throw new Error('controller')
 			}
 			
+			
+			
 			factory.create({
 				template: options.template
 			}).then(controller => {
+				console.log('ctroller', controller)
+				if (this._currentController != null) {
+					this._currentController.destroy();
+				}
+				this._currentController = factory;
+				
 				let template = factory.container.get('template');
 				target.innerHTML = '';
 				target.appendChild(template.render())
@@ -111,6 +120,13 @@ export class RouterService {
 			})	*/
 			
 			
+		}
+	}
+	
+	$destroy () {
+		if (this._currentController) {
+			this._currentController.destroy();
+			delete this._currentController;
 		}
 	}
 }
