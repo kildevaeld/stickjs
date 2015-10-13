@@ -68,6 +68,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	__webpack_require__(41);
 
+	__webpack_require__(43);
+
+	__webpack_require__(46);
+
 	var _stick = __webpack_require__(2);
 
 	_defaults(exports, _interopExportWildcard(_stick, _defaults));
@@ -3961,11 +3965,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = (function () {
+	    function defineProperties(target, props) {
+	        for (var i = 0; i < props.length; i++) {
+	            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+	        }
+	    }return function (Constructor, protoProps, staticProps) {
+	        if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	    };
+	})();
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+	function _interopRequireWildcard(obj) {
+	    if (obj && obj.__esModule) {
+	        return obj;
+	    } else {
+	        var newObj = {};if (obj != null) {
+	            for (var key in obj) {
+	                if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	            }
+	        }newObj['default'] = obj;return newObj;
+	    }
+	}
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	function _classCallCheck(instance, Constructor) {
+	    if (!(instance instanceof Constructor)) {
+	        throw new TypeError('Cannot call a class as a function');
+	    }
+	}
 
 	var _utilities = __webpack_require__(4);
 
@@ -3998,7 +4024,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var $context = this.container.get('$context');
 	            this.container.registerInstance('$context', $context.$createChild(), true);
 	            $context = this.container.get('$context');
-	            console.log(this.container);
 	            return this.resolveTemplate($context, options).then(function (template) {
 	                _this.container.registerInstance('template', template, true);
 	                $context.$observe();
@@ -6822,17 +6847,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = (function () {
+	    function defineProperties(target, props) {
+	        for (var i = 0; i < props.length; i++) {
+	            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+	        }
+	    }return function (Constructor, protoProps, staticProps) {
+	        if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	    };
+	})();
 
-	var _get = function get(_x5, _x6, _x7) { var _again = true; _function: while (_again) { var object = _x5, property = _x6, receiver = _x7; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x5 = parent; _x6 = property; _x7 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	var _get = function get(_x5, _x6, _x7) {
+	    var _again = true;_function: while (_again) {
+	        var object = _x5,
+	            property = _x6,
+	            receiver = _x7;desc = parent = getter = undefined;_again = false;if (object === null) object = Function.prototype;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+	            var parent = Object.getPrototypeOf(object);if (parent === null) {
+	                return undefined;
+	            } else {
+	                _x5 = parent;_x6 = property;_x7 = receiver;_again = true;continue _function;
+	            }
+	        } else if ('value' in desc) {
+	            return desc.value;
+	        } else {
+	            var getter = desc.get;if (getter === undefined) {
+	                return undefined;
+	            }return getter.call(receiver);
+	        }
+	    }
+	};
 
 	exports.tryCatch = tryCatch;
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+	function _interopRequireWildcard(obj) {
+	    if (obj && obj.__esModule) {
+	        return obj;
+	    } else {
+	        var newObj = {};if (obj != null) {
+	            for (var key in obj) {
+	                if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	            }
+	        }newObj['default'] = obj;return newObj;
+	    }
+	}
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	function _classCallCheck(instance, Constructor) {
+	    if (!(instance instanceof Constructor)) {
+	        throw new TypeError('Cannot call a class as a function');
+	    }
+	}
 
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) {
+	    if (typeof superClass !== 'function' && superClass !== null) {
+	        throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+	    }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+	}
 
 	var _di = __webpack_require__(13);
 
@@ -6872,35 +6941,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function hasInstance(key) {
 	            return this.__instances.has(key);
 	        }
-
-	        /*resolveDependencies(fn: Function, targetKey: any = undefined): any[] {
-	            
-	            var info = this._getOrCreateConstructionSet(fn, targetKey),
-	                keys = info.keys,
-	                args = new Array(keys.length);
-	        var i, ii, v;
-	             try {
-	                for (i = 0, ii = keys.length; i < ii; ++i) {
-	                    v = keys[i];
-	                    if (!this.hasHandler(v)) {
-	                        v = Repository.any(v);
-	                        if (!v) {
-	                            throw new StickDependencyError('');
-	                        }
-	                        this.register(v)
-	                    }
-	                    args[i] = this.get(keys[i]);
-	                }
-	                
-	            } catch (e) {
-	                var message = "Error"
-	                if (i < ii) {
-	            message += ` The argument at index ${i} (key:${keys[i]}) could not be satisfied.`;
-	          }
-	                throw new StickDependencyError(message);
-	            }
-	             return args
-	        }*/
 	    }, {
 	        key: 'get',
 	        value: function get(key, targetKey) {
@@ -7216,6 +7256,626 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var _annotations = __webpack_require__(42);
+
+	var _utilities = __webpack_require__(4);
+
+	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
+	    switch (arguments.length) {
+	        case 2:
+	            return decorators.reduceRight(function (o, d) {
+	                return d && d(o) || o;
+	            }, target);
+	        case 3:
+	            return decorators.reduceRight(function (o, d) {
+	                return (d && d(target, key), void 0);
+	            }, void 0);
+	        case 4:
+	            return decorators.reduceRight(function (o, d) {
+	                return d && d(target, key, o) || o;
+	            }, desc);
+	    }
+	};
+	var HttpService = (function () {
+	    function HttpService() {
+	        _classCallCheck(this, HttpService);
+	    }
+
+	    _createClass(HttpService, [{
+	        key: "get",
+	        value: function get(url) {
+	            return _utilities.request.get(url);
+	        }
+	    }, {
+	        key: "post",
+	        value: function post(url) {
+	            return _utilities.request.post(url);
+	        }
+	    }, {
+	        key: "put",
+	        value: function put(url) {
+	            return _utilities.request.put(url);
+	        }
+	    }, {
+	        key: "del",
+	        value: function del(url) {
+	            return _utilities.request.del(url);
+	        }
+	    }]);
+
+	    return HttpService;
+	})();
+	exports.HttpService = HttpService;
+	exports.HttpService = HttpService = __decorate([(0, _annotations.service)('$http')], HttpService);
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports.module = _module;
+	exports.service = service;
+	exports.factory = factory;
+	exports.config = config;
+
+	var _internal = __webpack_require__(3);
+
+	var _utilities = __webpack_require__(4);
+
+	var _di = __webpack_require__(13);
+
+	var _repository = __webpack_require__(24);
+
+	/*export function controller (moduleName:string, controllerName?:string): ClassDecorator {
+	    return function (target:Function) {
+	        
+	        let name = controllerName||camelcase(target.name);
+	        
+	        
+	        Repository.add(DependencyType.Controller, )
+	        
+	        classtype(ClassType.Controller)(target);
+	        
+	        if (!metadata.has(moduleName)) {
+	            metadata.set(moduleName, []);
+	        }
+	        
+	        let types = metadata.get(moduleName);
+	        
+	        let exists = find(types, i => i.name === name);
+	        
+	        if (exists) {
+	            throw new Error('controller already exists in module');
+	        }
+	        
+	        metadata.get(moduleName).push(map);
+	        
+	    }
+	}*/
+
+	function _module(moduleName) {
+	    return function (target) {
+	        var name = moduleName || (0, _utilities.camelcase)(target.name);
+	        _repository.Repository.add(_internal.DependencyType.Module, name, target);
+	    };
+	}
+
+	function service(serviceName, moduleName) {
+	    return function (target) {
+	        var name = serviceName || (0, _utilities.camelcase)(target.name);
+	        _repository.Repository.add(_internal.DependencyType.Service, name, target);
+	    };
+	}
+
+	function factory(factoryName) {
+	    return function (target) {
+	        _repository.Repository.add(_internal.DependencyType.Factory, factoryName, target);
+	    };
+	}
+
+	function config(config) {
+	    return function (target) {
+	        _di.Metadata.define(_internal.DIServiceConfig, config, target, undefined);
+	    };
+	}
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var _router = __webpack_require__(44);
+
+	var _utilities = __webpack_require__(4);
+
+	var utils = _interopRequireWildcard(_utilities);
+
+	var _annotations = __webpack_require__(42);
+
+	var _di = __webpack_require__(13);
+
+	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
+	    switch (arguments.length) {
+	        case 2:
+	            return decorators.reduceRight(function (o, d) {
+	                return d && d(o) || o;
+	            }, target);
+	        case 3:
+	            return decorators.reduceRight(function (o, d) {
+	                return (d && d(target, key), void 0);
+	            }, void 0);
+	        case 4:
+	            return decorators.reduceRight(function (o, d) {
+	                return d && d(target, key, o) || o;
+	            }, desc);
+	    }
+	};
+	var RouterService = (function () {
+	    function RouterService(ctx, container) {
+	        _classCallCheck(this, RouterService);
+
+	        this.router = new _router.Router({
+	            execute: utils.bind(this.__execute, this)
+	        });
+	        this.context = ctx;
+	        this.container = container;
+	        this.router.history.start();
+	    }
+
+	    _createClass(RouterService, [{
+	        key: "route",
+	        value: function route(_route, handler) {
+	            if (typeof handler === 'function') {
+	                this.router.route(_route, handler);
+	            } else if (utils.isObject(handler)) {
+	                this.router.route(_route, this.__handleController(handler));
+	            }
+	            return this;
+	        }
+	    }, {
+	        key: "__execute",
+	        value: function __execute(callback, args) {
+	            this.context.$call(callback, this.context, args);
+	        }
+	    }, {
+	        key: "__handleController",
+	        value: function __handleController(options) {
+	            if (!this.container.hasHandler(options.controller)) {
+	                throw new Error('[router] controller');
+	            }
+	            return function () {
+	                /*let target: HTMLElement;
+	                if (typeof options.target === 'string') {
+	                    target = <HTMLElement>document.querySelector(<string>options.target)
+	                } else {
+	                    target = <HTMLElement>options.target;
+	                }
+	                
+	                
+	                let templateResolver = <TemplateResolver>this.container.get('templateResolver');
+	                
+	                let controller = this.container.get(options.controller);
+	                templateResolver.resolve(options.template)
+	                .then( (str) => {
+	                    if (!str) {
+	                        throw new Error('template');
+	                    }
+	                    
+	                    let ctx = controller.ctx;
+	                
+	                    let template = templ.compile(str, {
+	                        viewClass: <any>TemplateView
+	                    })
+	                
+	                    let view = <any>template.view(ctx.model, {
+	                        container: this.container,
+	                        delegator: new EventDelegator(controller, ctx, this.container)
+	                    });
+	                    
+	                    controller.template = view
+	                    
+	                    target.appendChild(view.render())
+	                    
+	                })	*/
+	            };
+	        }
+	    }]);
+
+	    return RouterService;
+	})();
+	exports.RouterService = RouterService;
+	exports.RouterService = RouterService = __decorate([(0, _di.inject)('$context', '$container'), (0, _annotations.service)('$router')], RouterService);
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x3, _x4, _x5) { var _again = true; _function: while (_again) { var object = _x3, property = _x4, receiver = _x5; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x3 = parent; _x4 = property; _x5 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _history = __webpack_require__(45);
+
+	var _eventsjs = __webpack_require__(32);
+
+	var _utilities = __webpack_require__(4);
+
+	// Cached regular expressions for matching named param parts and splatted
+	// parts of route strings.
+	var optionalParam = /\((.*?)\)/g;
+	var namedParam = /(\(\?)?:\w+/g;
+	var splatParam = /\*\w+/g;
+	var escapeRegExp = /[\-{}\[\]+?.,\\\^$|#\s]/g;
+	var isRegExp = function isRegExp(value) {
+	    return value ? typeof value === 'object' && toString.call(value) === '[object RegExp]' : false;
+	};
+
+	var Router = (function (_EventEmitter) {
+	    _inherits(Router, _EventEmitter);
+
+	    function Router() {
+	        var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	        _classCallCheck(this, Router);
+
+	        _get(Object.getPrototypeOf(Router.prototype), 'constructor', this).call(this);
+	        this.history = new _history.HistoryApi();
+	        this.options = options;
+	    }
+
+	    _createClass(Router, [{
+	        key: 'route',
+	        value: function route(_route, name) {
+	            var _this = this;
+
+	            var handler = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+
+	            if (!isRegExp(_route)) _route = this._routeToRegExp(_route);
+	            if (typeof name === 'function') {
+	                handler = name;
+	                name = '';
+	            }
+	            if (!handler) {
+	                throw new Error('router: no handler');
+	            }
+	            this.history.route(_route, function (fragment) {
+	                var args = _this._extractParameters(_route, fragment);
+	                _this.execute(handler, args);
+	                _this.trigger.apply(_this, ['route:' + name].concat(args));
+	                _this.trigger('route', name, args);
+	                //this.history.trigger('route', this, name, args);
+	            });
+	            return this;
+	            return this;
+	        }
+
+	        // Execute a route handler with the provided parameters.  This is an
+	        // excellent place to do pre-route setup or post-route cleanup.
+	    }, {
+	        key: 'execute',
+	        value: function execute(callback, args) {
+	            if (callback) {
+	                if (this.options.execute) {
+	                    this.options.execute(callback, args);
+	                } else {
+	                    (0, _utilities.callFunc)(callback, this, args);
+	                }
+	            }
+	        }
+
+	        // Simple proxy to `Backbone.history` to save a fragment into the history.
+	    }, {
+	        key: 'navigate',
+	        value: function navigate(fragment, options) {
+	            this.history.navigate(fragment, options);
+	            return this;
+	        }
+
+	        // Convert a route string into a regular expression, suitable for matching
+	        // against the current location hash.
+	    }, {
+	        key: '_routeToRegExp',
+	        value: function _routeToRegExp(route) {
+	            route = route.replace(escapeRegExp, '\\$&').replace(optionalParam, '(?:$1)?').replace(namedParam, function (match, optional) {
+	                return optional ? match : '([^/?]+)';
+	            }).replace(splatParam, '([^?]*?)');
+	            return new RegExp('^' + route + '(?:\\?([\\s\\S]*))?$');
+	        }
+
+	        // Given a route, and a URL fragment that it matches, return the array of
+	        // extracted decoded parameters. Empty or unmatched parameters will be
+	        // treated as `null` to normalize cross-browser behavior.
+	    }, {
+	        key: '_extractParameters',
+	        value: function _extractParameters(route, fragment) {
+	            var params = route.exec(fragment).slice(1);
+	            return params.map(function (param, i) {
+	                // Don't decode the search params.
+	                if (i === params.length - 1) return param || null;
+	                return param ? decodeURIComponent(param) : null;
+	            });
+	        }
+	    }]);
+
+	    return Router;
+	})(_eventsjs.EventEmitter);
+
+	exports.Router = Router;
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x3, _x4, _x5) { var _again = true; _function: while (_again) { var object = _x3, property = _x4, receiver = _x5; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x3 = parent; _x4 = property; _x5 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var _eventsjs = __webpack_require__(32);
+
+	var _utilities = __webpack_require__(4);
+
+	var utils = _interopRequireWildcard(_utilities);
+
+	// Cached regex for stripping a leading hash/slash and trailing space.
+	var routeStripper = /^[#\/]|\s+$/g;
+	// Cached regex for stripping leading and trailing slashes.
+	var rootStripper = /^\/+|\/+$/g;
+	// Cached regex for removing a trailing slash.
+	var trailingSlash = /\/$/;
+	// Cached regex for stripping urls of hash and query.
+	var pathStripper = /[#].*$/;
+
+	var Handler = function Handler() {
+	    _classCallCheck(this, Handler);
+	};
+
+	exports.Handler = Handler;
+
+	var HistoryApi = (function (_EventEmitter) {
+	    _inherits(HistoryApi, _EventEmitter);
+
+	    function HistoryApi() {
+	        _classCallCheck(this, HistoryApi);
+
+	        _get(Object.getPrototypeOf(HistoryApi.prototype), 'constructor', this).call(this);
+	        this.handlers = [];
+	        this._started = false;
+	        if (typeof window !== 'undefined') {
+	            this.location = window.location;
+	            this.history = window.history;
+	        }
+	        this.checkUrl = utils.bind(this.checkUrl, this);
+	    }
+
+	    _createClass(HistoryApi, [{
+	        key: 'atRoot',
+
+	        // Are we at the app root?
+	        value: function atRoot() {
+	            return this.location.pathname.replace(/[^\/]$/, '$&/') === this.root;
+	        }
+
+	        // Gets the true hash value. Cannot use location.hash directly due to bug
+	        // in Firefox where location.hash will always be decoded.
+	    }, {
+	        key: 'getHash',
+	        value: function getHash(window) {
+	            var match = (window || this).location.href.match(/#(.*)$/);
+	            return match ? match[1] : '';
+	        }
+
+	        // Get the cross-browser normalized URL fragment, either from the URL,
+	        // the hash, or the override.
+	    }, {
+	        key: 'getFragment',
+	        value: function getFragment(fragment) {
+	            var forcePushState = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+	            if (fragment == null) {
+	                if (this._wantsPushState || !this._wantsHashChange) {
+	                    fragment = decodeURI(this.location.pathname + this.location.search);
+	                    var root = this.root.replace(trailingSlash, '');
+	                    if (!fragment.indexOf(root)) fragment = fragment.slice(root.length);
+	                } else {
+	                    fragment = this.getHash();
+	                }
+	            }
+	            return fragment.replace(routeStripper, '');
+	        }
+
+	        // Start the hash change handling, returning `true` if the current URL matches
+	        // an existing route, and `false` otherwise.
+	    }, {
+	        key: 'start',
+	        value: function start() {
+	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	            if (this.started) throw new Error("Backbone.history has already been started");
+	            this._started = true;
+	            // Figure out the initial configuration.
+	            // Is pushState desired or should we use hashchange only?
+	            this.options = utils.extend({ root: '/' }, this.options, options);
+	            this.root = this.options.root;
+	            this._wantsHashChange = this.options.hashChange !== false;
+	            this._wantsPushState = !!this.options.pushState;
+	            var fragment = this.getFragment();
+	            // Normalize root to always include a leading and trailing slash.
+	            this.root = ('/' + this.root + '/').replace(rootStripper, '/');
+	            // Depending on whether we're using pushState or hashes, determine how we
+	            // check the URL state.
+	            if (this._wantsPushState) {
+	                window.addEventListener('popstate', this.checkUrl, false);
+	            } else if (this._wantsHashChange) {
+	                window.addEventListener('hashchange', this.checkUrl, false);
+	            }
+	            // Determine if we need to change the base url, for a pushState link
+	            // opened by a non-pushState browser.
+	            this.fragment = fragment;
+	            var loc = this.location;
+	            // Transition from hashChange to pushState or vice versa if both are
+	            // requested.
+	            if (this._wantsHashChange && this._wantsPushState) {
+	                // If we've started out with a hash-based route, but we're currently
+	                // in a browser where it could be `pushState`-based instead...
+	                if (this.atRoot() && loc.hash) {
+	                    this.fragment = this.getHash().replace(routeStripper, '');
+	                    this.history.replaceState({}, document.title, this.root + this.fragment);
+	                }
+	            }
+	            if (!this.options.silent) return this.loadUrl();
+	        }
+
+	        // Disable Backbone.history, perhaps temporarily. Not useful in a real app,
+	        // but possibly useful for unit testing Routers.
+	    }, {
+	        key: 'stop',
+	        value: function stop() {
+	            window.removeEventListener('popstate', this.checkUrl);
+	            window.removeEventListener('hashchange', this.checkUrl);
+	            this._started = false;
+	        }
+
+	        // Add a route to be tested when the fragment changes. Routes added later
+	        // may override previous routes.
+	    }, {
+	        key: 'route',
+	        value: function route(_route, callback) {
+	            this.handlers.unshift({ route: _route, callback: callback });
+	        }
+
+	        // Checks the current URL to see if it has changed, and if it has,
+	        // calls `loadUrl`.
+	    }, {
+	        key: 'checkUrl',
+	        value: function checkUrl() {
+	            var current = this.getFragment();
+	            if (current === this.fragment) return false;
+	            this.loadUrl();
+	        }
+
+	        // Attempt to load the current URL fragment. If a route succeeds with a
+	        // match, returns `true`. If no defined routes matches the fragment,
+	        // returns `false`.
+	    }, {
+	        key: 'loadUrl',
+	        value: function loadUrl(fragment) {
+	            fragment = this.fragment = this.getFragment(fragment);
+	            return this.handlers.some(function (handler) {
+	                if (handler.route.test(fragment)) {
+	                    handler.callback(fragment);
+	                    return true;
+	                }
+	            });
+	        }
+
+	        // Save a fragment into the hash history, or replace the URL state if the
+	        // 'replace' option is passed. You are responsible for properly URL-encoding
+	        // the fragment in advance.
+	        //
+	        // The options object can contain `trigger: true` if you wish to have the
+	        // route callback be fired (not usually desirable), or `replace: true`, if
+	        // you wish to modify the current URL without adding an entry to the history.
+	    }, {
+	        key: 'navigate',
+	        value: function navigate(fragment, options) {
+	            if (!this.started) return false;
+	            if (!options || options === true) options = { trigger: !!options };
+	            var url = this.root + (fragment = this.getFragment(fragment || ''));
+	            // Strip the hash for matching.
+	            fragment = fragment.replace(pathStripper, '');
+	            if (this.fragment === fragment) return;
+	            this.fragment = fragment;
+	            // Don't include a trailing slash on the root.
+	            if (fragment === '' && url !== '/') url = url.slice(0, -1);
+	            // If we're using pushState we use it to set the fragment as a real URL.
+	            if (this._wantsPushState) {
+	                this.history[options.replace ? 'replaceState' : 'pushState']({}, document.title, url);
+	            } else if (this._wantsHashChange) {
+	                this._updateHash(this.location, fragment, options.replace);
+	            } else {
+	                return this.location.assign(url);
+	            }
+	            if (options.trigger) return this.loadUrl(fragment);
+	        }
+
+	        // Update the hash location, either replacing the current entry, or adding
+	        // a new one to the browser history.
+	    }, {
+	        key: '_updateHash',
+	        value: function _updateHash(location, fragment, replace) {
+	            if (replace) {
+	                var href = location.href.replace(/(javascript:|#).*$/, '');
+	                location.replace(href + '#' + fragment);
+	            } else {
+	                // Some browsers require that `hash` contains a leading #.
+	                location.hash = '#' + fragment;
+	            }
+	        }
+	    }, {
+	        key: 'started',
+	        get: function get() {
+	            return this._started;
+	        }
+	    }]);
+
+	    return HistoryApi;
+	})(_eventsjs.EventEmitter);
+
+	exports.HistoryApi = HistoryApi;
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7228,7 +7888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _stick = __webpack_require__(2);
 
-	var _componentsController = __webpack_require__(42);
+	var _componentsController = __webpack_require__(47);
 
 	var _templateView = __webpack_require__(40);
 
@@ -7237,7 +7897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	(0, _stick.component)('controller', _componentsController.ControllerComponent);
 
 /***/ },
-/* 42 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../typings" />

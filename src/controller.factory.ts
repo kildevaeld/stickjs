@@ -37,7 +37,7 @@ export class ControllerFactory {
 		this.container.registerInstance('$context', $context.$createChild(), true);
 		
 		$context = this.container.get('$context');
-		console.log(this.container)
+		
 		return this.resolveTemplate($context, options)
 		.then( template => {
 			this.container.registerInstance('template', template, true);

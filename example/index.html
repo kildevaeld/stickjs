@@ -10,33 +10,21 @@
 		</script>
 		<div id="app">
 			{{title}}
+			
 			<controller name="main">
 				{{title}}
+				<a href="#hello">Tryk</a>
 			</controller>
 		</div>
 		
 		<script>
 			'use strict';
-			
-			var factory = stick.module('app', function ($context, $container) {
+			console.log(stick)
+			var factory = stick.module('app', function ($context, $router) {
 				$context.title = "Hey hoe"
-				
-				//var fac = $container.get('main');	
-				/*fac.create({
-					template: 'main'
-				}).then(function (main) {
-					
-					var el = fac.container.get('template').render()
-					document.body.appendChild(el);
-					
-					setTimeout(function () {
-						fac.destroy();
-						console.log(fac)
-					}, 1000)
-					
-				}).catch(function (e) {
-					console.log(e)
-				})*/
+				$router.route('hello', function () {
+					$context.title = 'Hey joe'
+				})
 			});
 			
 			factory.controller('main', {

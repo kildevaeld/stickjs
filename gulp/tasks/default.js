@@ -2,4 +2,4 @@
 const gulp = require('gulp');
 
 
-gulp.task('default', ['typescript']);
+gulp.task('default', ['build', 'uglify']);

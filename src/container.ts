@@ -27,37 +27,6 @@ export class Container extends DIContainer {
 		return this.__instances.has(key);
 	}
 
-	/*resolveDependencies(fn: Function, targetKey: any = undefined): any[] {
-		
-		var info = this._getOrCreateConstructionSet(fn, targetKey),
-			keys = info.keys,
-			args = new Array(keys.length);
-    var i, ii, v;
-
-		try {
-			for (i = 0, ii = keys.length; i < ii; ++i) {
-				v = keys[i];
-				if (!this.hasHandler(v)) {
-					v = Repository.any(v);
-					if (!v) {
-						throw new StickDependencyError('');
-					}
-					this.register(v)
-				} 
-				args[i] = this.get(keys[i]);
-			}
-			
-		} catch (e) {
-			var message = "Error"
-			if (i < ii) {
-        message += ` The argument at index ${i} (key:${keys[i]}) could not be satisfied.`;
-      }
-			throw new StickDependencyError(message);
-		}
-
-		return args
-	}*/
-
 	get(key: any, targetKey?:string) : any {
     var entry;
 

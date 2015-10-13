@@ -26,7 +26,11 @@
     "src/context/index.ts",
     "src/context/object-observer-context.ts",
     "src/lib/index.ts",
+    "src/services/http.ts",
     "src/services/template.ts",
+    "src/services/router/history.ts",
+    "src/services/router/index.ts",
+    "src/services/router/router.ts",
     "src/template/index.ts",
     "src/template/template.view.ts",
     "src/template/components/controller.ts"
