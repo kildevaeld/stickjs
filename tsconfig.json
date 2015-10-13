@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "outDir": "lib",
+    "rootDir": "src",
+    "sourceMap": false,
+    "experimentalDecorators": true
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "files": [
+    "src/annotations.ts",
+    "src/container.ts",
+    "src/controller.factory.ts",
+    "src/index.ts",
+    "src/internal.ts",
+    "src/module.factory.ts",
+    "src/repository.ts",
+    "src/stick.ts",
+    "src/typings.ts",
+    "src/context/context.ts",
+    "src/context/dirty-object-context.ts",
+    "src/context/index.ts",
+    "src/context/object-observer-context.ts",
+    "src/lib/index.ts",
+    "src/services/template.ts",
+    "src/template/index.ts",
+    "src/template/template.view.ts",
+    "src/template/components/controller.ts"
+  ]
+}

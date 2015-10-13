@@ -1,0 +1,4 @@
+--require should
+--require sinon
+--require babel/register
+--reporter spec

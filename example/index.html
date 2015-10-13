@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="../build/stick.js"></script>
+		
+	</head>
+	<body>
+		<script id="main" type="text/template">
+			<h1>{{title}}</h1>
+		</script>
+		<div id="app">
+			{{title}}
+			<controller name="main">
+				{{title}}
+			</controller>
+		</div>
+		
+		<script>
+			'use strict';
+			
+			var factory = stick.module('app', function ($context, $container) {
+				$context.title = "Hey hoe"
+				
+				//var fac = $container.get('main');	
+				/*fac.create({
+					template: 'main'
+				}).then(function (main) {
+					
+					var el = fac.container.get('template').render()
+					document.body.appendChild(el);
+					
+					setTimeout(function () {
+						fac.destroy();
+						console.log(fac)
+					}, 1000)
+					
+				}).catch(function (e) {
+					console.log(e)
+				})*/
+			});
+			
+			factory.controller('main', {
+				initialize: function ($context) {
+					$context.title = 'test';
+				}
+			})
+			factory.create({
+				el: document.querySelector('#app')
+			}).then(function (a) {
+				console.log(a);
+				
+			})
+			
+			
+		</script>
+	</body>
+</html>

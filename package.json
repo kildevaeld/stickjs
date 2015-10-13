@@ -1,0 +1,40 @@
+{
+  "name": "stick",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node node_modules/.bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kildevaeld/stick.git"
+  },
+  "author": "Rasmus Kildevæld <rasmuskildevaeld@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kildevaeld/stick/issues"
+  },
+  "homepage": "https://github.com/kildevaeld/stick#readme",
+  "dependencies": {
+    "collection": "git+https://github.com/kildevaeld/collectionjs.git",
+    "di": "git+https://github.com/kildevaeld/dijs.git",
+    "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
+    "templ": "git+https://github.com/kildevaeld/templ.git#development",
+    "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
+  },
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "babel-loader": "^5.3.2",
+    "gulp": "^3.9.0",
+    "gulp-typescript": "^2.9.2",
+    "gulp-webpack": "^1.5.0",
+    "merge2": "^0.3.6",
+    "mocha": "^2.3.3",
+    "recursive-readdir": "^1.2.1",
+    "requiredir": "^1.0.7",
+    "should": "^7.1.0",
+    "sinon": "^1.17.1",
+    "webpack": "^1.12.2"
+  }
+}
