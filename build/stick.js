@@ -2907,6 +2907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.__queue = 0;
 	        this.__model = new _collection.NestedModel();
 	        this.__onchange = utils.bind(this.__onchange, this);
+	        this.__subscribers = {};
 	    }
 
 	    _createClass(Context, [{
@@ -2940,22 +2941,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: '$subscribe',
 	        value: function $subscribe(event, handler) {
-	            var _this2 = this;
-
-	            Context.emitter.on(event, function () {
-	                for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	                    args[_key] = arguments[_key];
-	                }
-
-	                _this2.$call(handler, _this2, args);
-	            });
+	            if (this.$root !== this) {
+	                return this.$root.$subscribe(event, handler);
+	            }
+	            var subscribers = this.__subscribers[event] || (this.__subscribers[event] = []);
+	            subscribers.push(handler);
+	            return this;
 	        }
 	    }, {
-	        key: '$unsubsribe',
-	        value: function $unsubsribe(event, handler) {}
+	        key: '$unsubscribe',
+	        value: function $unsubscribe(event, handler) {
+	            if (this.$root !== this) {
+	                return this.$root.$unsubscribe(event, handler);
+	            }
+	            var subscribers = this.__subscribers[event] || (this.__subscribers[event] = []);
+	            var i = subscribers.indexOf(handler);
+	            if (i > -1) {
+	                subscribers.splice(i, 1);
+	            }
+	            return this;
+	        }
 	    }, {
 	        key: '$publish',
-	        value: function $publish(event) {}
+	        value: function $publish(event) {
+	            var _this2 = this;
+
+	            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	                args[_key - 1] = arguments[_key];
+	            }
+
+	            var subscribers = this.__subscribers[event];
+	            if (subscribers) {
+	                this.$call(function () {
+	                    (0, _eventsjs.callFunc)(subscribers, _this2, args);
+	                });
+	            }
+	            if (this.__parent) {
+	                var _parent;
+
+	                (_parent = this.__parent).$publish.apply(_parent, [event].concat(args));
+	            }
+	        }
 	    }, {
 	        key: '__onchange',
 	        value: function __onchange(events) {
@@ -2965,7 +2991,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for (var i = 0, ii = events.length; i < ii; i++) {
 	                var e = events[i];
 	                var names = e.name.split('.');
-	                if (e.name === '__parent' || e.name === '__queue' || names[0] == '__model') continue;
+	                if (e.name === '__parent' || e.name === '__queue' || names[0] == '__model' || e.name === '__subscribers') continue;
 	                if (e.type === 'delete') {
 	                    this.__model.set(e.name, { unset: true });
 	                } else {
@@ -3028,8 +3054,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 	exports.Context = Context;
-
-	Context.emitter = new _eventsjs.EventEmitter();
 
 /***/ },
 /* 29 */
@@ -4512,7 +4536,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utilitiesLibIndex = __webpack_require__(4);
 
-	var reserved = ['model', 'parent', '__queue', '_onchange', '__timer', '_listeners'];
+	var reserved = ['model', 'parent', '__queue', '_onchange', '__timer', '_listeners', '__subscribers'];
 
 	var DirtyObjectObserver = (function (_Context) {
 	    _inherits(DirtyObjectObserver, _Context);

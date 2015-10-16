@@ -2,7 +2,7 @@ import {Context} from './context'
 import {IContext, ProxyEvent} from './index'
 import {IModel, NestedModel} from 'collection'
 import {toPromise, callFunc, nextTick, equal} from 'utilities/lib/index'
-let reserved = ['model','parent','__queue', '_onchange', '__timer', '_listeners']
+let reserved = ['model','parent','__queue', '_onchange', '__timer', '_listeners', '__subscribers']
 
 
 export class DirtyObjectObserver extends Context {

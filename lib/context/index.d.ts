@@ -12,7 +12,7 @@ export interface IContext {
     [x: string]: any;
     $call(fn: Function, ctx?: any, args?: any[]): any;
     $subscribe(event: string, handler: ISubscriber): any;
-    $unsubsribe(event: string, handler: ISubscriber): any;
+    $unsubscribe(event: string, handler: ISubscriber): any;
     $publish(event: string, ...args: any[]): any;
     $createChild(data?: IModel): IContext;
     $observe(): any;

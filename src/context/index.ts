@@ -18,7 +18,7 @@ export interface IContext {
 	[x: string]: any 
 	$call(fn:Function, ctx?:any, args?:any[])
 	$subscribe(event:string, handler:ISubscriber)
-	$unsubsribe(event:string, handler:ISubscriber)
+	$unsubscribe(event:string, handler:ISubscriber)
 	$publish(event:string, ...args:any[])
 	$createChild(data?:IModel): IContext
 	$observe()

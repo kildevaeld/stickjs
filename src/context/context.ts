@@ -1,7 +1,7 @@
 import {IContext, ISubscriber, ProxyEvent} from './index'
 import {IModel, Collection, NestedModel} from 'collection'
 import * as utils from 'utilities'
-import {EventEmitter} from 'eventsjs'
+import {callFunc} from 'eventsjs'
 
 export const get_atributes = function(attributes:any) {
 
@@ -30,15 +30,16 @@ export const get_atributes = function(attributes:any) {
 
 
 export abstract class Context implements IContext {
-	static emitter: EventEmitter = new EventEmitter();
 	private __queue: number
 	protected __parent: IContext
 	protected __model: IModel
+	protected __subscribers: {[key:string]: ISubscriber[]}
 	constructor () {
 		this.__queue = 0;
 		
 		this.__model = new NestedModel();
 		this.__onchange = utils.bind(this.__onchange, this);
+		this.__subscribers = {}
 	}
 	
 	get $root (): IContext {
@@ -78,18 +79,41 @@ export abstract class Context implements IContext {
 		}
 	}
 	
-	$subscribe(event:string, handler:ISubscriber) {
-		Context.emitter.on(event, (...args:any[]) => {
-			this.$call(handler, this, args);	
-		});
+	$subscribe(event:string, handler:ISubscriber): IContext {
+		if (this.$root !== this) {
+			return this.$root.$subscribe(event, handler)
+		}
+		let subscribers = this.__subscribers[event]||(this.__subscribers[event] = []);	
+		subscribers.push(handler);
+		return this
 	}
 	
-	$unsubsribe(event:string, handler:ISubscriber) {
+	$unsubscribe(event:string, handler:ISubscriber): IContext {
+		if (this.$root !== this) {
+			return this.$root.$unsubscribe(event, handler)
+		}
+		let subscribers = this.__subscribers[event]||(this.__subscribers[event] = []);
+		let i = subscribers.indexOf(handler);
+		if (i > -1) {
+			subscribers.splice(i,1);
+		}
+		return this;
 		
 	}
 	
 	$publish(event:string, ...args:any[]) {
 		
+		let subscribers = this.__subscribers[event];
+		
+		if (subscribers) {
+			this.$call(() => {
+				callFunc(subscribers, this, args)
+			})
+		}
+		
+		if (this.__parent) {
+			this.__parent.$publish(event, ...args)
+		}
 	}
 	
 	abstract $createChild(data?:IModel): IContext
@@ -106,7 +130,7 @@ export abstract class Context implements IContext {
 			let e = events[i]
 			let names = e.name.split('.');
 			
-			if (e.name === '__parent' || e.name === '__queue' || names[0] == '__model') continue;
+			if (e.name === '__parent' || e.name === '__queue' || names[0] == '__model' || e.name === '__subscribers') continue;
 			
 			if (e.type === 'delete') {
 				this.__model.set(e.name, {unset:true});
