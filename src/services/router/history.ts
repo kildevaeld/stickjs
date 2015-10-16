@@ -68,7 +68,7 @@ export class HistoryApi extends EventEmitter {
 	// Start the hash change handling, returning `true` if the current URL matches
 	// an existing route, and `false` otherwise.
 	start (options:any={}) {
-		if (this.started) throw new Error("Backbone.history has already been started");
+		if (this.started) throw new Error("Router.history has already been started");
 		this._started = true;
 
 		// Figure out the initial configuration.
@@ -140,16 +140,16 @@ export class HistoryApi extends EventEmitter {
 		// returns `false`.
 		loadUrl (fragment?:string) {
 			fragment = this.fragment = this.getFragment(fragment);
-
+		
 			return this.handlers.some(function(handler) {
-
+				
 				if (handler.route.test(fragment)) {
 					handler.callback(fragment);
 					return true;
 				}
 			});
 		}
-
+		
 		// Save a fragment into the hash history, or replace the URL state if the
 		// 'replace' option is passed. You are responsible for properly URL-encoding
 		// the fragment in advance.

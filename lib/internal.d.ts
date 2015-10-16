@@ -7,6 +7,7 @@ export declare enum DependencyType {
 }
 export declare enum Metakey {
     DependencyType = 0,
+    Template = 1,
 }
 export declare const DIServiceConfig: string;
 export declare function getDependencies(fn: Function | Object | any[]): [Function, any[]];

@@ -39,6 +39,8 @@ export class RouterService {
 			this.router.route(route, this.__handleController(<RouteOptions>handler));
 		}
 		
+		
+		
 		return this
 	}
 	
@@ -55,7 +57,7 @@ export class RouterService {
 		
 		
 		return (...args:any[]) => {
-			
+		
 			let target: HTMLElement;
 			if (typeof options.target === 'string') {
 				target = <HTMLElement>document.querySelector(<string>options.target)	
@@ -69,12 +71,10 @@ export class RouterService {
 				throw new Error('controller')
 			}
 			
-			
-			
 			factory.create({
 				template: options.template
 			}).then(controller => {
-				console.log('ctroller', controller)
+				
 				if (this._currentController != null) {
 					this._currentController.destroy();
 				}
@@ -82,6 +82,7 @@ export class RouterService {
 				
 				let template = factory.container.get('template');
 				target.innerHTML = '';
+				
 				target.appendChild(template.render())
 			})
 			

@@ -1,8 +1,6 @@
 import * as templ from 'templ';
-export interface IStick {
-}
-export declare function service(name: string, definition: Function): IStick;
-export declare function factory(name: string, factory: any | any[]): IStick;
+export declare function service(name: string, definition: Function): void;
+export declare function factory(name: string, factory: any | any[]): void;
 export declare function module(name: string, definition: Function | Object | any[]): any;
 export interface ComponentDefinition {
     initialize?: () => void;

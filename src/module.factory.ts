@@ -126,17 +126,15 @@ export class ModuleFactory {
 			}]);
 		}
 		
-		ctx.$observe()
-		let mod = this.container.get(this.name);
-		ctx.$unobserve();
-		//let mod
-		
 		if (options.el) {
 			let el = this.container.get('template').render()
 			options.el.innerHTML = '';
 			options.el.appendChild(el);	
 		}
 		
+		ctx.$observe()
+		let mod = this.container.get(this.name);
+		ctx.$unobserve();
 		
 		return utils.Promise.resolve(mod)
 	}
