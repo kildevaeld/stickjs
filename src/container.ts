@@ -3,6 +3,9 @@ import {StickDependencyError} from './typings'
 import {Repository, ItemMap} from './repository'
 import {DependencyType, setActivator} from './internal'
 import * as utils from 'utilities'
+
+import {ControllerFactory} from './controller.factory'
+
 export function tryCatch(fn:Function, ctx?:any, args?:any[]): [any,Error] {
 	let result, error;
 	try {
@@ -134,7 +137,8 @@ export class Container extends DIContainer {
 	register (item:ItemMap) {
 		switch (item.type) {
 			case DependencyType.Controller:
-				this.registerTransient(item.name, item.handler);
+				let factory = new ControllerFactory(item.name,item.handler, this.createChild());
+				this.registerInstance(item.name, factory, true);
 				break;
 			case DependencyType.Service:
 				this.registerSingleton(item.name, item.handler);

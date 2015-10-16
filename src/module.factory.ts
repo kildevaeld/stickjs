@@ -65,7 +65,7 @@ export class ModuleFactory {
 			setDependencyType(DependencyType.Controller)(fn);
 			
 			let factory = new ControllerFactory(name,fn, this.container.createChild());
-			this.container.registerInstance(name, factory);
+			this.container.registerInstance(name, factory, true);
 			
 		} else {
 			throw new StickError("controller definition should be a function, function constructor or a object literal");

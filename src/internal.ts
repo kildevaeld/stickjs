@@ -26,7 +26,8 @@ export enum DependencyType {
 }
 
 export enum Metakey {
-  DependencyType
+  DependencyType,
+  Template
 }
 
 export const DIServiceConfig = "mobyjs:service:config"

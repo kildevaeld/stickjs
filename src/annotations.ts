@@ -1,35 +1,17 @@
 
-import {DependencyType, setDependencyType,DIServiceConfig} from './internal'
+import {DependencyType, setDependencyType,DIServiceConfig, Metakey} from './internal'
 import {camelcase, find} from 'utilities'
 import {Metadata} from 'di'
 import {Repository} from './repository'
 
-/*export function controller (moduleName:string, controllerName?:string): ClassDecorator {
+export function controller (controllerName?:string): ClassDecorator {
 	return function (target:Function) {
 		
 		let name = controllerName||camelcase(target.name);
-		
-		
-		Repository.add(DependencyType.Controller, )
-		
-		classtype(ClassType.Controller)(target);
-		
-		if (!metadata.has(moduleName)) {
-			metadata.set(moduleName, []);
-		}
-		
-		let types = metadata.get(moduleName);
-		
-		let exists = find(types, i => i.name === name);
-		
-		if (exists) {
-			throw new Error('controller already exists in module');
-		}
-		
-		metadata.get(moduleName).push(map);
+		Repository.add(DependencyType.Controller, name, target);
 		
 	}	
-}*/
+}
 
 export function module (moduleName?:string): ClassDecorator {
 	return function (target:Function) {
@@ -60,5 +42,11 @@ export function factory(factoryName:string): ClassDecorator {
 export function config (config:any): ClassDecorator {
 	return function (target:Function) {
 		Metadata.define(DIServiceConfig, config, target, undefined)
+	}
+}
+
+export function template (name:string): ClassDecorator {
+	return function (target:Function) {
+		Metadata.define(Metakey[Metakey.Template], name, target, undefined)	
 	}
 }

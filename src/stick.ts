@@ -7,25 +7,19 @@ import {ModuleFactory} from './module.factory'
 import {Container} from './container'
 
 import * as templ from 'templ';
- 
-export interface Stick {
 
-}
 
-export function service(name: string, definition: Function): IStick {
+export function service(name: string, definition: Function) {
 		let [fn] = getDependencies(definition);
 
 		if (fn && typeof fn === 'function') {
 		Repository.add(DependencyType.Service, name, fn);
-
 		} else {
 		throw new StickError('service should be a function');
 		}
-
-		return this
 }
 
-export function factory(name: string, factory: any | any[]): IStick {
+export function factory(name: string, factory: any | any[]) {
 
 		let [fn] = getDependencies(factory);
 
@@ -33,12 +27,25 @@ export function factory(name: string, factory: any | any[]): IStick {
 
 		Repository.add(DependencyType.Factory, name, fn);
 
-		return this;
 }
+
+const container = new Container();
 
 export function module(name: string, definition: Function | Object | any[]) {
 
-
+	if (definition == null) {
+		let factory;
+		if (container.hasHandler(name)) {
+			factory = container.get(name)
+		} else if (Repository.has(DependencyType.Module, name)) {
+			let result = Repository.get(DependencyType.Module, name);
+			factory = new ModuleFactory(name, result.handler, container.createChild());
+			container.registerInstance(name, factory);
+		} else {
+			throw new StickError(`no module named ${name}`);
+		}
+		return factory;
+	}
 
 		let [def, deps] = getDependencies(definition)
 
@@ -69,28 +76,28 @@ export function module(name: string, definition: Function | Object | any[]) {
 		}
 
 		return new ModuleFactory(name, fn, new Container())
+
 		} else {
 		throw new StickError("controller definition should be a function, function constructor or a object literal");
 		}
 
-		return this
-
+		return null;
 }
 
 export interface ComponentDefinition {
-	initialize?:() => void
-	update?:() => void
+	initialize?: () => void
+	update?: () => void
 }
 
 export interface AttributeDefinition {
-	initialize?:() => void
-	update?:() => void
+	initialize?: () => void
+	update?: () => void
 }
 
-export function component (name:string, handler:templ.vnode.ComponentConstructor|ComponentDefinition) {
+export function component(name: string, handler: templ.vnode.ComponentConstructor | ComponentDefinition) {
 	templ.component(name, <any>handler);
 }
 
-export function attribute(name:string, handler:templ.vnode.AttributeConstructor) {
+export function attribute(name: string, handler: templ.vnode.AttributeConstructor) {
 	templ.attribute(name, <any>handler);
 }

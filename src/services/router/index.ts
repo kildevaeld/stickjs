@@ -85,41 +85,6 @@ export class RouterService {
 				target.appendChild(template.render())
 			})
 			
-			/*let target: HTMLElement;
-			if (typeof options.target === 'string') {
-				target = <HTMLElement>document.querySelector(<string>options.target)	
-			} else {
-				target = <HTMLElement>options.target;
-			}
-			
-			
-			let templateResolver = <TemplateResolver>this.container.get('templateResolver');
-			
-			let controller = this.container.get(options.controller);
-			templateResolver.resolve(options.template)
-			.then( (str) => {
-				if (!str) {
-					throw new Error('template');
-				}
-				
-				let ctx = controller.ctx;
-			
-				let template = templ.compile(str, {
-					viewClass: <any>TemplateView
-				})
-			
-				let view = <any>template.view(ctx.model, {
-					container: this.container,
-					delegator: new EventDelegator(controller, ctx, this.container)
-				});
-				
-				controller.template = view
-				
-				target.appendChild(view.render())
-				
-			})	*/
-			
-			
 		}
 	}
 	
