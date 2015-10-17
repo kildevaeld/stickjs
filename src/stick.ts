@@ -1,11 +1,12 @@
-import {getDependencies, DependencyType} from './internal'
+import {getDependencies, DependencyType, setActivator} from './internal'
 import {StickError} from './typings'
 import {Repository} from './repository'
 import * as utils from 'utilities'
 
 import {ModuleFactory} from './module.factory'
-import {Container} from './container'
-
+import {Container, FactoryActivator} from './container'
+import {AttributeDefinition, ComponentDefinition} from './template/index'
+import {BaseComponent} from './template/components/base-component'
 import * as templ from 'templ';
 
 
@@ -84,18 +85,32 @@ export function module(name: string, definition: Function | Object | any[]) {
 		return null;
 }
 
-export interface ComponentDefinition {
-	initialize?: () => void
-	update?: () => void
-}
 
-export interface AttributeDefinition {
-	initialize?: () => void
-	update?: () => void
-}
+export function component(name: string, handler:ComponentDefinition|any[]) {
+	
+	let component: AttributeDefinition
+	let [c, deps] = getDependencies(handler)
+	
+	if (typeof c === 'function') {
+		component = {
+			initialize: <any>c,
+		}
+	} else if (utils.isObject(c) && typeof (<any>c).initialize === 'function') {
+		let fn = (<any>c)
+		if (deps.length) {
+			fn.initialize.inject = deps
+		} else {
+			getDependencies((<any>c).initialize);	
+		}
 
-export function component(name: string, handler: templ.vnode.ComponentConstructor | ComponentDefinition) {
-	templ.component(name, <any>handler);
+		component = c;
+	} else {
+		throw new StickError("component should be a function or an object");
+	}
+	
+	let Component = utils.inherits(<any>BaseComponent, component)
+	
+	templ.component(name, Component);
 }
 
 export function attribute(name: string, handler: templ.vnode.AttributeConstructor) {

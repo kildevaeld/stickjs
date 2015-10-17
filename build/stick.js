@@ -66,11 +66,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	__webpack_require__(1);
 
-	__webpack_require__(46);
+	__webpack_require__(47);
 
-	__webpack_require__(48);
+	__webpack_require__(49);
 
-	__webpack_require__(51);
+	__webpack_require__(52);
 
 	var _stick = __webpack_require__(2);
 
@@ -88,7 +88,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Stick = _interopRequireWildcard(_stick);
 
-	var _templateTemplateView = __webpack_require__(45);
+	var _templateTemplateView = __webpack_require__(46);
 
 	var _templ = __webpack_require__(43);
 
@@ -150,6 +150,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _moduleFactory = __webpack_require__(25);
 
 	var _container = __webpack_require__(44);
+
+	var _templateComponentsBaseComponent = __webpack_require__(45);
 
 	var _templ = __webpack_require__(43);
 
@@ -233,7 +235,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function component(name, handler) {
-	    templ.component(name, handler);
+	    var component = undefined;
+
+	    var _getDependencies5 = (0, _internal.getDependencies)(handler);
+
+	    var _getDependencies52 = _slicedToArray(_getDependencies5, 2);
+
+	    var c = _getDependencies52[0];
+	    var deps = _getDependencies52[1];
+
+	    if (typeof c === 'function') {
+	        component = {
+	            initialize: c
+	        };
+	    } else if (utils.isObject(c) && typeof c.initialize === 'function') {
+	        var fn = c;
+	        if (deps.length) {
+	            fn.initialize.inject = deps;
+	        } else {
+	            (0, _internal.getDependencies)(c.initialize);
+	        }
+	        component = c;
+	    } else {
+	        throw new _typings.StickError("component should be a function or an object");
+	    }
+	    var Component = utils.inherits(_templateComponentsBaseComponent.BaseComponent, component);
+	    templ.component(name, Component);
 	}
 
 	function attribute(name, handler) {
@@ -251,6 +278,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.getFunctionParameters = getFunctionParameters;
 	exports.getDependencies = getDependencies;
+	exports.resolveDependencies = resolveDependencies;
 	exports.setDependencyType = setDependencyType;
 	exports.getDependencyType = getDependencyType;
 	exports.isDependencyType = isDependencyType;
@@ -305,6 +333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function getDependencies(fn) {
 	    var dependencies = undefined;
 	    if (fn.constructor === Array) {
+	        // TODO: Check for function
 	        var tmp = fn.pop();
 	        dependencies = fn;
 	        fn = tmp;
@@ -325,6 +354,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return [fn, null];
 	    }
 	    return [fn, dependencies];
+	}
+
+	function tryCatch(fn) {
+	    var val = undefined,
+	        err = undefined;
+	    try {
+	        val = fn();
+	    } catch (e) {
+	        err = e;
+	    }
+	    return [val, err];
+	}
+
+	function resolveDependencies(target, container) {
+	    var i = undefined,
+	        ii = undefined,
+	        ret = undefined,
+	        inject = target.inject;
+	    if (!inject) {
+	        return utils.Promise.resolve([]);
+	    }
+	    for (i = 0, ii = inject.length; i < ii; i++) {
+	        ret = tryCatch(function () {
+	            return container.get(inject[i]);
+	        });
+	        if (ret[1] != null) return utils.Promise.reject(ret[1]);
+	        inject[i] = ret[0];
+	    }
+	    return utils.Promise.all(inject);
 	}
 
 	function setDependencyType(type) {
@@ -2501,6 +2559,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 23 */
 /***/ function(module, exports) {
 
+	/// <reference path="../node_modules/templ/templ" />
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
@@ -7517,6 +7576,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.tryCatch = tryCatch;
 
+	function _interopExportWildcard(obj, defaults) { var newObj = defaults({}, obj); delete newObj['default']; return newObj; }
+
+	function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
@@ -7536,6 +7599,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils = _interopRequireWildcard(_utilities);
 
 	var _controllerFactory = __webpack_require__(42);
+
+	_defaults(exports, _interopExportWildcard(_di, _defaults));
 
 	function tryCatch(fn, ctx, args) {
 	    var result = undefined,
@@ -7739,6 +7804,82 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var _utilities = __webpack_require__(4);
+
+	var _templ = __webpack_require__(43);
+
+	var templ = _interopRequireWildcard(_templ);
+
+	var _internal = __webpack_require__(3);
+
+	var vnode = templ.vnode;
+
+	var BaseComponent = (function () {
+	    function BaseComponent(section, vvnode, attributes, view) {
+	        var _this = this;
+
+	        _classCallCheck(this, BaseComponent);
+
+	        this.section = section;
+	        this.vnode = vvnode;
+	        this.attributes = attributes;
+	        this.view = view;
+	        this.document = view.template.options.document;
+	        if (vvnode.childNodes) this.childTemplate = vnode.template(vnode.fragment(vvnode.childNodes), view.template.options);
+	        for (var key in attributes) this.setAttribute(key, attributes[key]);
+	        var container = this.view._container;
+	        console.log(container);
+	        (0, _internal.resolveDependencies)(this.initialize, container).then(function (deps) {
+	            (0, _utilities.callFunc)(_this.initialize, _this, deps);
+	        })['catch'](function (e) {
+	            throw e;
+	        });
+	    }
+
+	    _createClass(BaseComponent, [{
+	        key: 'initialize',
+	        value: function initialize() {}
+	    }, {
+	        key: 'setAttribute',
+	        value: function setAttribute(key, value) {
+	            this.attributes[key] = value;
+	        }
+	    }, {
+	        key: 'removeAttribute',
+	        value: function removeAttribute(key) {
+	            this.attributes[key] = void 0;
+	        }
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	            var a = this;
+	            if (typeof a.onDestroy === 'funciton') {
+	                a.onDestroy();
+	            }
+	        }
+	    }]);
+
+	    return BaseComponent;
+	})();
+
+	exports.BaseComponent = BaseComponent;
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/// <reference path="../typings" />
 	'use strict';
 
@@ -7876,7 +8017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.TemplateView = TemplateView;
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7889,7 +8030,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var _annotations = __webpack_require__(47);
+	var _annotations = __webpack_require__(48);
 
 	var _utilities = __webpack_require__(4);
 
@@ -7943,7 +8084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.HttpService = HttpService = __decorate([(0, _annotations.service)('$http')], HttpService);
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8006,7 +8147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8021,13 +8162,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var _router = __webpack_require__(49);
+	var _router = __webpack_require__(50);
 
 	var _utilities = __webpack_require__(4);
 
 	var utils = _interopRequireWildcard(_utilities);
 
-	var _annotations = __webpack_require__(47);
+	var _annotations = __webpack_require__(48);
 
 	var _di = __webpack_require__(13);
 
@@ -8125,7 +8266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.RouterService = RouterService = __decorate([(0, _di.inject)('$context', '$container'), (0, _annotations.service)('$router')], RouterService);
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8142,7 +8283,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var _history = __webpack_require__(50);
+	var _history = __webpack_require__(51);
 
 	var _eventsjs = __webpack_require__(40);
 
@@ -8251,7 +8392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Router = Router;
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8484,7 +8625,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.HistoryApi = HistoryApi;
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8499,16 +8640,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _stick = __webpack_require__(2);
 
-	var _componentsController = __webpack_require__(52);
+	var _componentsController = __webpack_require__(53);
 
-	var _templateView = __webpack_require__(45);
+	var _templateView = __webpack_require__(46);
 
 	_defaults(exports, _interopExportWildcard(_templateView, _defaults));
 
-	(0, _stick.component)('controller', _componentsController.ControllerComponent);
+	(0, _stick.component)('controller', ['$container', _componentsController.Controller]);
+
+	var _componentsBaseComponent = __webpack_require__(45);
+
+	_defaults(exports, _interopExportWildcard(_componentsBaseComponent, _defaults));
 
 /***/ },
-/* 52 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../typings" />
@@ -8518,65 +8663,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var _templ = __webpack_require__(43);
-
 	var _controllerFactory = __webpack_require__(42);
 
-	var ControllerComponent = (function (_components$BaseComponent) {
-	    _inherits(ControllerComponent, _components$BaseComponent);
+	var Controller = {
+	    initialize: function initialize($container) {
+	        var _this = this;
 
-	    function ControllerComponent() {
-	        _classCallCheck(this, ControllerComponent);
-
-	        _get(Object.getPrototypeOf(ControllerComponent.prototype), 'constructor', this).apply(this, arguments);
-	    }
-
-	    _createClass(ControllerComponent, [{
-	        key: 'initialize',
-	        value: function initialize() {
-	            var _this = this;
-
-	            this.container = this.view._container;
-	            if (this.attributes['name']) {
-	                this.name = this.attributes['name'];
-	                this.as = this.attributes['as'] || this.name;
-	            }
-	            this.factory = this.view._container.get(this.name);
-	            if (!(this.factory instanceof _controllerFactory.ControllerFactory)) {
-	                throw new Error(this.name + ' is not a controller');
-	            }
-	            var template = this.childTemplate;
-	            if (this.attributes['template']) {
-	                template = this.attributes['template'];
-	            }
-	            this.factory.create({
-	                template: template
-	            }).then(function (controller) {
-	                var template = _this.factory.container.get('template');
-	                _this.section.appendChild(template.render());
-	            });
+	        if (this.attributes['name']) {
+	            this.name = this.attributes['name'];
+	            this.as = this.attributes['as'] || this.name;
 	        }
-	    }, {
-	        key: 'destroy',
-	        value: function destroy() {
-	            _get(Object.getPrototypeOf(ControllerComponent.prototype), 'destroy', this).call(this);
+	        this.factory = $container.get(this.name);
+	        if (!(this.factory instanceof _controllerFactory.ControllerFactory)) {
+	            throw new Error(this.name + ' is not a controller');
+	        }
+	        var template = this.childTemplate;
+	        if (this.attributes['template']) {
+	            template = this.attributes['template'];
+	        }
+	        this.factory.create({
+	            template: template
+	        }).then(function (controller) {
+	            var template = _this.factory.container.get('template');
+	            _this.section.appendChild(template.render());
+	        });
+	    },
+	    onDestroy: function onDestroy() {
+	        if (this.factory) {
 	            this.factory.destroy();
-	            this.factory = void 0;
 	        }
-	    }]);
+	    }
+	};
+	exports.Controller = Controller;
+	/*export class ControllerComponent extends BaseComponent {
+	    container: DIContainer
+	    as: string
+	    name: string
+	    factory: ControllerFactory
+	    constructor(section:templ.vnode.Section, vvnode:templ.vnode.VNode, attributes:templ.vnode.AttributeMap, view:templ.vnode.IView) {
+	        super(section, vvnode, attributes, view)
+	        
+	        this.container = (<any>this.view)._container
+	        if (this.attributes['name']) {
+	            this.name = this.attributes['name']
+	            this.as = this.attributes['as'] || this.name
+	        }
+	        
+	        
+	        this.factory = (<any>this.view)._container.get(this.name);
+	        
+	        if (!(this.factory instanceof ControllerFactory)) {
+	            throw new Error(this.name + ' is not a controller');
+	        }
+	        
+	        let template:string|templ.vnode.Template = this.childTemplate
+	        if (this.attributes['template']) {
+	            template = this.attributes['template'];
+	        }
+	        
+	        this.factory.create({
+	            template: template
+	        }).then( controller => {
+	            let template = this.factory.container.get('template');
+	            this.section.appendChild(template.render());
+	        });
+	        
+	    }
+	    
+	    destroy () {
+	        
+	        super.destroy();
+	        this.factory.destroy();
+	        this.factory = void 0
+	    }
+	    
 
-	    return ControllerComponent;
-	})(_templ.components.BaseComponent);
-
-	exports.ControllerComponent = ControllerComponent;
+	}*/
 
 /***/ }
 /******/ ])

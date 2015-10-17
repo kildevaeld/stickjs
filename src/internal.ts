@@ -1,6 +1,6 @@
 
 import * as utils from 'utilities'
-import {Metadata} from 'di'
+import {Metadata, DIContainer} from 'di'
 
 const paramRegEx = /function[^(]*\(([^)]*)\)/i
 
@@ -36,6 +36,7 @@ export function getDependencies (fn:Function|Object|any[]): [Function, any[]] {
   let dependencies: any[];
  
   if (fn.constructor === Array) {
+    // TODO: Check for function
     let tmp = (<any[]>fn).pop()
     dependencies = <any>fn;
     fn = tmp;
@@ -61,6 +62,38 @@ export function getDependencies (fn:Function|Object|any[]): [Function, any[]] {
   }
   
   return [<Function>fn, dependencies];
+}
+
+function tryCatch (fn:() => any): [any, Error] {
+  let val, err
+  try {
+   val = fn();
+  } catch (e) {
+    err = e;
+  }
+  return [val, err];
+}
+
+export function resolveDependencies(target:Function, container:DIContainer): utils.IPromise<any[]> {
+  
+  let i, ii, ret, inject = (<any>target).inject
+  
+  if (!inject) {
+    return utils.Promise.resolve([]);
+  }
+  
+  for (i=0,ii=inject.length;i<ii;i++) {
+    
+    ret = tryCatch(() => {
+      return container.get(inject[i]);
+    })
+    
+    if (ret[1] != null) return utils.Promise.reject(ret[1]);
+    inject[i] = ret[0];
+  }
+  
+  return utils.Promise.all(inject)
+  
 }
 
 export function setDependencyType(type: DependencyType): ClassDecorator {

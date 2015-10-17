@@ -1,3 +1,5 @@
+import * as utils from 'utilities';
+import { DIContainer } from 'di';
 export declare function getFunctionParameters(fn: Function, cache?: boolean): string[];
 export declare enum DependencyType {
     Service = 0,
@@ -11,6 +13,7 @@ export declare enum Metakey {
 }
 export declare const DIServiceConfig: string;
 export declare function getDependencies(fn: Function | Object | any[]): [Function, any[]];
+export declare function resolveDependencies(target: Function, container: DIContainer): utils.IPromise<any[]>;
 export declare function setDependencyType(type: DependencyType): ClassDecorator;
 export declare function getDependencyType(target: Function): DependencyType;
 export declare function isDependencyType(target: Function, type: DependencyType): boolean;

@@ -6,6 +6,8 @@ import * as utils from 'utilities'
 
 import {ControllerFactory} from './controller.factory'
 
+export * from 'di'
+
 export function tryCatch(fn:Function, ctx?:any, args?:any[]): [any,Error] {
 	let result, error;
 	try {

@@ -33,6 +33,7 @@
     "src/services/router/router.ts",
     "src/template/index.ts",
     "src/template/template.view.ts",
+    "src/template/components/base-component.ts",
     "src/template/components/controller.ts"
   ]
 }
