@@ -87,7 +87,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _collection = __webpack_require__(29);
 
-	_defaults(exports, _interopExportWildcard(_collection, _defaults));
+	Object.defineProperty(exports, 'Collection', {
+	  enumerable: true,
+	  get: function get() {
+	    return _collection.Collection;
+	  }
+	});
+	Object.defineProperty(exports, 'NestedModel', {
+	  enumerable: true,
+	  get: function get() {
+	    return _collection.NestedModel;
+	  }
+	});
 
 /***/ },
 /* 1 */
@@ -7993,6 +8004,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _di = __webpack_require__(13);
 
 	var _repository = __webpack_require__(24);
+
+	Object.defineProperty(exports, 'inject', {
+	    enumerable: true,
+	    get: function get() {
+	        return _di.inject;
+	    }
+	});
 
 	function controller(controllerName) {
 	    return function (target) {

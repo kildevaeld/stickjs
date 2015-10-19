@@ -8,4 +8,4 @@ import * as cols from 'collection'
 export const utils = u
 export * from './stick'
 
-export * from 'collection'
+export {Collection, NestedModel} from 'collection'

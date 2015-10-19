@@ -1,3 +1,4 @@
+export { inject } from 'di';
 export declare function controller(controllerName?: string): ClassDecorator;
 export declare function module(moduleName?: string): ClassDecorator;
 export declare function service(serviceName?: string, moduleName?: string): ClassDecorator;
