@@ -39,5 +39,15 @@
     "should": "^7.1.0",
     "sinon": "^1.17.1",
     "webpack": "^1.12.2"
+  },
+  "jspm": {
+    "main": "build/stick.js",
+    "dependencies": {
+      "collection": "github:kildevaeld/collectionjs.git",
+      "di": "github:kildevaeld/dijs.git",
+      "eventsjs": "github:kildevaeld/eventsjs.git",
+      "templ": "github:kildevaeld/templ.git",
+      "utilities": "github:kildevaeld/utilitiesjs.git"
+    }
   }
 }
