@@ -250,6 +250,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            if (!deps || deps.length == 0) {
 	                (0, _internal.getDependencies)(fn);
+	            } else {
+	                fn.inject = deps;
 	            }
 	            utils.assign(fn.prototype, copy);
 	        } else if (typeof def === 'function') {
