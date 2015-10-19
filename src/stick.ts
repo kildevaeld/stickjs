@@ -8,7 +8,9 @@ import {Container, FactoryActivator} from './container'
 import {AttributeDefinition, ComponentDefinition} from './template/index'
 import {BaseComponent} from './template/components/base-component'
 import * as templ from 'templ';
+import * as annotations from './annotations'
 
+export const decorators = annotations
 
 export function service(name: string, definition: Function) {
 		let [fn] = getDependencies(definition);

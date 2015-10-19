@@ -1,5 +1,7 @@
 import { ComponentDefinition } from './template/index';
 import * as templ from 'templ';
+import * as annotations from './annotations';
+export declare const decorators: typeof annotations;
 export declare function service(name: string, definition: Function): void;
 export declare function factory(name: string, factory: any | any[]): void;
 export declare function module(name: string, definition: Function | Object | any[]): any;
