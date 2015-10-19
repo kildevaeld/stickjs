@@ -66,6 +66,8 @@ export function module(name: string, definition: Function | Object | any[]) {
 
 			if (!deps || deps.length == 0) {
 				getDependencies(fn);
+			} else {
+				fn.inject = deps;
 			}
 
 			utils.assign(fn.prototype, copy);
@@ -89,10 +91,10 @@ export function module(name: string, definition: Function | Object | any[]) {
 
 
 export function component(name: string, handler:ComponentDefinition|any[]) {
-	
+
 	let component: AttributeDefinition
 	let [c, deps] = getDependencies(handler)
-	
+
 	if (typeof c === 'function') {
 		component = {
 			initialize: <any>c,
@@ -102,16 +104,16 @@ export function component(name: string, handler:ComponentDefinition|any[]) {
 		if (deps.length) {
 			fn.initialize.inject = deps
 		} else {
-			getDependencies((<any>c).initialize);	
+			getDependencies((<any>c).initialize);
 		}
 
 		component = c;
 	} else {
 		throw new StickError("component should be a function or an object");
 	}
-	
+
 	let Component = utils.inherits(<any>BaseComponent, component)
-	
+
 	templ.component(name, Component);
 }
 
