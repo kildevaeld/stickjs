@@ -85,6 +85,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	_defaults(exports, _interopExportWildcard(_stick, _defaults));
 
+	var _collection = __webpack_require__(29);
+
+	_defaults(exports, _interopExportWildcard(_collection, _defaults));
+
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
