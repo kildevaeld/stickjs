@@ -120,3 +120,10 @@ export function component(name: string, handler:ComponentDefinition|any[]) {
 export function attribute(name: string, handler: templ.vnode.AttributeConstructor) {
 	templ.attribute(name, <any>handler);
 }
+
+export function decorator(name: string, decorator:any) {
+	if (utils.has(decorators, name)) {
+		throw new Error(`decorator called ${name} already defined!`);
+	}
+	decorators[name] = decorator;
+}

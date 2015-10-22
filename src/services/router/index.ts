@@ -39,8 +39,6 @@ export class RouterService {
 			this.router.route(route, this.__handleController(<RouteOptions>handler));
 		}
 		
-		
-		
 		return this
 	}
 	
