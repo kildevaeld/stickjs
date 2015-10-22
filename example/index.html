@@ -18,6 +18,9 @@
 			{{title}} {{count}}
 			<button onclick="{{count = count + 1}}">click</button>
 			<fa name="amazon"></fa>
+			<repeat each="{{items}}" as="item">
+				<li>{{item.name}}</li>
+			</repeat>
 			<ul class="menu">
 				<li><a href="#page1">page 1</a>
 				<li><a href="#page2">page 2</a>
@@ -62,6 +65,10 @@
 				//$router.route('hello', function () {
 					//$context.title = 'Hey joe'
 				//})//
+				
+				$context.items = [{
+					name: "test"
+				}];
 				console.log(stick)
 				$context.$subscribe('event', function (a) {
 					console.log('hello', a)

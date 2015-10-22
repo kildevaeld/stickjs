@@ -24,7 +24,7 @@ export class BaseComponent implements templ.vnode.Component {
   		for (var key in attributes) this.setAttribute(key, attributes[key]);
 
 			let container = (<TemplateView>this.view)._container
-			console.log(container)
+			
 			resolveDependencies(this.initialize, container)
 			.then(deps => {
 				callFunc(this.initialize, this, deps);
