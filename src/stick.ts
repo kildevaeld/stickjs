@@ -101,7 +101,7 @@ export function component(name: string, handler:ComponentDefinition|any[]) {
 		}
 	} else if (utils.isObject(c) && typeof (<any>c).initialize === 'function') {
 		let fn = (<any>c)
-		if (deps.length) {
+		if (deps && deps.length) {
 			fn.initialize.inject = deps
 		} else {
 			getDependencies((<any>c).initialize);

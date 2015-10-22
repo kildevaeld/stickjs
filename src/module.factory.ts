@@ -8,6 +8,7 @@ import {getContext, IContext} from './context'
 
 import {TemplateCreator} from './services/template'
 import {ControllerFactory} from './controller.factory'
+import {Observer} from './observer'
 
 export type ControllerDefinition = FunctionConstructor|Object|any[];
 
@@ -118,8 +119,13 @@ export class ModuleFactory {
 		
 		if (options.el) {
 			
+			// Add mutation observer
+			let observer = new Observer()
+			this.container.registerInstance('$observer', observer, true);
+	
+			// Instatiate template	
 			let $template: TemplateCreator = this.container.get('$templateCreator');
-			
+		
 			let templateString = options.el.innerHTML;
 			this.factory('template', ['$context', (ctx) => {
 				return $template(templateString, (<any>ctx).__model)

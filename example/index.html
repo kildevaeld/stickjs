@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 		<script src="../build/stick.js"></script>
 			
 	</head>
 	<body>
+		
 		<script id="page1" type="text/template">
 			<h1>page 1: {{title}}</h1>
 		</script>
@@ -15,6 +17,7 @@
 		<div id="app">
 			{{title}} {{count}}
 			<button onclick="{{count = count + 1}}">click</button>
+			<fa name="amazon"></fa>
 			<ul class="menu">
 				<li><a href="#page1">page 1</a>
 				<li><a href="#page2">page 2</a>
@@ -30,6 +33,28 @@
 		<script>
 			'use strict';
 			console.log(stick)
+			
+			stick.component('fa', {
+				initialize: function ($observer) {
+					
+				
+					var i = document.createElement('i');
+					this.section.appendChild(i)
+					i.classList.add('fa')
+					
+					
+					
+					if (this.attributes.name) {
+						i.classList.add("fa-" + this.attributes.name);
+					}
+					
+					$observer.observe(i, function () {
+						console.log(this)
+						i.classList.remove('fa-'  + this.attributes.name);
+						i.classList.add('fa-' + i.getAttribute('name'))
+					}.bind(this))
+				}
+			})
 			
 			var factory = stick.module('app', ['$context', '$router', function ($context, $router) {
 				$context.title = "Hey hoe"
@@ -64,6 +89,8 @@
 				$context.$publish('event', {name:'test'})
 			}).controller('page2', function ($context) {
 				$context.title = 'li li li'
+				var i = document.querySelector('i');
+				i.setAttribute('name', 'check')
 			});
 			factory.create({
 				el: document.querySelector('#app')

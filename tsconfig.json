@@ -18,6 +18,7 @@
     "src/index.ts",
     "src/internal.ts",
     "src/module.factory.ts",
+    "src/observer.ts",
     "src/repository.ts",
     "src/stick.ts",
     "src/typings.ts",
