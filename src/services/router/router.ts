@@ -26,25 +26,25 @@ export interface RouterOptions {
 
 export class Router extends EventEmitter  {
 	options: RouterOptions
-	history: HistoryApi
+	public history: HistoryApi
 	constructor (options:RouterOptions = {}) {
     super()
-		this.history = new HistoryApi()
+    this.history = new HistoryApi();
     this.options = options
 	}
-	
-	
+
+
 	route (route:RegExp|string, name:RouteHandler|string, handler: RouteHandler = null): Router {
 		if (!isRegExp(route)) route = this._routeToRegExp(<string>route);
       if (typeof name === 'function') {
         handler = <RouteHandler>name;
         name = '';
       }
-			
+
 			if (!handler) {
 				throw new Error('router: no handler');
 			}
-      
+
       this.history.route(route, (fragment) => {
         var args = this._extractParameters(<RegExp>route, fragment);
         this.execute(handler, args);
@@ -53,10 +53,10 @@ export class Router extends EventEmitter  {
         //this.history.trigger('route', this, name, args);
       });
       return this;
-		
+
 		return this
 	}
-  
+
   // Execute a route handler with the provided parameters.  This is an
   // excellent place to do pre-route setup or post-route cleanup.
   execute (callback:RouteHandler, args:any[]) {
@@ -74,8 +74,8 @@ export class Router extends EventEmitter  {
     this.history.navigate(fragment, options);
     return this;
   }
-	
-	
+
+
 	// Convert a route string into a regular expression, suitable for matching
   // against the current location hash.
   private _routeToRegExp (route:string): RegExp {
@@ -98,5 +98,10 @@ export class Router extends EventEmitter  {
       if (i === params.length - 1) return param || null;
       return param ? decodeURIComponent(param) : null;
     });
+  }
+
+  $destroy () {
+    super.destroy()
+    this.history.off()
   }
 }

@@ -15,7 +15,7 @@ export function tryCatch(fn:Function, ctx?:any, args?:any[]): [any,Error] {
 	} catch (e) {
 		error = e
 	}
-	
+
 	return [result, error];
 }
 
@@ -27,9 +27,17 @@ export class Container extends DIContainer {
 		this.__instances = new Map<any, any>()
 
 	}
-	
+
+
 	hasInstance (key:any): boolean {
 		return this.__instances.has(key);
+	}
+
+	hasHandler(name:string, parent?:boolean, repository?:boolean): boolean {
+		let has = super.hasHandler(name, parent)
+
+    return (!has && repository) ? Repository.hasAny(name) : has;
+
 	}
 
 	get(key: any, targetKey?:string) : any {
@@ -57,15 +65,15 @@ export class Container extends DIContainer {
     if(this.parent && this.parent.hasHandler(key)){
       return this.parent.get(key, targetKey)
     }
-		
+
 		entry = Repository.any(key);
-		
+
 		if (entry != null) {
 			this.register(entry);
 			return this.entries.get(key)[0](this);
 		}
-		
-		
+
+
 
     // No point in registrering a string
     if (typeof key === 'string') {
@@ -74,7 +82,7 @@ export class Container extends DIContainer {
 
     this.autoRegister(key, targetKey);
     entry = this.entries.get(key);
-	
+
     return entry[0](this);
   }
 
@@ -94,30 +102,30 @@ export class Container extends DIContainer {
 			}
 		})
 	}
-	
+
 	registerInstance(key: any, instance: any, track:boolean = false) {
-		
+
 		super.registerInstance(key, instance);
 		if (track) {
 			this.__instances.set(key, instance);
 		}
-		
+
 	}
-	
+
 	clear () {
 		for (let key of this.__instances.keys()) {
-				this.destroy(key);	
+				this.destroy(key);
 			}
 	}
 
 	destroy(key: any = null, fn: (arg: any) => void = null) {
 		if (key == null) {
 			for (let key of this.__instances.keys()) {
-				this.destroy(key, fn);	
+				this.destroy(key, fn);
 			}
 			delete this.constructionInfo
 			//this.entries
-			
+
 			return
 		}
 
@@ -135,7 +143,7 @@ export class Container extends DIContainer {
 			console.log('could not find key ', key)
 		}
 	}
-	
+
 	register (item:ItemMap) {
 		switch (item.type) {
 			case DependencyType.Controller:
@@ -150,13 +158,13 @@ export class Container extends DIContainer {
 					setActivator(item.handler, FactoryActivator.instance);
 					this.registerSingleton(item.name, item.handler);
 				} else {
-					this.registerInstance(item.name, item.handler);	
+					this.registerInstance(item.name, item.handler);
 				}
-				
+
 				break;
 		}
 	}
-	
+
 	createChild () : Container {
 		let child = new Container();
 		child.parent = this;

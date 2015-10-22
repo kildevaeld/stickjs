@@ -41,13 +41,6 @@
     "webpack": "^1.12.2"
   },
   "jspm": {
-    "main": "build/stick.js",
-    "dependencies": {
-      "collection": "github:kildevaeld/collectionjs",
-      "di": "github:kildevaeld/dijs",
-      "eventsjs": "github:kildevaeld/eventsjs",
-      "templ": "github:kildevaeld/templ",
-      "utilities": "github:kildevaeld/utilitiesjs"
-    }
+    "main": "build/stick.js"
   }
 }

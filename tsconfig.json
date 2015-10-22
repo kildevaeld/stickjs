@@ -6,7 +6,8 @@
     "outDir": "lib",
     "rootDir": "src",
     "sourceMap": false,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "removeComments": false
   },
   "exclude": [
     "node_modules"

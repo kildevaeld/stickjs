@@ -12,7 +12,18 @@ export declare class RouterService {
     context: IContext;
     container: Container;
     _currentController: ControllerFactory;
+    /**
+     * @param {IContext} ctx
+     * @param {Container} container
+     * @constructor RouterService
+     */
     constructor(ctx: IContext, container: Container);
+    else(handler: RouteHandler | RouteOptions): void;
+    /**
+     * @param  {string|RegExp} route
+     * @param  {RouteHandler|RouteOptions} handler
+     * @return {RouterService} RouterService
+     */
     route(route: string | RegExp, handler: RouteHandler | RouteOptions): RouterService;
     private __execute(callback, args);
     private __handleController(options);

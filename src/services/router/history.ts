@@ -122,7 +122,6 @@ export class HistoryApi extends EventEmitter {
 		// Add a route to be tested when the fragment changes. Routes added later
 		// may override previous routes.
 		route (route, callback) {
-
 			this.handlers.unshift({route: route, callback: callback});
 		}
 
@@ -132,7 +131,9 @@ export class HistoryApi extends EventEmitter {
 			var current = this.getFragment();
 
 			if (current === this.fragment) return false;
-			this.loadUrl();
+			if (!this.loadUrl()) {
+        this.trigger('route:unmatched');
+			}
 		}
 
 		// Attempt to load the current URL fragment. If a route succeeds with a
@@ -140,16 +141,16 @@ export class HistoryApi extends EventEmitter {
 		// returns `false`.
 		loadUrl (fragment?:string) {
 			fragment = this.fragment = this.getFragment(fragment);
-		
+
 			return this.handlers.some(function(handler) {
-				
+
 				if (handler.route.test(fragment)) {
 					handler.callback(fragment);
 					return true;
 				}
 			});
 		}
-		
+
 		// Save a fragment into the hash history, or replace the URL state if the
 		// 'replace' option is passed. You are responsible for properly URL-encoding
 		// the fragment in advance.

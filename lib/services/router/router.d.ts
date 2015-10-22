@@ -15,4 +15,5 @@ export declare class Router extends EventEmitter {
     navigate(fragment: any, options: any): Router;
     private _routeToRegExp(route);
     private _extractParameters(route, fragment);
+    $destroy(): void;
 }
