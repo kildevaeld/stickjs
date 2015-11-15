@@ -38,8 +38,10 @@ export function module(name: string, definition: Function | Object | any[]) {
 
 	if (definition == null) {
 		let factory;
+		// Check if module already is defined
 		if (container.hasHandler(name)) {
 			factory = container.get(name)
+		// Check if the module is in the repository
 		} else if (Repository.has(DependencyType.Module, name)) {
 			let result = Repository.get(DependencyType.Module, name);
 			factory = new ModuleFactory(name, result.handler, container.createChild());
@@ -50,9 +52,9 @@ export function module(name: string, definition: Function | Object | any[]) {
 		return factory;
 	}
 
-		let [def, deps] = getDependencies(definition)
+	let [def, deps] = getDependencies(definition)
 
-		if (def) {
+	if (def) {
 		let fn
 		if (typeof def !== 'function' && utils.isObject(def)) {
 			let copy = utils.extend({}, def);
@@ -80,17 +82,18 @@ export function module(name: string, definition: Function | Object | any[]) {
 			throw new StickError('controller defition should be a function or an object literal')
 		}
 
-		return new ModuleFactory(name, fn, new Container())
+		let factory = new ModuleFactory(name, fn, container.createChild()) 
+		container.registerInstance(name, factory, true);
+		return factory
+		
+	} else {
+		throw new StickError('controller defition should be a function or an object literal')	
+	}
 
-		} else {
-		throw new StickError("controller definition should be a function, function constructor or a object literal");
-		}
-
-		return null;
 }
 
 
-export function component(name: string, handler:ComponentDefinition|any[]) {
+export function component(name: string, handler: ComponentDefinition | any[]) {
 
 	let component: AttributeDefinition
 	let [c, deps] = getDependencies(handler)
@@ -121,7 +124,7 @@ export function attribute(name: string, handler: templ.vnode.AttributeConstructo
 	templ.attribute(name, <any>handler);
 }
 
-export function decorator(name: string, decorator:any) {
+export function decorator(name: string, decorator: any) {
 	if (utils.has(decorators, name)) {
 		throw new Error(`decorator called ${name} already defined!`);
 	}

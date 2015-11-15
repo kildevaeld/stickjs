@@ -3222,11 +3222,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = (function () {
+	    function defineProperties(target, props) {
+	        for (var i = 0; i < props.length; i++) {
+	            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+	        }
+	    }return function (Constructor, protoProps, staticProps) {
+	        if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	    };
+	})();
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+	function _interopRequireWildcard(obj) {
+	    if (obj && obj.__esModule) {
+	        return obj;
+	    } else {
+	        var newObj = {};if (obj != null) {
+	            for (var key in obj) {
+	                if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	            }
+	        }newObj['default'] = obj;return newObj;
+	    }
+	}
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	function _classCallCheck(instance, Constructor) {
+	    if (!(instance instanceof Constructor)) {
+	        throw new TypeError('Cannot call a class as a function');
+	    }
+	}
 
 	var _utilities = __webpack_require__(6);
 
@@ -6197,6 +6219,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _module(name, definition) {
 	    if (definition == null) {
 	        var _factory = undefined;
+	        // Check if module already is defined
 	        if (container.hasHandler(name)) {
 	            _factory = container.get(name);
 	        } else if (_repository.Repository.has(_internal.DependencyType.Module, name)) {
@@ -6239,11 +6262,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (typeof fn !== 'function') {
 	            throw new _typings.StickError('controller defition should be a function or an object literal');
 	        }
-	        return new _moduleFactory.ModuleFactory(name, fn, new _container.Container());
+	        var _factory2 = new _moduleFactory.ModuleFactory(name, fn, container.createChild());
+	        container.registerInstance(name, _factory2, true);
+	        return _factory2;
 	    } else {
-	        throw new _typings.StickError("controller definition should be a function, function constructor or a object literal");
+	        throw new _typings.StickError('controller defition should be a function or an object literal');
 	    }
-	    return null;
 	}
 
 	function component(name, handler) {
@@ -8268,21 +8292,73 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = (function () {
+	    function defineProperties(target, props) {
+	        for (var i = 0; i < props.length; i++) {
+	            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+	        }
+	    }return function (Constructor, protoProps, staticProps) {
+	        if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	    };
+	})();
 
-	var _get = function get(_x5, _x6, _x7) { var _again = true; _function: while (_again) { var object = _x5, property = _x6, receiver = _x7; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x5 = parent; _x6 = property; _x7 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	var _get = function get(_x5, _x6, _x7) {
+	    var _again = true;_function: while (_again) {
+	        var object = _x5,
+	            property = _x6,
+	            receiver = _x7;desc = parent = getter = undefined;_again = false;if (object === null) object = Function.prototype;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+	            var parent = Object.getPrototypeOf(object);if (parent === null) {
+	                return undefined;
+	            } else {
+	                _x5 = parent;_x6 = property;_x7 = receiver;_again = true;continue _function;
+	            }
+	        } else if ('value' in desc) {
+	            return desc.value;
+	        } else {
+	            var getter = desc.get;if (getter === undefined) {
+	                return undefined;
+	            }return getter.call(receiver);
+	        }
+	    }
+	};
 
 	exports.tryCatch = tryCatch;
 
-	function _interopExportWildcard(obj, defaults) { var newObj = defaults({}, obj); delete newObj['default']; return newObj; }
+	function _interopExportWildcard(obj, defaults) {
+	    var newObj = defaults({}, obj);delete newObj['default'];return newObj;
+	}
 
-	function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+	function _defaults(obj, defaults) {
+	    var keys = Object.getOwnPropertyNames(defaults);for (var i = 0; i < keys.length; i++) {
+	        var key = keys[i];var value = Object.getOwnPropertyDescriptor(defaults, key);if (value && value.configurable && obj[key] === undefined) {
+	            Object.defineProperty(obj, key, value);
+	        }
+	    }return obj;
+	}
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+	function _interopRequireWildcard(obj) {
+	    if (obj && obj.__esModule) {
+	        return obj;
+	    } else {
+	        var newObj = {};if (obj != null) {
+	            for (var key in obj) {
+	                if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	            }
+	        }newObj['default'] = obj;return newObj;
+	    }
+	}
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	function _classCallCheck(instance, Constructor) {
+	    if (!(instance instanceof Constructor)) {
+	        throw new TypeError('Cannot call a class as a function');
+	    }
+	}
 
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) {
+	    if (typeof superClass !== 'function' && superClass !== null) {
+	        throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+	    }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+	}
 
 	var _di = __webpack_require__(17);
 
