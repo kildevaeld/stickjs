@@ -17,6 +17,7 @@ export const Repeat: ComponentDefinition = {
 
 	update() {
     this._children = this._children || [];
+    this._collection = this._collection ||  [];
 		var as = this['as'];
    	var each = this['each'];
     var key = this['key'] || "key";
@@ -25,7 +26,7 @@ export const Repeat: ComponentDefinition = {
     var self = this;
     var parent = this.view;
 
-		if ((each === this._collection || !each) && this._collection.length > 0) {
+		if (each === this._collection || !each) {
 			return
 		}
 
@@ -56,6 +57,7 @@ export const Repeat: ComponentDefinition = {
 		var delegateID = uniqueId('.repeat')
 
 		var self = this
+
 
 		this._collection.forEach(function (m: IModel) {
 
