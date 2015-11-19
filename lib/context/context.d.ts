@@ -13,6 +13,7 @@ export declare abstract class Context implements IContext {
     };
     constructor();
     $root: IContext;
+    $parent: IContext;
     $call(fn: Function, ctx?: any, args?: any[]): any;
     $subscribe(event: string, handler: ISubscriber): IContext;
     $unsubscribe(event: string, handler: ISubscriber): IContext;

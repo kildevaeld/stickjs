@@ -8,6 +8,7 @@ import {service} from '../../annotations'
 import * as templ from 'templ'
 import {inject} from 'di'
 import {ControllerFactory} from '../../controller.factory'
+import {ModuleFactory} from '../../module.factory'
 import {decorator} from '../../stick'
 import {isDependencyType, DependencyType} from '../../internal'
 export interface RouteOptions {
@@ -26,6 +27,11 @@ decorator("route", function () : ClassDecorator {
 	}
 })
 
+export interface Route {
+	fragment: string
+	parameters: string[]
+}
+
 
 @inject('$context', '$container')
 @service('$router')
@@ -35,18 +41,29 @@ export class RouterService {
 	context: IContext
 	container:Container
 	_currentController: ControllerFactory
+	swap:any
 	/**
 	 * @param {IContext} ctx
 	 * @param {Container} container
 	 * @constructor RouterService
 	 */
 	constructor (ctx:IContext, container: Container) {
-		this.router = new Router({
-			execute: utils.bind(this.__execute, this)
-		})
+    this.router = new Router({
+      execute: <any>utils.bind(this.__execute, this)
+    });
 		this.context = ctx;
 		this.container = container;
 		this.router.history.start()
+	}
+
+	public swapElements (target:HTMLElement, element: HTMLElement) {
+
+		if (this.swap) {
+      this.swap(target, element);
+			return
+		}
+    target.innerHTML = "";
+    target.appendChild(element);
 	}
 
 	public else(handler:RouteHandler|RouteOptions) {
@@ -74,13 +91,25 @@ export class RouterService {
 		return this
 	}
 
-	private __execute (callback:RouteHandler, args:any[]) {
+
+	public navigate(route: string, options) {
+		this.router.navigate(route, options);
+	}
+
+	private __execute (callback:RouteHandler, name: string, args:any[]) {
+		if (this.container.hasHandler('$route')) {
+			this.container.unregister('$route');
+		}
+
+		this.container.registerInstance('$route', {
+			fragment: name,
+			parameters: args
+		});
 
 		this.context.$call(callback,this.context,args)
 	}
 
 	private __handleController(options:RouteOptions): RouteHandler {
-		console.log('has handler', name)
 		if (!this.container.hasHandler(options.controller, true, true)) {
 			throw new Error('[router] controller');
 		}
@@ -96,12 +125,15 @@ export class RouterService {
 
 			let factory = this.container.get(options.controller);
 
-			if (factory == null || !(factory instanceof ControllerFactory)) {
-				throw new Error('controller')
+			if (factory == null || (!(factory instanceof ControllerFactory) && !(factory instanceof ModuleFactory))) {
+        console.log(factory);
+        throw new Error('controller is');
 			}
 
 			factory.create({
-				template: options.template
+				template: options.template,
+				el: target,
+				parent: this.container
 			}).then(controller => {
 
 				if (this._currentController != null) {
@@ -110,15 +142,20 @@ export class RouterService {
 				this._currentController = factory;
 
 				let template = factory.container.get('template');
-				target.innerHTML = '';
+				//target.innerHTML = '';
 
-				target.appendChild(template.render())
+				this.swapElements(target, template.render())
+
+				//target.appendChild(template.render())
 			})
 
 		}
 	}
 
 	$destroy () {
+		if (this.container.hasHandler('$route')) {
+			this.container.unregister('$route');
+		}
 		if (this._currentController) {
 			this._currentController.destroy();
 			delete this._currentController;

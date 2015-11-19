@@ -1,5 +1,5 @@
 /// <reference path="../../typings" />
-import {callFunc} from 'utilities'
+import {callFunc, bind} from 'utilities'
 import * as templ from 'templ'
 import {resolveDependencies} from '../../internal'
 import {TemplateView} from '../template.view'
@@ -14,6 +14,13 @@ export class BaseComponent implements templ.vnode.Component {
 		childTemplate:templ.vnode.Template
 		constructor(section:templ.vnode.Section, vvnode:templ.vnode.VNode, attributes:templ.vnode.AttributeMap, view:templ.vnode.IView) {
 
+			if (this.initialize) {
+				this.initialize = bind(this.initialize, this);
+			}
+			if (this.update) {
+				this.update = bind(this.update, this);
+			}
+
 			this.section = section
 			this.vnode = vvnode
 			this.attributes = attributes
@@ -24,7 +31,7 @@ export class BaseComponent implements templ.vnode.Component {
   		for (var key in attributes) this.setAttribute(key, attributes[key]);
 
 			let container = (<TemplateView>this.view)._container
-			
+
 			resolveDependencies(this.initialize, container)
 			.then(deps => {
 				callFunc(this.initialize, this, deps);
@@ -32,13 +39,13 @@ export class BaseComponent implements templ.vnode.Component {
 				throw e
 			})
 
-			
+
 		}
 
 		initialize () {
-			
+
 		}
-		
+
 
 		setAttribute (key:string, value:any) {
 			this.attributes[key]  = value
@@ -54,5 +61,5 @@ export class BaseComponent implements templ.vnode.Component {
 				a.onDestroy();
 			}
 		}
-		
+
 }

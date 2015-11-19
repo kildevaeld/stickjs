@@ -8,7 +8,7 @@ export class TemplateView extends templ.View {
 	_context: any
 	_container: DIContainer
 	set context(context: any) {
-		
+
 		if (this._context && this._context instanceof Model) {
 			//this._context.off('change');
 		}
@@ -20,32 +20,32 @@ export class TemplateView extends templ.View {
 				}
 			}, this)
 		}
-		
+
 		this._context = context
 	}
 
 	get context(): any {
 		return this._context
 	}
-	
+
 	_onModelChange () {
-		
+
 	}
-	
+
 	constructor(section:any, template:any, context:any,options?:any) {
 			super(section, template, context, options)
-			
+
 			if (options.delegator) {
 				this.delegator = options.delegator
 			}
 			if (options.container) {
 				this._container = options.container
 			}
-		
+
 	}
-	
+
 	set(key: string|string[], val: any, silent: boolean = false) {
-		
+
 		if (!silent) {
 			if (!(this.context instanceof Model)) {
 				return super.set(key, val)
@@ -96,9 +96,9 @@ export class TemplateView extends templ.View {
 			}
 		} else if (key[0] === 'root') {
 			(<any>key).shift();
-			context = this.context.root
+			context = this.root.context
 		}
-		
+
 		key = (<any>key).join('.')
 		if (!value) {
 			if (!(this.context instanceof Model)) {
@@ -110,14 +110,14 @@ export class TemplateView extends templ.View {
 
 		return value;
 	}
-	
+
 	remove () {
 		super.remove()
 		delete this._container
 		delete this.delegator
 		delete this._context
 	}
-	
+
 	$destroy () {
 		this.remove()
 	}

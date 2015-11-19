@@ -47,7 +47,7 @@ export class Router extends EventEmitter  {
 
       this.history.route(route, (fragment) => {
         var args = this._extractParameters(<RegExp>route, fragment);
-        this.execute(handler, args);
+        this.execute(handler, fragment, args);
         this.trigger.apply(this, ['route:' + name].concat(args));
         this.trigger('route', name, args);
         //this.history.trigger('route', this, name, args);
@@ -59,10 +59,10 @@ export class Router extends EventEmitter  {
 
   // Execute a route handler with the provided parameters.  This is an
   // excellent place to do pre-route setup or post-route cleanup.
-  execute (callback:RouteHandler, args:any[]) {
+  execute (callback:RouteHandler, name:string, args:any[]) {
     if (callback) {
       if (this.options.execute) {
-        this.options.execute(callback, args)
+        this.options.execute(callback, name, args)
       } else {
         callFunc(callback, this, args)
       }

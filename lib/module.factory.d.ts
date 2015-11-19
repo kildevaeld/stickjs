@@ -1,8 +1,11 @@
 import { Container } from './container';
 import * as utils from 'utilities';
+import * as templ from 'templ';
 export declare type ControllerDefinition = FunctionConstructor | Object | any[];
 export interface ModuleCreateOptions {
     el?: HTMLElement;
+    parent?: Container;
+    template?: string | templ.vnode.Template;
 }
 export declare class ModuleFactory {
     name: string;

@@ -7,17 +7,23 @@ export interface RouteOptions {
     template?: string;
     target?: string | HTMLElement;
 }
+export interface Route {
+    fragment: string;
+    parameters: string[];
+}
 export declare class RouterService {
     router: Router;
     context: IContext;
     container: Container;
     _currentController: ControllerFactory;
+    swap: any;
     /**
      * @param {IContext} ctx
      * @param {Container} container
      * @constructor RouterService
      */
     constructor(ctx: IContext, container: Container);
+    swapElements(target: HTMLElement, element: HTMLElement): void;
     else(handler: RouteHandler | RouteOptions): void;
     /**
      * @param  {string|RegExp} route
@@ -25,7 +31,8 @@ export declare class RouterService {
      * @return {RouterService} RouterService
      */
     route(route: string | RegExp, handler: RouteHandler | RouteOptions): RouterService;
-    private __execute(callback, args);
+    navigate(route: string, options: any): void;
+    private __execute(callback, name, args);
     private __handleController(options);
     $destroy(): void;
 }

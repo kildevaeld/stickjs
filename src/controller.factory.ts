@@ -11,6 +11,7 @@ import * as templ from 'templ';
 export interface ControllerCreateOptions {
 	el?: HTMLElement
 	template?: string|templ.vnode.Template
+	contextName: string
 }
 
 export class ControllerFactory {
@@ -22,44 +23,54 @@ export class ControllerFactory {
 		this.container = container
 		this.controller = controller
 		this.name = name;
-		
-		
+
+
 	}
-		
-	create (options?:ControllerCreateOptions): utils.IPromise<any> {
-		
+
+	create (options:ControllerCreateOptions): utils.IPromise<any> {
+
 		if (this.container.hasInstance(this.name)) {
-			
+
 			return utils.Promise.resolve(this.container.get(this.name));
 		}
-		
+
 		this.container.registerSingleton(this.name, this.controller);
-		
+
 		let $context: IContext = this.container.get('$context');
-			
+
+
+
+
+
 
 		this.container.registerInstance('$context', $context.$createChild(), true);
-		
+
 		$context = this.container.get('$context');
-		
+
+    let contextName = options.contextName || this.name
+
 		return this.resolveTemplate($context, options)
 		.then( template => {
 			this.container.registerInstance('template', template, true);
-			
+
+      let el = template.render();
+
 			$context.$observe();
 			let controller = this.container.get(this.name);
+      $context[contextName] = controller;
 			$context.$unobserve();
-			
+
 			if (options.el) {
 				options.el.innerHTML = '';
-				options.el.appendChild(template.render());
+				options.el.appendChild(el);
+
 			}
 			return controller;
 		});
-		
-		
+
+
 	}
-	
+
 	resolveTemplate(ctx:IContext, options:ControllerCreateOptions): utils.IPromise<TemplateView> {
 		let $template: TemplateCreator = this.container.get('$templateCreator');
 		let promise: utils.IPromise<string>
@@ -73,19 +84,19 @@ export class ControllerFactory {
 				});
 				return utils.Promise.resolve(view);
 			}
-			
+
 			promise = this.container.get('$templateResolver')(options.template)
-			
+
 		} else {
 			return utils.Promise.reject(new StickError("no element or template"));
 		}
-		
+
 		return promise.then((templateString) => {
-			return $template(templateString, (<any>ctx).__model)	
+			return $template(templateString, (<any>ctx).__model)
 		})
 	}
-	
-	destroy () {		
+
+	destroy () {
 		this.container.clear();
 		this.container.entries.clear()
 	}
