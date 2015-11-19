@@ -4,6 +4,7 @@ import {StickError} from './typings'
 import {FactoryActivator} from 'di'
 import * as utils from 'utilities'
 import * as templ from 'templ'
+import {TemplateView} from './template/template.view'
 import {getContext, IContext} from './context'
 
 import {TemplateCreator} from './services/template'
@@ -126,8 +127,29 @@ export class ModuleFactory {
       }
 		}
 
+		if (options.template || options.el) {
 
-		if (options.el) {
+			return this.resolveTemplate(ctx, options)
+			.then((template) => {
+
+        this.container.registerInstance("template", template, true);
+
+
+        if (options.el) {
+          let el = this.container.get('template').render()
+          options.el.innerHTML = '';
+          options.el.appendChild(el);
+          this.container.registerInstance('$elm', options.el, true)
+        }
+
+        ctx.$observe()
+        let mod = this.container.get(this.name);
+        ctx.$unobserve();
+
+			})
+
+
+		} /*else if (options.el) {
 
 			// Add mutation observer
 			let observer = new Observer()
@@ -149,7 +171,7 @@ export class ModuleFactory {
 			options.el.appendChild(el);
 			this.container.registerInstance('$elm', options.el, true)
 		}
-
+		*/
 		ctx.$observe()
 		let mod = this.container.get(this.name);
 		ctx.$unobserve();
@@ -157,8 +179,33 @@ export class ModuleFactory {
 		return utils.Promise.resolve(mod)
 	}
 
+  resolveTemplate(ctx: IContext, options: ModuleCreateOptions): utils.IPromise<TemplateView> {
+    let $template: TemplateCreator = this.container.get('$templateCreator');
+    let promise: utils.IPromise<string>
+    if (options.el) {
+      let templateString = options.el.innerHTML;
+      promise = utils.Promise.resolve(templateString)
+    } else if (options.template) {
+      if (options.template instanceof templ.vnode.Template) {
+        let view = (<templ.vnode.Template>options.template).view((<any>ctx).__model, {
+          container: this.container
+        });
+        return utils.Promise.resolve(view);
+      }
+
+      promise = this.container.get('$templateResolver')(options.template)
+
+    } else {
+      return utils.Promise.reject(new StickError("no element or template"));
+    }
+
+    return promise.then((templateString) => {
+      return $template(templateString, (<any>ctx).__model)
+    })
+  }
+
 
 	destroy () {
-		this.container.destroy();
+		//this.container.destroy();
 	}
 }

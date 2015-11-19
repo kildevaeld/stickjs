@@ -8,15 +8,15 @@ import {uniqueId, bind} from 'utilities/lib/index'
 
 import {ComponentDefinition} from '../index'
 export const Repeat: ComponentDefinition = {
-	_children: [],
+
 	initialize () {
 		this._children = []
 		this._collection = [];
-
+    this.id = uniqueId();
 	},
 
 	update() {
-
+    this._children = this._children || [];
 		var as = this['as'];
    	var each = this['each'];
     var key = this['key'] || "key";
@@ -25,7 +25,7 @@ export const Repeat: ComponentDefinition = {
     var self = this;
     var parent = this.view;
 
-		if (each === this._collection || !each) {
+		if ((each === this._collection || !each) && this._collection.length > 0) {
 			return
 		}
 
@@ -56,6 +56,7 @@ export const Repeat: ComponentDefinition = {
 		var delegateID = uniqueId('.repeat')
 
 		var self = this
+
 		this._collection.forEach(function (m: IModel) {
 
 			var child;

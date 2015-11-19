@@ -29,6 +29,9 @@ export const get_atributes = function(attributes:any) {
 };
 
 
+const reserved_words = ["__queue", "__parent", "__model", "__subscriber"]
+
+
 export abstract class Context implements IContext {
 	private __queue: number
 	protected __parent: IContext
@@ -134,7 +137,10 @@ export abstract class Context implements IContext {
 			let e = events[i]
 			let names = e.name.split('.');
 
-			if (e.name === '__parent' || e.name === '__queue' || names[0] == '__model' || e.name === '__subscribers') continue;
+			if (!!~reserved_words.indexOf(names[0])) {
+        console.warn('cannot set a reserved word:', reserved_words);
+        continue;
+			}
 
 			if (e.type === 'delete') {
 				this.__model.set(e.name, {unset:true});

@@ -124,6 +124,7 @@ export class Container extends DIContainer {
 				this.destroy(key, fn);
 			}
 			delete this.constructionInfo
+      this.constructionInfo = new Map()
 			//this.entries
 
 			return

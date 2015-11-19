@@ -132,7 +132,6 @@ export class RouterService {
 
 			factory.create({
 				template: options.template,
-				el: target,
 				parent: this.container
 			}).then(controller => {
 
@@ -142,11 +141,10 @@ export class RouterService {
 				this._currentController = factory;
 
 				let template = factory.container.get('template');
-				//target.innerHTML = '';
+
 
 				this.swapElements(target, template.render())
 
-				//target.appendChild(template.render())
 			})
 
 		}
