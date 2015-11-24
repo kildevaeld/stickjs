@@ -17,8 +17,8 @@ export class BaseComponent implements templ.vnode.Component {
 			if (this.initialize) {
 				this.initialize = bind(this.initialize, this);
 			}
-			if (this.update) {
-				this.update = bind(this.update, this);
+			if ((<any>this).update) {
+				(<any>this).update = bind((<any>this).update, this);
 			}
 
 			this.section = section
@@ -57,7 +57,7 @@ export class BaseComponent implements templ.vnode.Component {
 
 		destroy () {
 			let a = <any>this
-			if (typeof a.onDestroy === 'funciton') {
+			if (typeof a.onDestroy === 'function') {
 				a.onDestroy();
 			}
 		}

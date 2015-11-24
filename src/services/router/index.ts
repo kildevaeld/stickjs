@@ -11,6 +11,7 @@ import {ControllerFactory} from '../../controller.factory'
 import {ModuleFactory} from '../../module.factory'
 import {decorator} from '../../stick'
 import {isDependencyType, DependencyType} from '../../internal'
+
 export interface RouteOptions {
 	controller:string
 	template?:string
@@ -42,6 +43,16 @@ export class RouterService {
 	container:Container
 	_currentController: ControllerFactory
 	swap:any
+	private  _target: HTMLElement;
+
+	get target (): HTMLElement {
+		return this._target;
+	}
+	set target (target:HTMLElement) {
+		this._target = target
+	}
+
+
 	/**
 	 * @param {IContext} ctx
 	 * @param {Container} container
@@ -56,7 +67,7 @@ export class RouterService {
 		this.router.history.start()
 	}
 
-	public swapElements (target:HTMLElement, element: HTMLElement) {
+	private swapElements (target:HTMLElement, element: HTMLElement) {
 
 		if (this.swap) {
       this.swap(target, element);
@@ -66,6 +77,10 @@ export class RouterService {
     target.appendChild(element);
 	}
 
+	/**
+	 * Notfound handler
+	 * @param {RouteHandler|RouteOptions} handler
+	 */
 	public else(handler:RouteHandler|RouteOptions) {
 		if (typeof handler !== 'function') {
 			handler = this.__handleController(<RouteOptions>handler);
@@ -91,7 +106,16 @@ export class RouterService {
 		return this
 	}
 
+	public reload () {
+		this.router.history.loadUrl()
+	}
 
+
+	/**
+	 * Navigate to fragment
+	 * @param {string} route   Fragment to navigate to
+	 * @param {Object} options options
+	 */
 	public navigate(route: string, options) {
 		this.router.navigate(route, options);
 	}
@@ -119,15 +143,20 @@ export class RouterService {
 			let target: HTMLElement;
 			if (typeof options.target === 'string') {
 				target = <HTMLElement>document.querySelector(<string>options.target)
-			} else {
+			} else if (options.target && options.target instanceof Element) {
 				target = <HTMLElement>options.target;
+			} else {
+				target = this.target
+			}
+
+			if (target == null) {
+				throw new Error('[router] target not defined')
 			}
 
 			let factory = this.container.get(options.controller);
 
 			if (factory == null || (!(factory instanceof ControllerFactory) && !(factory instanceof ModuleFactory))) {
-        console.log(factory);
-        throw new Error('controller is');
+        throw new Error(`${options.controller} not a controller`);
 			}
 
 			factory.create({
@@ -139,12 +168,8 @@ export class RouterService {
 					this._currentController.destroy();
 				}
 				this._currentController = factory;
-
 				let template = factory.container.get('template');
-
-
 				this.swapElements(target, template.render())
-
 			})
 
 		}

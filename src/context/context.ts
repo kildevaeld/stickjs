@@ -138,7 +138,7 @@ export abstract class Context implements IContext {
 			let names = e.name.split('.');
 
 			if (!!~reserved_words.indexOf(names[0])) {
-        console.warn('cannot set a reserved word:', reserved_words);
+        //console.warn('cannot set a reserved word:', reserved_words);
         continue;
 			}
 

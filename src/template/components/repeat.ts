@@ -32,9 +32,7 @@ export const Repeat: ComponentDefinition = {
 
 		if (this._collection && this._collection instanceof Collection) {
 			this.__removeEventListeners(this._collection)
-			//this._collection.off('remove',this._update)
-			//this._collection.off('add', this._update)
-			//this.__removeEventListeners(this._collection)
+
 		}
 
 		this._collection = each
@@ -121,7 +119,10 @@ export const Repeat: ComponentDefinition = {
 	},
 
 	onDestroy () {
-		this._collection.destroy();
+		if (this._collection && typeof this._collection.destroy === 'function') {
+			this._collection.destroy();
+		}
+
 		for (let child of this._children) {
 			child.remove();
 		}

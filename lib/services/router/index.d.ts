@@ -17,13 +17,19 @@ export declare class RouterService {
     container: Container;
     _currentController: ControllerFactory;
     swap: any;
+    private _target;
+    target: HTMLElement;
     /**
      * @param {IContext} ctx
      * @param {Container} container
      * @constructor RouterService
      */
     constructor(ctx: IContext, container: Container);
-    swapElements(target: HTMLElement, element: HTMLElement): void;
+    private swapElements(target, element);
+    /**
+     * Notfound handler
+     * @param {RouteHandler|RouteOptions} handler
+     */
     else(handler: RouteHandler | RouteOptions): void;
     /**
      * @param  {string|RegExp} route
@@ -31,6 +37,12 @@ export declare class RouterService {
      * @return {RouterService} RouterService
      */
     route(route: string | RegExp, handler: RouteHandler | RouteOptions): RouterService;
+    reload(): void;
+    /**
+     * Navigate to fragment
+     * @param {string} route   Fragment to navigate to
+     * @param {Object} options options
+     */
     navigate(route: string, options: any): void;
     private __execute(callback, name, args);
     private __handleController(options);

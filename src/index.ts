@@ -8,5 +8,5 @@ import * as u from 'utilities'
 import * as cols from 'collection'
 export const utils = u
 export * from './stick'
-
+export * from './repository'
 export {Collection, NestedModel} from 'collection'
