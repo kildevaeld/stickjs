@@ -3330,6 +3330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.resolveTemplate($context, options).then(function (template) {
 	                _this.container.registerInstance('template', template, true);
 	                var el = template.render();
+	                _this.container.registerInstance('$elm', el, true);
 	                $context.$observe();
 	                var controller = _this.container.get(_this.name);
 	                $context[contextName] = controller;
@@ -8795,6 +8796,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.section.appendChild(template.render());
 	        });
 	    },
+	    _update: function _update() {},
 	    onDestroy: function onDestroy() {
 	        if (this.factory) {
 	            this.factory.destroy();
@@ -8940,7 +8942,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        console.log(arguments);
 	    },
 	    onDestroy: function onDestroy() {
-	        if (this._collection) {
+	        if (this._collection && typeof this._collection.destroy === 'function') {
 	            this._collection.destroy();
 	        }
 	        var _iteratorNormalCompletion = true;
