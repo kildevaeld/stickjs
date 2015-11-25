@@ -200,7 +200,7 @@ export class ModuleFactory {
     }
 
     return promise.then((templateString) => {
-      return $template(templateString, (<any>ctx).__model)
+      return $template(templateString, (<any>ctx).__model, this.container)
     })
   }
 

@@ -38,6 +38,11 @@ export class ControllerFactory {
 
 		let $context: IContext = this.container.get('$context');
 
+
+
+
+
+
 		this.container.registerInstance('$context', $context.$createChild(), true);
 
 		$context = this.container.get('$context');
@@ -50,8 +55,6 @@ export class ControllerFactory {
 
       let el = template.render();
 
-      this.container.registerInstance('$elm', el, true)
-
 			$context.$observe();
 			let controller = this.container.get(this.name);
       $context[contextName] = controller;
@@ -60,8 +63,8 @@ export class ControllerFactory {
 			if (options.el) {
 				options.el.innerHTML = '';
 				options.el.appendChild(el);
-			}
 
+			}
 			return controller;
 		});
 

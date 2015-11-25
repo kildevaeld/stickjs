@@ -36,10 +36,6 @@ export const Controller: ComponentDefinition = {
 		});
 	},
 
-	_update () {
-
-	},
-
 	onDestroy () {
 		if (this.factory) {
 			this.factory.destroy()

@@ -1,21 +1,48 @@
 {
-  "name": "stick",
-  "version": "0.0.4",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "node node_modules/.bin/mocha"
+  "_args": [
+    [
+      "stick@git+https://github.com/kildevaeld/stickjs.git",
+      "/Users/rasmus/Development/Node/projects2/src"
+    ]
+  ],
+  "_from": "git+https://github.com/kildevaeld/stickjs.git",
+  "_id": "stick@0.0.4",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/stick",
+  "_phantomChildren": {},
+  "_requested": {
+    "hosted": {
+      "directUrl": "https://raw.githubusercontent.com/kildevaeld/stickjs/master/package.json",
+      "gitUrl": "git://github.com/kildevaeld/stickjs.git",
+      "httpsUrl": "git+https://github.com/kildevaeld/stickjs.git",
+      "shortcut": "github:kildevaeld/stickjs",
+      "ssh": "git@github.com:kildevaeld/stickjs.git",
+      "sshUrl": "git+ssh://git@github.com/kildevaeld/stickjs.git",
+      "type": "github"
+    },
+    "name": "stick",
+    "raw": "stick@git+https://github.com/kildevaeld/stickjs.git",
+    "rawSpec": "git+https://github.com/kildevaeld/stickjs.git",
+    "scope": null,
+    "spec": "git+https://github.com/kildevaeld/stickjs.git",
+    "type": "hosted"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kildevaeld/stick.git"
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git+https://github.com/kildevaeld/stickjs.git#10ba30ee3c5cd13fb2e4e7cc648b0debd59858db",
+  "_shasum": "2fa71a13bf95410b8c7d40c4a8436217caa26b4f",
+  "_shrinkwrap": null,
+  "_spec": "stick@git+https://github.com/kildevaeld/stickjs.git",
+  "_where": "/Users/rasmus/Development/Node/projects2/src",
+  "author": {
+    "email": "rasmuskildevaeld@gmail.com",
+    "name": "Rasmus Kildevæld"
   },
-  "author": "Rasmus Kildevæld <rasmuskildevaeld@gmail.com>",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kildevaeld/stick/issues"
   },
-  "homepage": "https://github.com/kildevaeld/stick#readme",
   "dependencies": {
     "babel": "^5.8.34",
     "babel-loader": "^5.4.0",
@@ -48,8 +75,23 @@
     "sinon": "^1.17.1",
     "webpack": "^1.12.2"
   },
+  "gitHead": "10ba30ee3c5cd13fb2e4e7cc648b0debd59858db",
+  "homepage": "https://github.com/kildevaeld/stick#readme",
   "jspm": {
     "main": "build/stick.js"
   },
-  "typings": "lib/index"
+  "license": "MIT",
+  "main": "index.js",
+  "name": "stick",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kildevaeld/stick.git"
+  },
+  "scripts": {
+    "test": "node node_modules/.bin/mocha"
+  },
+  "typings": "lib/index",
+  "version": "0.0.4"
 }
