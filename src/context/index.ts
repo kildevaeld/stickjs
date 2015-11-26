@@ -15,7 +15,7 @@ export interface ISubscriber {
 }
 
 export interface IContext {
-	[x: string]: any 
+	[x: string]: any
 	$call(fn:Function, ctx?:any, args?:any[])
 	$subscribe(event:string, handler:ISubscriber)
 	$unsubscribe(event:string, handler:ISubscriber)
@@ -32,7 +32,7 @@ export function createContext(model:IModel): IContext {
 	if (typeof (<any>Object).observe === 'function') {
 		return new ObjectObserveProxy();
 	} /*else if (typeof (global||window).Proxy  === 'function') {
-		
+
 	}*/ else {
 		return new DirtyObjectObserver();
 	}
@@ -42,7 +42,7 @@ export function getContext (): any {
 	if (typeof (<any>Object).observe === 'function') {
 		return ObjectObserveProxy;
 	} /*else if (typeof (global||window).Proxy  === 'function') {
-		
+
 	}*/ else {
 		return DirtyObjectObserver;
 	}

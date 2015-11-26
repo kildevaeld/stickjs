@@ -37,6 +37,7 @@ export abstract class Context implements IContext {
 	protected __parent: IContext
 	protected __model: IModel
 	protected __subscribers: {[key:string]: ISubscriber[]}
+
 	constructor () {
 		this.__queue = 0;
 
@@ -61,9 +62,12 @@ export abstract class Context implements IContext {
     return this.__parent;
 	}
 
+	get $model (): IModel {
+		return this.__model;
+	}
+
 	$call(fn:Function, ctx?:any, args?:any[]) {
 		this.$observe();
-
 
 		let results = utils.callFunc(fn, ctx, args);
 
