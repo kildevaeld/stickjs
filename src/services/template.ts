@@ -16,28 +16,28 @@ export interface TemplateCreator {
 Stick.factory('$templateResolver', () => {
 	return function (name:string): utils.IPromise<string> {
 		let template = document.getElementById(name);
-		
-		if (template == null) 
+
+		if (template == null)
 			return utils.Promise.reject(new Error(`template with id: '${name}' not found`));
-			
+
 		return utils.Promise.resolve(template.innerHTML);
 	}
 });
 
 
 Stick.factory('$templateCreator', ['$templateResolver', '$container', (resolver:TemplateResolver, container:Container) => {
-	
-	return function (templateString:string, data:any): TemplateView  {
-		
+
+	return function (templateString:string, data:any, $container?:Container): TemplateView  {
+
 			let template = templ.compile(templateString, {
 				viewClass: <any>TemplateView
 			})
 			let view = <any>template.view(data, {
-				container: container
+				container: $container||container
 			});
-				
+
 			return view;
 	}
-	
+
 }]);
 

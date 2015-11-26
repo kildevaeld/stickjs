@@ -3344,6 +3344,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'resolveTemplate',
 	        value: function resolveTemplate(ctx, options) {
+	            var _this2 = this;
+
 	            var $template = this.container.get('$templateCreator');
 	            var promise = undefined;
 	            if (options.el) {
@@ -3361,7 +3363,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return utils.Promise.reject(new _typings.StickError("no element or template"));
 	            }
 	            return promise.then(function (templateString) {
-	                return $template(templateString, ctx.__model);
+	                return $template(templateString, ctx.__model, _this2.container);
 	            });
 	        }
 	    }, {
@@ -6371,6 +6373,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'resolveTemplate',
 	        value: function resolveTemplate(ctx, options) {
+	            var _this2 = this;
+
 	            var $template = this.container.get('$templateCreator');
 	            var promise = undefined;
 	            if (options.el) {
@@ -6388,7 +6392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return utils.Promise.reject(new _typings.StickError("no element or template"));
 	            }
 	            return promise.then(function (templateString) {
-	                return $template(templateString, ctx.__model);
+	                return $template(templateString, ctx.__model, _this2.container);
 	            });
 	        }
 	    }, {
@@ -8576,12 +8580,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	});
 	Stick.factory('$templateCreator', ['$templateResolver', '$container', function (resolver, container) {
-	    return function (templateString, data) {
+	    return function (templateString, data, $container) {
 	        var template = templ.compile(templateString, {
 	            viewClass: _templateTemplateView.TemplateView
 	        });
 	        var view = template.view(data, {
-	            container: container
+	            container: $container || container
 	        });
 	        return view;
 	    };
@@ -8940,7 +8944,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        console.log(arguments);
 	    },
 	    onDestroy: function onDestroy() {
-	        if (this._collection) {
+	        if (this._collection && typeof this._collection.destroy === 'function') {
 	            this._collection.destroy();
 	        }
 	        var _iteratorNormalCompletion = true;
