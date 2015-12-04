@@ -130,3 +130,7 @@ export function decorator(name: string, decorator: any) {
 	}
 	decorators[name] = decorator;
 }
+
+export function modifier(name: string, modifier: (value:any) => any) {
+	templ.modifier(name, modifier);
+}

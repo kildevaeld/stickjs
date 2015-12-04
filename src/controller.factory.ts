@@ -38,6 +38,11 @@ export class ControllerFactory {
 
 		let $context: IContext = this.container.get('$context');
 
+
+
+
+
+
 		this.container.registerInstance('$context', $context.$createChild(), true);
 
 		$context = this.container.get('$context');
@@ -87,7 +92,7 @@ export class ControllerFactory {
 		}
 
 		return promise.then((templateString) => {
-			return $template(templateString, (<any>ctx).__model, this.container)
+			return $template(templateString, (<any>ctx).__model)
 		})
 	}
 

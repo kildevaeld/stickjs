@@ -3,6 +3,7 @@ export declare class BaseComponent implements templ.vnode.Component {
     section: templ.vnode.Section;
     vnode: templ.vnode.VNode;
     attributes: templ.vnode.AttributeMap;
+    _attributes: any;
     view: templ.vnode.IView;
     document: Document;
     childTemplate: templ.vnode.Template;

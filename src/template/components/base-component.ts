@@ -9,6 +9,7 @@ export class BaseComponent implements templ.vnode.Component {
 		section: templ.vnode.Section
 		vnode: templ.vnode.VNode
 		attributes: templ.vnode.AttributeMap
+		_attributes: any
 		view: templ.vnode.IView
 		document:Document
 		childTemplate:templ.vnode.Template
@@ -24,6 +25,7 @@ export class BaseComponent implements templ.vnode.Component {
 			this.section = section
 			this.vnode = vvnode
 			this.attributes = attributes
+      this._attributes = {};
 			this.view = view
 			this.document = view.template.options.document
 
@@ -48,11 +50,11 @@ export class BaseComponent implements templ.vnode.Component {
 
 
 		setAttribute (key:string, value:any) {
-			this.attributes[key]  = value
+			this._attributes[key]  = value
 		}
 
 		removeAttribute(key:string) {
-			this.attributes[key] = void 0
+			this._attributes[key] = void 0
 		}
 
 		destroy () {

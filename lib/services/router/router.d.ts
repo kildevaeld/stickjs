@@ -12,7 +12,7 @@ export declare class Router extends EventEmitter {
     constructor(options?: RouterOptions);
     route(route: RegExp | string, name: RouteHandler | string, handler?: RouteHandler): Router;
     execute(callback: RouteHandler, name: string, args: any[]): void;
-    navigate(fragment: any, options: any): Router;
+    navigate(fragment: any, options: any): this;
     private _routeToRegExp(route);
     private _extractParameters(route, fragment);
     $destroy(): void;
