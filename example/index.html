@@ -38,7 +38,7 @@
 			console.log(stick)
 			
 			stick.component('fa', {
-				initialize: function ($observer) {
+				initialize: function () {
 					
 				
 					var i = document.createElement('i');
@@ -51,11 +51,7 @@
 						i.classList.add("fa-" + this.attributes.name);
 					}
 					
-					$observer.observe(i, function () {
-						console.log(this)
-						i.classList.remove('fa-'  + this.attributes.name);
-						i.classList.add('fa-' + i.getAttribute('name'))
-					}.bind(this))
+					
 				}
 			})
 			

@@ -15,9 +15,6 @@ export class BaseComponent implements templ.vnode.Component {
 		childTemplate:templ.vnode.Template
 		constructor(section:templ.vnode.Section, vvnode:templ.vnode.VNode, attributes:templ.vnode.AttributeMap, view:templ.vnode.IView) {
 
-			if (this.initialize) {
-				this.initialize = bind(this.initialize, this);
-			}
 			if ((<any>this).update) {
 				(<any>this).update = bind((<any>this).update, this);
 			}
@@ -33,14 +30,14 @@ export class BaseComponent implements templ.vnode.Component {
   		for (var key in attributes) this.setAttribute(key, attributes[key]);
 
 			let container = (<TemplateView>this.view)._container
-
+			
+		
 			resolveDependencies(this.initialize, container)
 			.then(deps => {
 				callFunc(this.initialize, this, deps);
 			}).catch((e) => {
 				throw e
 			})
-
 
 		}
 

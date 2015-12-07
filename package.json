@@ -10,7 +10,7 @@
     "collection": "git+https://github.com/kildevaeld/collectionjs.git",
     "di": "git+https://github.com/kildevaeld/dijs.git",
     "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
-    "templ": "git+https://github.com/kildevaeld/templ.git",
+    "templ": "git+https://github.com/kildevaeld/templ.git#development",
     "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
   },
   "devDependencies": {
@@ -46,5 +46,5 @@
     "test": "node node_modules/.bin/mocha"
   },
   "typings": "lib/index",
-  "version": "0.0.6"
+  "version": "0.0.7"
 }

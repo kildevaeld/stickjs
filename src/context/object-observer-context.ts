@@ -7,21 +7,18 @@ import {Context} from './context'
 export class ObjectObserveProxy extends Context {
 	
 	$observe () {
-		//if (this.__observing) return
 		(<any>Object).observe(this, this.__onchange);
-		//super.observe();
 	}
 	
 	$unobserve () {
-		//if (!this.__observing) return
 		(<any>Object).unobserve(this, this.__onchange);
-		//super.unobserve();
-		
 	}
 	
 	$createChild (): ObjectObserveProxy {
-		let child = new ObjectObserveProxy();
+		let child = new ObjectObserveProxy(this.__mediator);
 		child.__parent = this;
 		return child;
 	}
 }
+
+

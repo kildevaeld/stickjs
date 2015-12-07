@@ -1,4 +1,5 @@
 import { IModel } from 'collection';
+import { Mediator } from '../services/mediator';
 export interface ProxyEvent {
     name: string;
     object: any;
@@ -18,5 +19,5 @@ export interface IContext {
     $observe(): any;
     $unobserve(): any;
 }
-export declare function createContext(model: IModel): IContext;
+export declare function createContext(model: IModel, mediator: Mediator): IContext;
 export declare function getContext(): any;

@@ -60,10 +60,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	__webpack_require__(1);
-	/*import './services/template'
-	import './services/http'
-	import './services/router'*/
-	__webpack_require__(48);
+	__webpack_require__(49);
 	var u = __webpack_require__(6);
 	exports.utils = u;
 	__export(__webpack_require__(42));
@@ -83,6 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(2));
 	__export(__webpack_require__(45));
 	__export(__webpack_require__(46));
+	__export(__webpack_require__(48));
 
 /***/ },
 /* 2 */
@@ -622,33 +620,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	function getID() {
 	    return "" + (++idCounter);
 	}
-	function callFunc(fn, ctx, args) {
+	function callFunc(fn, args) {
 	    if (args === void 0) { args = []; }
 	    var l = fn.length, i = -1, a1 = args[0], a2 = args[1], a3 = args[2], a4 = args[3];
 	    switch (args.length) {
 	        case 0:
 	            while (++i < l)
-	                fn[i].call(ctx);
+	                fn[i].handler.call(fn[i].ctx);
 	            return;
 	        case 1:
 	            while (++i < l)
-	                fn[i].call(ctx, a1);
+	                fn[i].handler.call(fn[i].ctx, a1);
 	            return;
 	        case 2:
 	            while (++i < l)
-	                fn[i].call(ctx, a1, a2);
+	                fn[i].handler.call(fn[i].ctx, a1, a2);
 	            return;
 	        case 3:
 	            while (++i < l)
-	                fn[i].call(ctx, a1, a2, a3);
+	                fn[i].handler.call(fn[i].ctx, a1, a2, a3);
 	            return;
 	        case 4:
 	            while (++i < l)
-	                fn[i].call(ctx, a1, a2, a3, a4);
+	                fn[i].handler.call(fn[i].ctx, a1, a2, a3, a4);
 	            return;
 	        default:
 	            while (++i < l)
-	                fn[i].apply(ctx, args);
+	                fn[i].handler.apply(fn[i].ctx, args);
 	            return;
 	    }
 	}
@@ -669,8 +667,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        events.push({
 	            name: event,
 	            once: once,
-	            handler: fn.bind(ctx || this) /*,
-	            ctx: ctx||this*/
+	            handler: fn,
+	            ctx: ctx || this
 	        });
 	        return this;
 	    };
@@ -713,24 +711,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	            a = args;
 	            if (event.name == 'all') {
 	                a = [eventName].concat(args);
-	                callFunc([event.handler], event.ctx, a);
+	                callFunc([event], a);
 	            }
-	            calls.push(event.handler);
+	            else {
+	                calls.push(event);
+	            }
 	            if (event.once === true) {
 	                index = this._listeners[event.name].indexOf(event);
 	                this._listeners[event.name].splice(index, 1);
 	            }
 	        }
-	        this._executeListener(calls, undefined, args);
-	        callFunc(calls, undefined, args);
+	        if (calls.length)
+	            this._executeListener(calls, args);
 	        return this;
 	    };
-	    EventEmitter.prototype._executeListener = function (func, ctx, args) {
+	    EventEmitter.prototype._executeListener = function (func, args) {
 	        var executor = callFunc;
 	        if (this.constructor.executeListenerFunction) {
 	            executor = this.constructor.executeListenerFunction;
 	        }
-	        executor(func, ctx, args);
+	        executor(func, args);
 	    };
 	    EventEmitter.prototype.listenTo = function (obj, event, fn, ctx, once) {
 	        if (once === void 0) { once = false; }
@@ -761,8 +761,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    EventEmitter.prototype.destroy = function () {
 	        this.stopListening();
 	        this.off();
-	    };
-	    EventEmitter.executeListenerFunction = function () {
 	    };
 	    return EventEmitter;
 	})();
@@ -1990,7 +1988,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    });
 	}
-	var Version = '0.0.5';
+	var Version = '0.0.6';
 	exports.Version = Version;
 
 	var _container = __webpack_require__(19);
@@ -2233,7 +2231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (i < ii) {
 	                message += ' The argument at index ' + i + ' (key:' + keys[i] + ') could not be satisfied.';
 	            }
-	            throw (0, _errors.createError)("DependencyError", message);
+	            throw (0, _errors.createError)("DependencyError", message, [e]);
 	        }
 	        return args;
 	    };
@@ -2722,7 +2720,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 21 */
 /***/ function(module, exports) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+	/* WEBPACK VAR INJECTION */(function(global) {/* global global:true */
+	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
@@ -2801,7 +2800,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Metadata = {
 	    global: theGlobal,
 	    noop: function noop() {},
-	    resource: 'aurelia:resource',
 	    paramTypes: 'design:paramtypes',
 	    properties: 'design:properties',
 	    get: function get(metadataKey, target, targetKey) {
@@ -6259,14 +6257,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var object_observer_context_1 = __webpack_require__(33);
 	var dirty_object_context_1 = __webpack_require__(41);
-	function createContext(model) {
+	function createContext(model, mediator) {
 	    if (typeof Object.observe === 'function') {
-	        return new object_observer_context_1.ObjectObserveProxy();
+	        return new object_observer_context_1.ObjectObserveProxy(mediator);
 	    } /*else if (typeof (global||window).Proxy  === 'function') {
 	        
 	      }*/
 	    else {
-	            return new dirty_object_context_1.DirtyObjectObserver();
+	            return new dirty_object_context_1.DirtyObjectObserver(mediator);
 	        }
 	}
 	exports.createContext = createContext;
@@ -6310,21 +6308,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(ObjectObserveProxy, [{
 	        key: '$observe',
 	        value: function $observe() {
-	            //if (this.__observing) return
 	            Object.observe(this, this.__onchange);
-	            //super.observe();
 	        }
 	    }, {
 	        key: '$unobserve',
 	        value: function $unobserve() {
-	            //if (!this.__observing) return
 	            Object.unobserve(this, this.__onchange);
-	            //super.unobserve();
 	        }
 	    }, {
 	        key: '$createChild',
 	        value: function $createChild() {
-	            var child = new ObjectObserveProxy();
+	            var child = new ObjectObserveProxy(this.__mediator);
 	            child.__parent = this;
 	            return child;
 	        }
@@ -6339,15 +6333,24 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+	    var c = arguments.length,
+	        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+	        d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
 	var collection_1 = __webpack_require__(35);
 	var utils = __webpack_require__(6);
-	var eventsjs_1 = __webpack_require__(5);
+	var annotations_1 = __webpack_require__(15);
 	exports.get_atributes = function (attributes) {
 	    var keys = Object.keys(attributes),
 	        deferred = {},
@@ -6367,20 +6370,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	    return { attr: attr, deferred: deferred };
 	};
-	var reserved_words = ["__queue", "__parent", "__model", "__subscriber"];
-
+	var reserved_words = ["__queue", "__parent", "__model", "__subscriber", '__mediator'];
 	var Context = (function () {
-	    function Context() {
+	    function Context(mediator) {
 	        _classCallCheck(this, Context);
 
 	        this.__queue = 0;
+	        this.__mediator = mediator;
 	        this.__model = new collection_1.NestedModel();
 	        this.__onchange = utils.bind(this.__onchange, this);
-	        this.__subscribers = {};
+	        this.__subscribers = new Map();
 	    }
 
 	    _createClass(Context, [{
-	        key: '$call',
+	        key: "$call",
 	        value: function $call(fn, ctx, args) {
 	            var _this = this;
 
@@ -6404,55 +6407,91 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    };
 	                })();
 
-	                if (typeof _ret === 'object') return _ret.v;
+	                if (typeof _ret === "object") return _ret.v;
 	            }
 	        }
 	    }, {
-	        key: '$subscribe',
-	        value: function $subscribe(event, handler) {
-	            if (this.$root !== this) {
-	                return this.$root.$subscribe(event, handler);
-	            }
-	            var subscribers = this.__subscribers[event] || (this.__subscribers[event] = []);
-	            subscribers.push(handler);
-	            return this;
-	        }
-	    }, {
-	        key: '$unsubscribe',
-	        value: function $unsubscribe(event, handler) {
-	            if (this.$root !== this) {
-	                return this.$root.$unsubscribe(event, handler);
-	            }
-	            var subscribers = this.__subscribers[event] || (this.__subscribers[event] = []);
-	            var i = subscribers.indexOf(handler);
-	            if (i > -1) {
-	                subscribers.splice(i, 1);
-	            }
-	            return this;
-	        }
-	    }, {
-	        key: '$publish',
-	        value: function $publish(event) {
+	        key: "$subscribe",
+	        value: function $subscribe(event, _handler) {
 	            var _this2 = this;
 
-	            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	                args[_key - 1] = arguments[_key];
-	            }
+	            var ctx = arguments.length <= 2 || arguments[2] === undefined ? undefined : arguments[2];
 
-	            var subscribers = this.__subscribers[event];
-	            if (subscribers) {
-	                this.$call(function () {
-	                    eventsjs_1.callFunc(subscribers, _this2, args);
-	                });
-	            }
-	            if (this.__parent) {
-	                var _parent;
+	            var ev = {
+	                event: event,
+	                handler: function handler() {
+	                    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	                        args[_key] = arguments[_key];
+	                    }
 
-	                (_parent = this.__parent).$publish.apply(_parent, [event].concat(args));
-	            }
+	                    _this2.$call(_handler, ctx, args);
+	                },
+	                id: utils.uniqueId("ctx")
+	            };
+	            this.__subscribers.set(_handler, ev);
+	            this.__mediator.subscribe(event, ev.handler, this);
+	            return ev.id;
 	        }
 	    }, {
-	        key: '__onchange',
+	        key: "$unsubscribe",
+	        value: function $unsubscribe(event, handler) {
+	            var ev = null,
+	                key = null;
+	            if (typeof handler === 'string') {
+	                var _iteratorNormalCompletion = true;
+	                var _didIteratorError = false;
+	                var _iteratorError = undefined;
+
+	                try {
+	                    for (var _iterator = this.__subscribers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var _step$value = _slicedToArray(_step.value, 2);
+
+	                        var k = _step$value[0];
+	                        var v = _step$value[1];
+
+	                        if (v.id === handler) {
+	                            ev = this.__subscribers.get(k);
+	                            key = k;
+	                        }
+	                    }
+	                } catch (err) {
+	                    _didIteratorError = true;
+	                    _iteratorError = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion && _iterator["return"]) {
+	                            _iterator["return"]();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError) {
+	                            throw _iteratorError;
+	                        }
+	                    }
+	                }
+	            } else if (this.__subscribers.has(handler)) {
+	                ev = this.__subscribers.get(handler);
+	                key = handler;
+	            }
+	            if (ev !== null) {
+	                console.log('EVET', ev, this.__mediator);
+	                this.__mediator.unsubscribe(event, ev.handler);
+	                this.__subscribers["delete"](key);
+	            }
+	            return this;
+	        }
+	    }, {
+	        key: "$publish",
+	        value: function $publish(event) {
+	            var _mediator;
+
+	            for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+	                args[_key2 - 1] = arguments[_key2];
+	            }
+
+	            (_mediator = this.__mediator).publish.apply(_mediator, [event].concat(args));
+	        }
+	    }, {
+	        key: "__onchange",
 	        value: function __onchange(events) {
 	            var _this3 = this;
 
@@ -6492,14 +6531,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    props = _this3.__normalizeAttr(props);
 	                    utils.extend(_this3, props);
 	                    _this3.__model.set(props);
-	                })['catch'](function (e) {
+	                })["catch"](function (e) {
 	                    _this3.__model.trigger('error', e);
 	                    _this3.$unobserve();
 	                });
 	            }
 	        }
 	    }, {
-	        key: '__normalizeAttr',
+	        key: "__normalizeAttr",
 	        value: function __normalizeAttr(attr) {
 	            for (var key in attr) {
 	                var val = attr[key];
@@ -6511,7 +6550,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return attr;
 	        }
 	    }, {
-	        key: '$root',
+	        key: "$destroy",
+	        value: function $destroy() {
+	            var _iteratorNormalCompletion2 = true;
+	            var _didIteratorError2 = false;
+	            var _iteratorError2 = undefined;
+
+	            try {
+	                for (var _iterator2 = this.__subscribers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	                    var _step2$value = _slicedToArray(_step2.value, 2);
+
+	                    var k = _step2$value[0];
+	                    var v = _step2$value[1];
+
+	                    this.__mediator.unsubscribe(v.event, k);
+	                }
+	            } catch (err) {
+	                _didIteratorError2 = true;
+	                _iteratorError2 = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion2 && _iterator2["return"]) {
+	                        _iterator2["return"]();
+	                    }
+	                } finally {
+	                    if (_didIteratorError2) {
+	                        throw _iteratorError2;
+	                    }
+	                }
+	            }
+
+	            this.__subscribers.clear();
+	        }
+	    }, {
+	        key: "$root",
 	        get: function get() {
 	            var parent = this.__parent;
 	            while (parent != null) {
@@ -6521,7 +6593,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        }
 	    }, {
-	        key: '$parent',
+	        key: "$parent",
 	        get: function get() {
 	            return this.__parent;
 	        }
@@ -6529,7 +6601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return Context;
 	})();
-
+	Context = __decorate([annotations_1.inject('$mediator')], Context);
 	exports.Context = Context;
 
 /***/ },
@@ -7321,7 +7393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: '$createChild',
 	        value: function $createChild() {
-	            var child = new DirtyObjectObserver();
+	            var child = new DirtyObjectObserver(this.__mediator);
 	            child.__parent = this;
 	            return child;
 	        }
@@ -7445,9 +7517,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            initialize: c
 	        };
 	    } else if (utils.isObject(c) && typeof c.initialize === 'function') {
-	        var fn = c;
 	        if (deps && deps.length) {
-	            fn.initialize.inject = deps;
+	            c.initialize.inject = deps;
 	        } else {
 	            internal_1.getDependencies(c.initialize);
 	        }
@@ -7761,9 +7832,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        _classCallCheck(this, BaseComponent);
 
-	        if (this.initialize) {
-	            this.initialize = utilities_1.bind(this.initialize, this);
-	        }
 	        if (this.update) {
 	            this.update = utilities_1.bind(this.update, this);
 	        }
@@ -8029,19 +8097,73 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+	    var c = arguments.length,
+	        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+	        d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var annotations_1 = __webpack_require__(15);
+	var eventsjs_1 = __webpack_require__(5);
+	var Mediator = (function () {
+	    function Mediator() {
+	        _classCallCheck(this, Mediator);
+
+	        this.emitter = new eventsjs_1.EventEmitter();
+	    }
+
+	    _createClass(Mediator, [{
+	        key: "publish",
+	        value: function publish(event) {
+	            var _emitter;
+
+	            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	                args[_key - 1] = arguments[_key];
+	            }
+
+	            (_emitter = this.emitter).trigger.apply(_emitter, [event].concat(args));
+	        }
+	    }, {
+	        key: "subscribe",
+	        value: function subscribe(event, handler, ctx) {
+	            this.emitter.on(event, handler, ctx);
+	        }
+	    }, {
+	        key: "unsubscribe",
+	        value: function unsubscribe(event, handler) {
+	            this.emitter.off(event, handler);
+	        }
+	    }]);
+
+	    return Mediator;
+	})();
+	Mediator = __decorate([annotations_1.service('$mediator')], Mediator);
+	exports.Mediator = Mediator;
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	var stick_1 = __webpack_require__(42);
 	__export(__webpack_require__(47));
-	var controller_1 = __webpack_require__(49);
-	var repeat_1 = __webpack_require__(50);
+	var controller_1 = __webpack_require__(50);
+	var repeat_1 = __webpack_require__(51);
 	stick_1.component('controller', ['$container', controller_1.Controller]);
 	stick_1.component('repeat', repeat_1.Repeat);
 	__export(__webpack_require__(44));
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../typings" />
@@ -8124,7 +8246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}*/
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../typings" />

@@ -2,7 +2,8 @@ import {IContext, ISubscriber, ProxyEvent} from './index'
 import {IModel, Collection, NestedModel} from 'collection'
 import * as utils from 'utilities'
 import {callFunc} from 'eventsjs'
-
+import {Mediator} from '../services/mediator'
+import {inject} from '../annotations'
 export const get_atributes = function(attributes:any) {
 
   let keys = Object.keys(attributes),
@@ -29,20 +30,27 @@ export const get_atributes = function(attributes:any) {
 };
 
 
-const reserved_words = ["__queue", "__parent", "__model", "__subscriber"]
+const reserved_words = ["__queue", "__parent", "__model", "__subscriber", '__mediator']
 
+interface subscriber {
+	event: string
+	handler:any
+	id: string
+}
 
+@inject('$mediator')
 export abstract class Context implements IContext {
 	private __queue: number
 	protected __parent: IContext
 	protected __model: IModel
-	protected __subscribers: {[key:string]: ISubscriber[]}
-	constructor () {
+	private __subscribers: Map<ISubscriber,subscriber>
+	protected __mediator: Mediator
+	constructor (mediator:Mediator) {
 		this.__queue = 0;
-
+		this.__mediator = mediator
 		this.__model = new NestedModel();
 		this.__onchange = utils.bind(this.__onchange, this);
-		this.__subscribers = {}
+		this.__subscribers = new Map()
 	}
 
 	get $root (): IContext {
@@ -86,41 +94,49 @@ export abstract class Context implements IContext {
 		}
 	}
 
-	$subscribe(event:string, handler:ISubscriber): IContext {
-		if (this.$root !== this) {
-			return this.$root.$subscribe(event, handler)
+	$subscribe(event:string, handler:ISubscriber, ctx:any = undefined): string {
+
+		let ev = {
+			event:event,
+			handler: (...args:any[]) => {
+				this.$call(handler, ctx, args)
+			},
+			id: utils.uniqueId("ctx")
 		}
-		let subscribers = this.__subscribers[event]||(this.__subscribers[event] = []);
-		subscribers.push(handler);
-		return this
+		
+		this.__subscribers.set(handler, ev)	
+		this.__mediator.subscribe(event, ev.handler, this)
+		
+		return ev.id
 	}
 
-	$unsubscribe(event:string, handler:ISubscriber): IContext {
-		if (this.$root !== this) {
-			return this.$root.$unsubscribe(event, handler)
+	$unsubscribe(event:string, handler:ISubscriber|string): IContext {
+		let ev: subscriber = null,
+			key: ISubscriber = null;
+		if (typeof handler === 'string') {
+			for (let [k, v] of this.__subscribers) {
+				if (v.id === handler) {
+					ev = this.__subscribers.get(k);
+					key = k;
+				}
+			}
+		} else if (this.__subscribers.has(handler)) {
+			ev = this.__subscribers.get(handler);
+			key = handler;
 		}
-		let subscribers = this.__subscribers[event]||(this.__subscribers[event] = []);
-		let i = subscribers.indexOf(handler);
-		if (i > -1) {
-			subscribers.splice(i,1);
+		
+		if (ev !== null) {
+			console.log('EVET', ev, this.__mediator)
+			this.__mediator.unsubscribe(event, ev.handler);
+			this.__subscribers.delete(key);
 		}
+		
 		return this;
 
 	}
 
 	$publish(event:string, ...args:any[]) {
-
-		let subscribers = this.__subscribers[event];
-
-		if (subscribers) {
-			this.$call(() => {
-				callFunc(subscribers, this, args)
-			})
-		}
-
-		if (this.__parent) {
-			this.__parent.$publish(event, ...args)
-		}
+		this.__mediator.publish(event, ...args);
 	}
 
 	abstract $createChild(data?:IModel): IContext
@@ -197,5 +213,13 @@ export abstract class Context implements IContext {
   	}
 		return attr
 	}
+	
 
+	$destroy () {
+		for (let [k, v] of this.__subscribers) {
+			this.__mediator.unsubscribe(v.event, k)
+		}
+		this.__subscribers.clear()
+	}
 }
+

@@ -1,7 +1,7 @@
 import {IModel} from 'collection'
 import {ObjectObserveProxy} from './object-observer-context'
 import {DirtyObjectObserver} from './dirty-object-context'
-
+import {Mediator} from '../services/mediator' 
 export interface ProxyEvent {
 	name: string
 	object:any
@@ -28,13 +28,13 @@ export interface IContext {
 
 
 
-export function createContext(model:IModel): IContext {
+export function createContext(model:IModel, mediator:Mediator): IContext {
 	if (typeof (<any>Object).observe === 'function') {
-		return new ObjectObserveProxy();
+		return new ObjectObserveProxy(mediator);
 	} /*else if (typeof (global||window).Proxy  === 'function') {
 		
 	}*/ else {
-		return new DirtyObjectObserver();
+		return new DirtyObjectObserver(mediator);
 	}
 }
 

@@ -27,6 +27,7 @@ export class DirtyObjectObserver extends Context {
     //super.unobserve();
 	}
   
+  
   _check (model:IModel) {
 		
 		let attributes = this.__model.toJSON()
@@ -69,7 +70,7 @@ export class DirtyObjectObserver extends Context {
 	
 	
 	$createChild(): IContext {
-		let child = new DirtyObjectObserver();
+		let child = new DirtyObjectObserver(this.__mediator);
     child.__parent = this
 		return  child;
 	}
