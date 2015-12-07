@@ -46,5 +46,5 @@
     "test": "node node_modules/.bin/mocha"
   },
   "typings": "lib/index",
-  "version": "0.0.5"
+  "version": "0.0.6"
 }
