@@ -44,19 +44,11 @@
     "url": "https://github.com/kildevaeld/stick/issues"
   },
   "dependencies": {
-    "babel": "^5.8.34",
-    "babel-loader": "^5.4.0",
     "collection": "git+https://github.com/kildevaeld/collectionjs.git",
     "di": "git+https://github.com/kildevaeld/dijs.git",
     "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
-    "gulp-babel": "^5.3.0",
-    "gulp-uglify": "^1.5.1",
-    "mocha": "^2.3.4",
-    "should": "^7.1.1",
-    "sinon": "^1.17.2",
     "templ": "git+https://github.com/kildevaeld/templ.git#development",
     "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git",
-    "webpack": "^1.12.9"
   },
   "devDependencies": {
     "babel": "^5.8.23",
