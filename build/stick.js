@@ -67,7 +67,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var u = __webpack_require__(6);
 	exports.utils = u;
 	__export(__webpack_require__(42));
-	__export(__webpack_require__(27));
 	var collection_1 = __webpack_require__(35);
 	exports.Collection = collection_1.Collection;
 	exports.NestedModel = collection_1.NestedModel;
