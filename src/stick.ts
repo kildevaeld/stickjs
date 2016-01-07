@@ -7,6 +7,7 @@ import {ModuleFactory} from './module.factory'
 import {Container, FactoryActivator} from './container'
 import {AttributeDefinition, ComponentDefinition} from './template/index'
 import {BaseComponent} from './template/components/base-component'
+import {AttributeConstructor} from 'templ/lib/vnode';
 import * as templ from 'templ';
 import * as annotations from './annotations'
 
@@ -119,7 +120,7 @@ export function component(name: string, handler: ComponentDefinition | any[]) {
 	templ.component(name, Component);
 }
 
-export function attribute(name: string, handler: templ.vnode.AttributeConstructor) {
+export function attribute(name: string, handler: AttributeConstructor) {
 	templ.attribute(name, <any>handler);
 }
 

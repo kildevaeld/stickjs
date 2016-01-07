@@ -2,10 +2,10 @@ import { Container } from './container';
 import * as utils from 'utilities';
 import { IContext } from './context';
 import { TemplateView } from './template/template.view';
-import * as templ from 'templ';
+import { Template } from 'templ/lib/vnode';
 export interface ControllerCreateOptions {
     el?: HTMLElement;
-    template?: string | templ.vnode.Template;
+    template?: string | Template;
     contextName: string;
 }
 export declare class ControllerFactory {

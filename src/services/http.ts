@@ -1,6 +1,3 @@
-
-
-/// <reference path="../typings" />
 import {service} from '../annotations'
 import {request, Request} from 'utilities'
 

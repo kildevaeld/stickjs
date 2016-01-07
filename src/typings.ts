@@ -1,5 +1,3 @@
-/// <reference path="../node_modules/templ/templ" />
-
 
 export class StickError extends Error {
 	message:string

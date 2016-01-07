@@ -1,6 +1,6 @@
-import * as templ from 'templ';
+import { View } from 'templ/lib/view';
 import { DIContainer } from 'di';
-export declare class TemplateView extends templ.View {
+export declare class TemplateView extends View {
     _context: any;
     _container: DIContainer;
     context: any;

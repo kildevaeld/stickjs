@@ -6,7 +6,7 @@ import {isPromise, IPromise, Promise} from 'utilities/lib/index'
 import {BaseComponent} from './base-component'
 import {TemplateView} from '../template.view'
 import {ControllerFactory} from '../../controller.factory'
-import * as templ from 'templ'
+import {Template} from 'templ/lib/vnode'
 import {ComponentDefinition} from '../index'
 
 export const Controller: ComponentDefinition = {
@@ -22,7 +22,7 @@ export const Controller: ComponentDefinition = {
 			throw new Error(this.name + ' is not a controller');
 		}
 
-		let template:string|templ.vnode.Template = this.childTemplate
+		let template:string|Template = this.childTemplate
 		if (this.attributes['template']) {
 			template = this.attributes['template'];
 		}

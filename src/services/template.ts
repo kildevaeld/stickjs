@@ -13,6 +13,7 @@ export interface TemplateCreator {
 	(templateString: string, data:any): TemplateView
 }
 
+
 Stick.factory('$templateResolver', () => {
 	return function (name:string): utils.IPromise<string> {
 		let template = document.getElementById(name);

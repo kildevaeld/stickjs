@@ -19,6 +19,7 @@ export declare class RouterService {
     swap: any;
     private _target;
     target: HTMLElement;
+    setTarget(target: HTMLElement | string): void;
     /**
      * @param {IContext} ctx
      * @param {Container} container

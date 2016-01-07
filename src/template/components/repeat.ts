@@ -1,6 +1,6 @@
 /// <reference path="../../typings" />
 
-import {components, View, compile, vnode} from 'templ'
+//import {components, View, compile, vnode} from 'templ/lib'
 //import {TemplateResolver} from '../../services/template.resolver'
 //import {TemplateView} from '../template-view'
 import {Collection, IModel, NestedModel} from 'collection'

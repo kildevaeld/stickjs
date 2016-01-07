@@ -10,7 +10,7 @@
     "collection": "git+https://github.com/kildevaeld/collectionjs.git",
     "di": "git+https://github.com/kildevaeld/dijs.git",
     "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
-    "templ": "git+https://github.com/kildevaeld/templ.git#development",
+    "templ": "git+https://github.com/kildevaeld/templ.git",
     "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
   },
   "devDependencies": {
@@ -28,6 +28,7 @@
     "requiredir": "^1.0.7",
     "should": "^7.1.0",
     "sinon": "^1.17.1",
+    "tslint": "^3.2.1",
     "webpack": "^1.12.2"
   },
   "homepage": "https://github.com/kildevaeld/stick#readme",

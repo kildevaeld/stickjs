@@ -1,21 +1,17 @@
-import {Router, RouteHandler} from './router'
-//import {classtype, ClassType} from '../../internal'
-import {bind} from 'utilities'
-import {IContext} from '../../context'
-import * as utils from 'utilities'
-import {Container} from '../../container'
-import {service} from '../../annotations'
-import * as templ from 'templ'
-import {inject} from 'di'
-import {ControllerFactory} from '../../controller.factory'
-import {ModuleFactory} from '../../module.factory'
-import {decorator} from '../../stick'
-import {isDependencyType, DependencyType} from '../../internal'
+import {Router, RouteHandler} from './router';
+import {IContext} from '../../context';
+import * as utils from 'utilities';
+import {Container} from '../../container';
+import {service, inject} from '../../annotations';
+import {ControllerFactory} from '../../controller.factory';
+import {ModuleFactory} from '../../module.factory';
+import {decorator} from '../../stick';
+import {isDependencyType, DependencyType} from '../../internal';
 
 export interface RouteOptions {
-	controller:string
-	template?:string
-	target?:string|HTMLElement
+	controller:string;
+	template?:string;
+	target?:string|HTMLElement;
 }
 
 
@@ -50,6 +46,13 @@ export class RouterService {
 	}
 	set target (target:HTMLElement) {
 		this._target = target
+	}
+	
+	setTarget (target:HTMLElement|string) {
+		if (typeof target === 'string') {
+			target = <HTMLElement>document.querySelector(<string>target)
+		}
+		this.target = <HTMLElement>target
 	}
 
 

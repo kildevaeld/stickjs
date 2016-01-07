@@ -1,10 +1,10 @@
 /// <reference path="../typings" />
 
-import * as templ from 'templ'
+import {View} from 'templ/lib/view'
 import {Model,NestedModel} from 'collection'
 import {DIContainer} from 'di'
 
-export class TemplateView extends templ.View {
+export class TemplateView extends View {
 	_context: any
 	_container: DIContainer
 	set context(context: any) {
@@ -36,7 +36,7 @@ export class TemplateView extends templ.View {
 			super(section, template, context, options)
 
 			if (options.delegator) {
-				this.delegator = options.delegator
+				this._delegator = options.delegator
 			}
 			if (options.container) {
 				this._container = options.container
@@ -114,7 +114,7 @@ export class TemplateView extends templ.View {
 	remove () {
 		super.remove()
 		delete this._container
-		delete this.delegator
+		delete this._delegator
 		delete this._context
 	}
 
