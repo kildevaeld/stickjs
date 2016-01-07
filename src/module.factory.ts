@@ -91,7 +91,11 @@ export class ModuleFactory {
 
 		return this
 	}
-
+	
+	/**
+	 * Create a factory function
+	 * @param {String} name
+	 */
 	factory (name:string, factory:any|any[]): ModuleFactory {
 
 		let [fn] = getDependencies(factory);
@@ -109,12 +113,17 @@ export class ModuleFactory {
 		return this;
 	}
 
+	/**
+	 * Create a new instance of the module
+	 * @method create
+	 * @params {Object} options 
+	 * @return {Promise}
+	 */
 	create (options:ModuleCreateOptions = {}): utils.IPromise<any> {
-
+		// There can only be one.
 		if (this.container.hasInstance(this.name)) {
 			return utils.Promise.resolve(this.container.get(this.name));
 		}
-
 
 		this.container.registerSingleton('$context', getContext());
 
@@ -149,29 +158,8 @@ export class ModuleFactory {
 			})
 
 
-		} /*else if (options.el) {
-
-			// Add mutation observer
-			let observer = new Observer()
-			this.container.registerInstance('$observer', observer, true);
-
-
-			// Instatiate template
-			let $template: TemplateCreator = this.container.get('$templateCreator');
-
-			let templateString = options.el.innerHTML;
-			this.factory('template', ['$context', (ctx) => {
-				return $template(templateString, (<any>ctx).__model)
-			}]);
-		}
-
-		if (options.el) {
-			let el = this.container.get('template').render()
-			options.el.innerHTML = '';
-			options.el.appendChild(el);
-			this.container.registerInstance('$elm', options.el, true)
-		}
-		*/
+		} 
+		
 		ctx.$observe()
 		let mod = this.container.get(this.name);
 		ctx.$unobserve();
@@ -179,7 +167,7 @@ export class ModuleFactory {
 		return utils.Promise.resolve(mod)
 	}
 
-  resolveTemplate(ctx: IContext, options: ModuleCreateOptions): utils.IPromise<TemplateView> {
+  private resolveTemplate(ctx: IContext, options: ModuleCreateOptions): utils.IPromise<TemplateView> {
     let $template: TemplateCreator = this.container.get('$templateCreator');
     let promise: utils.IPromise<string>
     if (options.el) {

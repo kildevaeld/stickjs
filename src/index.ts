@@ -7,5 +7,4 @@ export const utils = u
 export * from './stick'
 export {Collection, NestedModel} from 'collection'
 
-import {EventEmitter} from 'eventsjs';
-
+export var ready = u.domReady();

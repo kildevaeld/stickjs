@@ -1,4 +1,4 @@
-/// <reference path="../../typings" />
+
 import {callFunc, bind} from 'utilities'
 import {Component, Section, VNode, AttributeMap, IView, fragment, Template, template} from 'templ/lib/vnode'
 import {resolveDependencies} from '../../internal'

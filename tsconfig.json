@@ -14,12 +14,13 @@
   ],
   "files": [
     "src/annotations.ts",
+    "src/collection.ts",
     "src/container.ts",
     "src/controller.factory.ts",
     "src/index.ts",
     "src/internal.ts",
-    "src/observer.ts",
     "src/module.factory.ts",
+    "src/observer.ts",
     "src/repository.ts",
     "src/stick.ts",
     "src/typings.ts",
@@ -38,7 +39,7 @@
     "src/template/index.ts",
     "src/template/template.view.ts",
     "src/template/components/base-component.ts",
-    "src/template/components/controller.ts",
-    "src/template/components/repeat.ts"
+    "src/template/components/repeat.ts",
+    "src/template/components/controller.ts"
   ]
 }

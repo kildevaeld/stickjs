@@ -137,7 +137,6 @@ export abstract class Context implements IContext {
 		}
 		
 		if (ev !== null) {
-			console.log('EVET', ev, this.__mediator)
 			this.__mediator.unsubscribe(event, ev.handler);
 			this.__subscribers.delete(key);
 		}

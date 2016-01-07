@@ -67,6 +67,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var collection_1 = __webpack_require__(47);
 	exports.Collection = collection_1.Collection;
 	exports.NestedModel = collection_1.NestedModel;
+	exports.ready = u.domReady();
 
 /***/ },
 /* 1 */
@@ -4298,6 +4299,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            return this;
 	        }
+
+	        /**
+	         * Create a factory function
+	         * @param {String} name
+	         */
 	    }, {
 	        key: 'factory',
 	        value: function factory(name, _factory) {
@@ -4317,6 +4323,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            return this;
 	        }
+
+	        /**
+	         * Create a new instance of the module
+	         * @method create
+	         * @params {Object} options
+	         * @return {Promise}
+	         */
 	    }, {
 	        key: 'create',
 	        value: function create() {
@@ -4324,6 +4337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
+	            // There can only be one.
 	            if (this.container.hasInstance(this.name)) {
 	                return utils.Promise.resolve(this.container.get(this.name));
 	            }
@@ -4348,24 +4362,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var mod = _this.container.get(_this.name);
 	                    ctx.$unobserve();
 	                });
-	            } /*else if (options.el) {
-	                 // Add mutation observer
-	                let observer = new Observer()
-	                this.container.registerInstance('$observer', observer, true);
-	                  // Instatiate template
-	                let $template: TemplateCreator = this.container.get('$templateCreator');
-	                 let templateString = options.el.innerHTML;
-	                this.factory('template', ['$context', (ctx) => {
-	                    return $template(templateString, (<any>ctx).__model)
-	                }]);
-	              }
-	              if (options.el) {
-	                let el = this.container.get('template').render()
-	                options.el.innerHTML = '';
-	                options.el.appendChild(el);
-	                this.container.registerInstance('$elm', options.el, true)
-	              }
-	              */
+	            }
 	            ctx.$observe();
 	            var mod = this.container.get(this.name);
 	            ctx.$unobserve();
@@ -4640,7 +4637,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                key = handler;
 	            }
 	            if (ev !== null) {
-	                console.log('EVET', ev, this.__mediator);
 	                this.__mediator.unsubscribe(event, ev.handler);
 	                this.__subscribers["delete"](key);
 	            }
@@ -6042,7 +6038,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../typings" />
 	'use strict';
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();

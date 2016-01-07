@@ -1,8 +1,6 @@
 import { Container } from './container';
 import * as utils from 'utilities';
 import { Template } from 'templ/lib/vnode';
-import { TemplateView } from './template/template.view';
-import { IContext } from './context';
 export declare type ControllerDefinition = FunctionConstructor | Object | any[];
 export interface ModuleCreateOptions {
     el?: HTMLElement;
@@ -16,8 +14,18 @@ export declare class ModuleFactory {
     constructor(name: string, module: FunctionConstructor, container: Container);
     controller(name: string, definition: ControllerDefinition): ModuleFactory;
     service(name: string | FunctionConstructor, definition: Function): ModuleFactory;
+    /**
+     * Create a factory function
+     * @param {String} name
+     */
     factory(name: string, factory: any | any[]): ModuleFactory;
+    /**
+     * Create a new instance of the module
+     * @method create
+     * @params {Object} options
+     * @return {Promise}
+     */
     create(options?: ModuleCreateOptions): utils.IPromise<any>;
-    resolveTemplate(ctx: IContext, options: ModuleCreateOptions): utils.IPromise<TemplateView>;
+    private resolveTemplate(ctx, options);
     destroy(): void;
 }
