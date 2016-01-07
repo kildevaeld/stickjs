@@ -1,5 +1,5 @@
 import { IContext, ISubscriber, ProxyEvent } from './index';
-import { IModel } from 'collection';
+import { IModel, NestedModel } from 'collection';
 import { Mediator } from '../services/mediator';
 export declare const get_atributes: (attributes: any) => {
     attr: {};
@@ -8,7 +8,7 @@ export declare const get_atributes: (attributes: any) => {
 export declare abstract class Context implements IContext {
     private __queue;
     protected __parent: IContext;
-    protected __model: IModel;
+    protected __model: NestedModel;
     private __subscribers;
     protected __mediator: Mediator;
     constructor(mediator: Mediator);
@@ -16,6 +16,7 @@ export declare abstract class Context implements IContext {
     $parent: IContext;
     $call(fn: Function, ctx?: any, args?: any[]): any;
     $subscribe(event: string, handler: ISubscriber, ctx?: any): string;
+    __onModelChange(): void;
     $unsubscribe(event: string, handler: ISubscriber | string): IContext;
     $publish(event: string, ...args: any[]): void;
     abstract $createChild(data?: IModel): IContext;

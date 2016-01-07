@@ -45,7 +45,6 @@ export class TemplateView extends View {
 	}
 
 	set(key: string|string[], val: any, silent: boolean = false) {
-
 		if (!silent) {
 			if (!(this.context instanceof Model)) {
 				return super.set(key, val)
@@ -68,9 +67,9 @@ export class TemplateView extends View {
 			} else if (key[0] === 'root') {
 				(<string[]>key).shift()
 				this.root.set(key, val);
-			} else {
-
+			} else {				
 				this.context.set((<string[]>key).join('.'), val)
+
 			}
 
 		}

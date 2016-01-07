@@ -42,7 +42,7 @@ interface subscriber {
 export abstract class Context implements IContext {
 	private __queue: number
 	protected __parent: IContext
-	protected __model: IModel
+	protected __model: NestedModel
 	private __subscribers: Map<ISubscriber,subscriber>
 	protected __mediator: Mediator
 	constructor (mediator:Mediator) {
@@ -50,6 +50,7 @@ export abstract class Context implements IContext {
 		this.__mediator = mediator
 		this.__model = new NestedModel();
 		this.__onchange = utils.bind(this.__onchange, this);
+		this.__model.on('change', utils.bind(this.__onModelChange, this));
 		this.__subscribers = new Map()
 	}
 
@@ -108,6 +109,16 @@ export abstract class Context implements IContext {
 		this.__mediator.subscribe(event, ev.handler, this)
 		
 		return ev.id
+	}
+	
+	__onModelChange () {
+		let changed = this.__model.changed
+		
+		for (let k in changed) {
+			if (this[k] == changed[k]) continue
+			this[k] = changed[k]; 
+		}
+		
 	}
 
 	$unsubscribe(event:string, handler:ISubscriber|string): IContext {

@@ -22,7 +22,7 @@ export module Repository {
 			items.splice(items.indexOf(item), 1)
 			//throw new Error(`${type} named ${name} already imported as ${item.type}`);
 		}
-
+		
 		let config = Metadata.get(DIServiceConfig, target)
 
 		items.push({
@@ -33,7 +33,6 @@ export module Repository {
 		});
 
 	}
-
 
 	export function hasAny(name:string): boolean {
     return !!any(name);

@@ -52,21 +52,19 @@ export const Repeat: ComponentDefinition = {
 		var parent = this.view
 		var n = 0
 
-		var delegateID = uniqueId('.repeat')
-
 		var self = this
-
+		
 
 		this._collection.forEach(function (m: IModel) {
 
 			var child;
 
 			if (as) {
-				properties = new NestedModel({[as]:m});
+				properties =  new NestedModel({[as]:m});
 			} else {
 				properties = m;
 			}
-
+			
 			// TODO - provide SAME context here for speed and stability
 			if (n >= this._children.length) {
 
@@ -74,7 +72,7 @@ export const Repeat: ComponentDefinition = {
 					parent: parent
 				});
 
-
+				
 				this._children.push(child);
 
 				this.section.appendChild(child.render(properties));
