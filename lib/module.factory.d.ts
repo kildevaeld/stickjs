@@ -1,13 +1,13 @@
 import { Container } from './container';
 import * as utils from 'utilities';
-import * as templ from 'templ';
+import { Template } from 'templ/lib/vnode';
 import { TemplateView } from './template/template.view';
 import { IContext } from './context';
 export declare type ControllerDefinition = FunctionConstructor | Object | any[];
 export interface ModuleCreateOptions {
     el?: HTMLElement;
     parent?: Container;
-    template?: string | templ.vnode.Template;
+    template?: string | Template;
 }
 export declare class ModuleFactory {
     name: string;

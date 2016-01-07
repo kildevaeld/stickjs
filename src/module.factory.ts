@@ -3,7 +3,7 @@ import {getDependencies, setActivator, DependencyType, setDependencyType} from '
 import {StickError} from './typings'
 import {FactoryActivator} from 'di'
 import * as utils from 'utilities'
-import * as templ from 'templ'
+import {Template} from 'templ/lib/vnode'
 import {TemplateView} from './template/template.view'
 import {getContext, IContext} from './context'
 
@@ -16,7 +16,7 @@ export type ControllerDefinition = FunctionConstructor|Object|any[];
 export interface ModuleCreateOptions {
 	el?: HTMLElement
 	parent?:Container
-  template?: string | templ.vnode.Template
+  template?: string | Template
 }
 
 export class ModuleFactory {
@@ -186,8 +186,8 @@ export class ModuleFactory {
       let templateString = options.el.innerHTML;
       promise = utils.Promise.resolve(templateString)
     } else if (options.template) {
-      if (options.template instanceof templ.vnode.Template) {
-        let view = (<templ.vnode.Template>options.template).view((<any>ctx).__model, {
+      if (options.template instanceof Template) {
+        let view = (<Template>options.template).view((<any>ctx).__model, {
           container: this.container
         });
         return utils.Promise.resolve(view);

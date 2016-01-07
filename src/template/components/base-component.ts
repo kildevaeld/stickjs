@@ -1,19 +1,19 @@
 /// <reference path="../../typings" />
 import {callFunc, bind} from 'utilities'
-import * as templ from 'templ'
+import {Component, Section, VNode, AttributeMap, IView, fragment, Template, template} from 'templ/lib/vnode'
 import {resolveDependencies} from '../../internal'
 import {TemplateView} from '../template.view'
-const vnode = templ.vnode
 
-export class BaseComponent implements templ.vnode.Component {
-		section: templ.vnode.Section
-		vnode: templ.vnode.VNode
-		attributes: templ.vnode.AttributeMap
+
+export class BaseComponent implements Component {
+		section: Section
+		vnode: VNode
+		attributes: AttributeMap
 		_attributes: any
-		view: templ.vnode.IView
+		view: IView
 		document:Document
-		childTemplate:templ.vnode.Template
-		constructor(section:templ.vnode.Section, vvnode:templ.vnode.VNode, attributes:templ.vnode.AttributeMap, view:templ.vnode.IView) {
+		childTemplate:Template
+		constructor(section:Section, vvnode:VNode, attributes:AttributeMap, view:IView) {
 
 			if ((<any>this).update) {
 				(<any>this).update = bind((<any>this).update, this);
@@ -26,7 +26,7 @@ export class BaseComponent implements templ.vnode.Component {
 			this.view = view
 			this.document = view.template.options.document
 
-			if (vvnode.childNodes) this.childTemplate = vnode.template(vnode.fragment(vvnode.childNodes), view.template.options);
+			if (vvnode.childNodes) this.childTemplate = template(fragment(vvnode.childNodes), view.template.options);
   		for (var key in attributes) this.setAttribute(key, attributes[key]);
 
 			let container = (<TemplateView>this.view)._container

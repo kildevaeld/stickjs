@@ -4,7 +4,7 @@ export interface RouteHandler {
     (...args: any[]): void;
 }
 export interface RouterOptions {
-    execute?: (callback: RouteHandler, args: any[]) => void;
+    execute?: (callback: RouteHandler, name: string, args: any[]) => void;
 }
 export declare class Router extends EventEmitter {
     options: RouterOptions;

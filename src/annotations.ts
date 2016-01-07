@@ -4,6 +4,7 @@ import {camelcase, find} from 'utilities'
 import {Metadata} from 'di'
 import {Repository} from './repository'
 export {inject} from 'di'
+
 export function controller (controllerName?:string): ClassDecorator {
 	return function (target:Function) {
 		

@@ -82,6 +82,7 @@ export function resolveDependencies(target:Function, container:DIContainer): uti
     return utils.Promise.resolve([]);
   }
   
+  
   for (i=0,ii=inject.length;i<ii;i++) {
     
     ret = tryCatch(() => {

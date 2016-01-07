@@ -6,11 +6,11 @@ import {FactoryActivator} from 'di'
 import {TemplateCreator, TemplateResolver} from './services/template'
 import {StickError} from './typings'
 import {TemplateView} from './template/template.view'
-import * as templ from 'templ';
+import {Template} from 'templ/lib/vnode' 
 
 export interface ControllerCreateOptions {
 	el?: HTMLElement
-	template?: string|templ.vnode.Template
+	template?: string|Template
 	contextName: string
 }
 
@@ -74,8 +74,8 @@ export class ControllerFactory {
 			let templateString = options.el.innerHTML;
 			promise = utils.Promise.resolve(templateString)
 		} else if (options.template) {
-			if (options.template instanceof templ.vnode.Template) {
-				let view = (<templ.vnode.Template>options.template).view((<any>ctx).__model, {
+			if (options.template instanceof Template) {
+				let view = (<Template>options.template).view((<any>ctx).__model, {
 					container:this.container
 				});
 				return utils.Promise.resolve(view);
