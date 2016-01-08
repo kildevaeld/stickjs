@@ -14,8 +14,6 @@ var isRegExp = function(value) {
 };
 
 
-
-
 export interface RouteHandler {
 	(...args:any[]): void
 }

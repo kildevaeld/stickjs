@@ -143,7 +143,6 @@ export class ModuleFactory {
 
         this.container.registerInstance("template", template, true);
 
-
         if (options.el) {
           let el = this.container.get('template').render()
           options.el.innerHTML = '';
