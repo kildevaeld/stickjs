@@ -14,7 +14,7 @@ export declare class HistoryApi extends EventEmitter {
     options: any;
     fragment: string;
     started: boolean;
-    constructor();
+    constructor(options?: any);
     atRoot(): boolean;
     getHash(window?: Window): string;
     getFragment(fragment?: string, forcePushState?: boolean): string;

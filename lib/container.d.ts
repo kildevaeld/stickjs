@@ -9,6 +9,7 @@ export declare class Container extends DIContainer {
     hasHandler(name: string, parent?: boolean, repository?: boolean): boolean;
     get(key: any, targetKey?: string): any;
     registerSingleton(key: any, fn: Function, targetKey?: any): void;
+    registerService(key: any, fn: Function, targetKey?: any): void;
     registerInstance(key: any, instance: any, track?: boolean): void;
     clear(): void;
     destroy(key?: any, fn?: (arg: any) => void): void;

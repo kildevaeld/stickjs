@@ -1,5 +1,6 @@
 import {Container} from './container'
 import {getDependencies, setActivator, DependencyType, setDependencyType} from './internal'
+import {Repository} from './repository';
 import {StickError} from './typings'
 import {FactoryActivator} from 'di'
 import * as utils from 'utilities'
@@ -83,7 +84,8 @@ export class ModuleFactory {
 
 		if (fn && typeof fn === 'function') {
 			setDependencyType(DependencyType.Service)(fn);
-			this.container.registerSingleton(name, fn);
+			this.container.registerService(name, fn);
+            //this.container.registerSingleton(name, fn);
 
 		} else {
 			throw new StickError('service should be a function');
@@ -130,33 +132,30 @@ export class ModuleFactory {
 		let ctx: IContext = this.container.get('$context');
 
 		if (options.parent) {
-      this.container.parent = options.parent;
-      if (options.parent.hasHandler('$context')) {
-        (<any>ctx).__parent = options.parent.get('$context');
-      }
+            this.container.parent = options.parent;
+            if (options.parent.hasHandler('$context')) {
+                (<any>ctx).__parent = options.parent.get('$context');
+            }
 		}
 
 		if (options.template || options.el) {
-
-			return this.resolveTemplate(ctx, options)
+            return this.resolveTemplate(ctx, options)
 			.then((template) => {
 
-        this.container.registerInstance("template", template, true);
+                this.container.registerInstance("template", template, true);
 
-        if (options.el) {
-          let el = this.container.get('template').render()
-          options.el.innerHTML = '';
-          options.el.appendChild(el);
-          this.container.registerInstance('$elm', options.el, true)
-        }
+                if (options.el) {
+                    let el = this.container.get('template').render()
+                    options.el.innerHTML = '';
+                    options.el.appendChild(el);
+                    this.container.registerInstance('$elm', options.el, true)
+                }
 
-        ctx.$observe()
-        let mod = this.container.get(this.name);
-        ctx.$unobserve();
-
-			})
-
-
+                ctx.$observe()
+                let mod = this.container.get(this.name);
+                ctx.$unobserve();
+                return mod;
+			});
 		} 
 		
 		ctx.$observe()
@@ -166,23 +165,50 @@ export class ModuleFactory {
 		return utils.Promise.resolve(mod)
 	}
 
+  public configure<T>(name:string): utils.IPromise<T> {
+      let configName = name;
+      if (!/Provider$/.test(name)) {
+          configName = name + 'Provider';
+      } else {
+          name = name.replace('Provider', '');
+      }
+      
+      let provider;
+      // Check if provider is registered
+      if (this.container.hasHandler(configName, false, false)) {
+          return Promise.resolve(this.container.get(name));
+      // Register module, if exists, at try loading the provider again
+      } else if (Repository.has(DependencyType.Service, name)) {
+          let serv = Repository.get(DependencyType.Service, name);
+          this.container.register(serv);
+          if (this.container.hasHandler(configName, false, false)) {
+            return Promise.resolve(this.container.get(configName));
+          }
+      } 
+      
+      return utils.Promise.reject(new Error('No provider for ' + name.replace('Provider','')));
+  }
+
   private resolveTemplate(ctx: IContext, options: ModuleCreateOptions): utils.IPromise<TemplateView> {
     let $template: TemplateCreator = this.container.get('$templateCreator');
     let promise: utils.IPromise<string>
     if (options.el) {
-      let templateString = options.el.innerHTML;
-      promise = utils.Promise.resolve(templateString)
-    } else if (options.template) {
+      if (options.template == null) {
+          promise = utils.Promise.resolve(options.el.innerHTML)
+      }
+    }
+  
+    if (!promise && options.template) {
       if (options.template instanceof Template) {
         let view = (<Template>options.template).view((<any>ctx).__model, {
           container: this.container
         });
         return utils.Promise.resolve(view);
       }
-
+      
       promise = this.container.get('$templateResolver')(options.template)
 
-    } else {
+    } else if (!options.el) {
       return utils.Promise.reject(new StickError("no element or template"));
     }
 

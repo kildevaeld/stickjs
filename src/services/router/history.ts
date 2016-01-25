@@ -29,13 +29,14 @@ export class HistoryApi extends EventEmitter {
 	get started (): boolean {
 		return this._started
 	}
-	constructor () {
+	constructor (options?:any) {
 		super()
 		if (typeof window !== 'undefined') {
 			this.location = window.location;
 			this.history = window.history;
 		}
 		this.checkUrl = utils.bind(this.checkUrl, this);
+        this.options = options||{};
 	}
 
 	// Are we at the app root?

@@ -1,4 +1,4 @@
-import { Router, RouteHandler } from './router';
+import { Router, RouteHandler, IRouterOptions } from './router';
 import { IContext } from '../../context';
 import { Container } from '../../container';
 import { ControllerFactory } from '../../controller.factory';
@@ -10,6 +10,11 @@ export interface RouteOptions {
 export interface Route {
     fragment: string;
     parameters: string[];
+}
+export declare class RouterOptions implements IRouterOptions {
+    execute: (callback: RouteHandler, name: string, args: any[]) => void;
+    pushState: boolean;
+    constructor();
 }
 export declare class RouterService {
     router: Router;
@@ -25,7 +30,7 @@ export declare class RouterService {
      * @param {Container} container
      * @constructor RouterService
      */
-    constructor(ctx: IContext, container: Container);
+    constructor(ctx: IContext, container: Container, options?: IRouterOptions);
     private swapElements(target, element);
     /**
      * Notfound handler

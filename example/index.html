@@ -95,12 +95,19 @@
 				var i = document.querySelector('i');
 				i.setAttribute('name', 'check')
 			});
+            
+            factory.configure('$routerProvider').then((p) => {
+                p.pushState = true;
+            })
+            
 			factory.create({
 				el: document.querySelector('#app')
 			}).then(function (a) {
 				console.log(a);
 				
 			})
+            
+           
 			
 			
 		</script>

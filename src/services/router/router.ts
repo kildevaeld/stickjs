@@ -18,19 +18,21 @@ export interface RouteHandler {
 	(...args:any[]): void
 }
 
-export interface RouterOptions {
-	execute?: (callback:RouteHandler, name:string, args:any[]) => void
+export interface IRouterOptions {
+    execute?: (callback:RouteHandler, name:string, args:any[]) => void
+    pushState?: boolean
 }
 
+
+
 export class Router extends EventEmitter  {
-	options: RouterOptions
+	options: IRouterOptions
 	public history: HistoryApi
-	constructor (options:RouterOptions = {}) {
+	constructor (options:IRouterOptions = {}) {
     super()
-    this.history = new HistoryApi();
+    this.history = new HistoryApi(options);
     this.options = options
 	}
-
 
 	route (route:RegExp|string, name:RouteHandler|string, handler: RouteHandler = null): Router {
 		if (!isRegExp(route)) route = this._routeToRegExp(<string>route);

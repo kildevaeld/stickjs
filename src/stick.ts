@@ -36,7 +36,7 @@ export function factory(name: string, factory: any | any[]) {
 
 const container = new Container();
 
-export function module(name: string, definition: Function | Object | any[]) {
+export function module(name: string, definition: Function | Object | any[] = null) {
 
 	if (definition == null) {
 		let factory;

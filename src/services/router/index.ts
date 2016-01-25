@@ -1,8 +1,8 @@
-import {Router, RouteHandler} from './router';
+import {Router, RouteHandler, IRouterOptions} from './router';
 import {IContext} from '../../context';
 import * as utils from 'utilities';
 import {Container} from '../../container';
-import {service, inject} from '../../annotations';
+import {service, inject, config} from '../../annotations';
 import {ControllerFactory} from '../../controller.factory';
 import {ModuleFactory} from '../../module.factory';
 import {decorator} from '../../stick';
@@ -29,8 +29,19 @@ export interface Route {
 	parameters: string[]
 }
 
+export class RouterOptions implements IRouterOptions {
+	execute: (callback:RouteHandler, name:string, args:any[]) => void
+    pushState: boolean
+    constructor () {
+        this.execute = null;
+        this.pushState = false;
+    }
+}
 
-@inject('$context', '$container')
+
+
+@config(RouterOptions)
+@inject('$context', '$container', '$routerProvider')
 @service('$router')
 /** Router */
 export class RouterService {
@@ -61,10 +72,10 @@ export class RouterService {
 	 * @param {Container} container
 	 * @constructor RouterService
 	 */
-	constructor (ctx:IContext, container: Container) {
-    this.router = new Router({
-      execute: <any>utils.bind(this.__execute, this)
-    });
+	constructor (ctx:IContext, container: Container, options:IRouterOptions={}) {
+        console.log(options);
+        options.execute = options.execute||utils.bind(this.__execute, this);
+        this.router = new Router(options);
 		this.context = ctx;
 		this.container = container;
 		this.router.history.start()

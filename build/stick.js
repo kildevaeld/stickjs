@@ -114,6 +114,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	});
+
+	var RouterOptions = function RouterOptions() {
+	    _classCallCheck(this, RouterOptions);
+
+	    this.execute = null;
+	    this.pushState = false;
+	};
+
+	exports.RouterOptions = RouterOptions;
 	var RouterService = (function () {
 	    /**
 	     * @param {IContext} ctx
@@ -122,11 +131,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 
 	    function RouterService(ctx, container) {
+	        var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
 	        _classCallCheck(this, RouterService);
 
-	        this.router = new router_1.Router({
-	            execute: utils.bind(this.__execute, this)
-	        });
+	        console.log(options);
+	        options.execute = options.execute || utils.bind(this.__execute, this);
+	        this.router = new router_1.Router(options);
 	        this.context = ctx;
 	        this.container = container;
 	        this.router.history.start();
@@ -267,7 +278,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return RouterService;
 	})();
-	RouterService = __decorate([annotations_1.inject('$context', '$container'), annotations_1.service('$router')], RouterService);
+	RouterService = __decorate([annotations_1.config(RouterOptions), annotations_1.inject('$context', '$container', '$routerProvider'), annotations_1.service('$router')], RouterService);
 	exports.RouterService = RouterService;
 
 /***/ },
@@ -306,7 +317,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _classCallCheck(this, Router);
 
 	        _get(Object.getPrototypeOf(Router.prototype), 'constructor', this).call(this);
-	        this.history = new history_1.HistoryApi();
+	        this.history = new history_1.HistoryApi(options);
 	        this.options = options;
 	    }
 
@@ -429,7 +440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var HistoryApi = (function (_eventsjs_1$EventEmitter) {
 	    _inherits(HistoryApi, _eventsjs_1$EventEmitter);
 
-	    function HistoryApi() {
+	    function HistoryApi(options) {
 	        _classCallCheck(this, HistoryApi);
 
 	        _get(Object.getPrototypeOf(HistoryApi.prototype), 'constructor', this).call(this);
@@ -440,6 +451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.history = window.history;
 	        }
 	        this.checkUrl = utils.bind(this.checkUrl, this);
+	        this.options = options || {};
 	    }
 
 	    _createClass(HistoryApi, [{
@@ -714,7 +726,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            EventEmitter.debugCallback(this.constructor.name, this.name, eventName, args);
 	        var event, a, len = events.length, index, i;
 	        var calls = [];
-	       
 	        for (i = 0; i < events.length; i++) {
 	            event = events[i];
 	            a = args;
@@ -829,11 +840,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.indexOf = indexOf;
 	function find(array, callback, ctx) {
-	    var i, v;
-	    for (i = 0; i < array.length; i++) {
-	        v = array[i];
-	        if (callback.call(ctx, v))
-	            return v;
+	    var v;
+	    for (var i = 0, ii = array.length; i < ii; i++) {
+	        if (callback.call(ctx, array[i]))
+	            return array[i];
 	    }
 	    return null;
 	}
@@ -859,8 +869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    })
 	        .sort(function (left, right) {
-	        var a = left.criteria;
-	        var b = right.criteria;
+	        var a = left.criteria, b = right.criteria;
 	        if (a !== b) {
 	            if (a > b || a === void 0)
 	                return 1;
@@ -1679,25 +1688,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Request;
 	})();
 	exports.Request = Request;
-	var request;
-	(function (request) {
-	    function get(url) {
-	        return new Request('GET', url);
-	    }
-	    request.get = get;
-	    function post(url) {
-	        return new Request('POST', url);
-	    }
-	    request.post = post;
-	    function put(url) {
-	        return new Request('PUT', url);
-	    }
-	    request.put = put;
-	    function del(url) {
-	        return new Request('DELETE', url);
-	    }
-	    request.del = del;
-	})(request = exports.request || (exports.request = {}));
+	(function (HttpMethod) {
+	    HttpMethod[HttpMethod["Get"] = 0] = "Get";
+	    HttpMethod[HttpMethod["Post"] = 1] = "Post";
+	    HttpMethod[HttpMethod["Put"] = 2] = "Put";
+	    HttpMethod[HttpMethod["Delete"] = 3] = "Delete";
+	    HttpMethod[HttpMethod["Patch"] = 4] = "Patch";
+	    HttpMethod[HttpMethod["Head"] = 5] = "Head";
+	})(exports.HttpMethod || (exports.HttpMethod = {}));
+	var HttpMethod = exports.HttpMethod;
+	exports.request = {};
+	['get', 'post', 'put', 'delete', 'patch', 'head']
+	    .forEach(function (m) {
+	    exports.request[m === 'delete' ? 'del' : m] = function (url) {
+	        return new Request(m.toUpperCase(), url);
+	    };
+	});
 
 
 /***/ },
@@ -4222,6 +4228,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	var internal_1 = __webpack_require__(16);
+	var repository_1 = __webpack_require__(27);
 	var typings_1 = __webpack_require__(29);
 	var di_1 = __webpack_require__(17);
 	var utils = __webpack_require__(6);
@@ -4293,7 +4300,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            if (fn && typeof fn === 'function') {
 	                internal_1.setDependencyType(internal_1.DependencyType.Service)(fn);
-	                this.container.registerSingleton(name, fn);
+	                this.container.registerService(name, fn);
 	            } else {
 	                throw new typings_1.StickError('service should be a function');
 	            }
@@ -4361,6 +4368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    ctx.$observe();
 	                    var mod = _this.container.get(_this.name);
 	                    ctx.$unobserve();
+	                    return mod;
 	                });
 	            }
 	            ctx.$observe();
@@ -4369,14 +4377,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return utils.Promise.resolve(mod);
 	        }
 	    }, {
+	        key: 'configure',
+	        value: function configure(name) {
+	            var configName = name;
+	            if (!/Provider$/.test(name)) {
+	                configName = name + 'Provider';
+	            } else {
+	                name = name.replace('Provider', '');
+	            }
+	            var provider = undefined;
+	            // Check if provider is registered
+	            if (this.container.hasHandler(configName, false, false)) {
+	                return Promise.resolve(this.container.get(name));
+	            } else if (repository_1.Repository.has(internal_1.DependencyType.Service, name)) {
+	                var serv = repository_1.Repository.get(internal_1.DependencyType.Service, name);
+	                this.container.register(serv);
+	                if (this.container.hasHandler(configName, false, false)) {
+	                    return Promise.resolve(this.container.get(configName));
+	                }
+	            }
+	            return utils.Promise.reject(new Error('No provider for ' + name.replace('Provider', '')));
+	        }
+	    }, {
 	        key: 'resolveTemplate',
 	        value: function resolveTemplate(ctx, options) {
 	            var $template = this.container.get('$templateCreator');
 	            var promise = undefined;
 	            if (options.el) {
-	                var templateString = options.el.innerHTML;
-	                promise = utils.Promise.resolve(templateString);
-	            } else if (options.template) {
+	                if (options.template == null) {
+	                    promise = utils.Promise.resolve(options.el.innerHTML);
+	                }
+	            }
+	            if (!promise && options.template) {
 	                if (options.template instanceof vnode_1.Template) {
 	                    var view = options.template.view(ctx.__model, {
 	                        container: this.container
@@ -4384,7 +4416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return utils.Promise.resolve(view);
 	                }
 	                promise = this.container.get('$templateResolver')(options.template);
-	            } else {
+	            } else if (!options.el) {
 	                return utils.Promise.reject(new typings_1.StickError("no element or template"));
 	            }
 	            return promise.then(function (templateString) {
@@ -5672,7 +5704,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.factory = factory;
 	var container = new container_1.Container();
-	function _module(name, definition) {
+	function _module(name) {
+	    var definition = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
 	    if (definition == null) {
 	        var _factory = undefined;
 	        // Check if module already is defined
@@ -5786,15 +5820,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	})();
 
-	var _get = function get(_x5, _x6, _x7) {
+	var _get = function get(_x6, _x7, _x8) {
 	    var _again = true;_function: while (_again) {
-	        var object = _x5,
-	            property = _x6,
-	            receiver = _x7;_again = false;if (object === null) object = Function.prototype;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+	        var object = _x6,
+	            property = _x7,
+	            receiver = _x8;_again = false;if (object === null) object = Function.prototype;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
 	            var parent = Object.getPrototypeOf(object);if (parent === null) {
 	                return undefined;
 	            } else {
-	                _x5 = parent;_x6 = property;_x7 = receiver;_again = true;desc = parent = undefined;continue _function;
+	                _x6 = parent;_x7 = property;_x8 = receiver;_again = true;desc = parent = undefined;continue _function;
 	            }
 	        } else if ('value' in desc) {
 	            return desc.value;
@@ -5826,6 +5860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var repository_1 = __webpack_require__(27);
 	var internal_1 = __webpack_require__(16);
 	var utils = __webpack_require__(6);
+	var meta_1 = __webpack_require__(23);
 	var controller_factory_1 = __webpack_require__(28);
 	__export(__webpack_require__(17));
 	function tryCatch(fn, ctx, args) {
@@ -5839,6 +5874,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return [result, error];
 	}
 	exports.tryCatch = tryCatch;
+	// TODO: Handle instances in unregister
 
 	var Container = (function (_di_1$DIContainer) {
 	    _inherits(Container, _di_1$DIContainer);
@@ -5907,6 +5943,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	                } else {
 	                    var singleton = _this.invoke(fn, null, targetKey);
 	                    _this.__instances.set(key, singleton);
+	                    return singleton;
+	                }
+	            });
+	        }
+	    }, {
+	        key: 'registerService',
+	        value: function registerService(key, fn) {
+	            var _this2 = this;
+
+	            var targetKey = arguments.length <= 2 || arguments[2] === undefined ? undefined : arguments[2];
+
+	            var name = undefined;
+	            if (typeof key === 'string') {
+	                name = key;
+	            } else {
+	                name = key.name;
+	            }
+	            var configKey = name + 'Provider';
+	            var Config = meta_1.Metadata.getOwn(internal_1.DIServiceConfig, fn, targetKey);
+	            if (Config != null) {
+	                if (this.hasHandler(configKey, false, false)) {
+	                    throw new Error('Provider for \'' + name + '\' already defined');
+	                }
+	                var config = new Config();
+	                this.registerInstance(configKey, config);
+	            }
+	            return this.registerHandler(key, function (x) {
+	                if (_this2.__instances.has(key)) {
+	                    return _this2.__instances.get(key);
+	                } else {
+	                    var singleton = _this2.invoke(fn, null, targetKey);
+	                    _this2.__instances.set(key, singleton);
+	                    _this2.unregister(configKey);
 	                    return singleton;
 	                }
 	            });
@@ -6008,7 +6077,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.registerInstance(item.name, factory, true);
 	                    break;
 	                case internal_1.DependencyType.Service:
-	                    this.registerSingleton(item.name, item.handler);
+	                    this.registerService(item.name, item.handler);
 	                    break;
 	                case internal_1.DependencyType.Factory:
 	                    if (typeof item.handler === 'function') {
@@ -6603,6 +6672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.onclick = event_1.ClickAttribute;
 	exports.onenter = event_1.OnEnterAttribute;
 	exports.onescape = event_1.OnEscapeAttribute;
+	exports.onchange = event_1.ChangeAttribute;
 	exports.checked = value_1.ValueAttribute;
 	exports.style = style_1.StyleAttribute;
 	exports.focus = focus_1.FocusAttribute;
@@ -6863,11 +6933,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.KeyCodeAttribute = KeyCodeAttribute;
 
-	var ClickAttribute = function (_EventAttribute2) {
-	    _inherits(ClickAttribute, _EventAttribute2);
+	var ChangeAttribute = function (_EventAttribute2) {
+	    _inherits(ChangeAttribute, _EventAttribute2);
 
-	    function ClickAttribute() {
-	        _classCallCheck(this, ClickAttribute);
+	    function ChangeAttribute() {
+	        _classCallCheck(this, ChangeAttribute);
 
 	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
 	            args[_key] = arguments[_key];
@@ -6875,8 +6945,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var _this3 = _possibleConstructorReturn(this, _EventAttribute2.call.apply(_EventAttribute2, [this].concat(args)));
 
-	        _this3.event = "click";
+	        _this3.event = "change";
 	        return _this3;
+	    }
+
+	    return ChangeAttribute;
+	}(EventAttribute);
+
+	exports.ChangeAttribute = ChangeAttribute;
+
+	var ClickAttribute = function (_EventAttribute3) {
+	    _inherits(ClickAttribute, _EventAttribute3);
+
+	    function ClickAttribute() {
+	        _classCallCheck(this, ClickAttribute);
+
+	        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	            args[_key2] = arguments[_key2];
+	        }
+
+	        var _this4 = _possibleConstructorReturn(this, _EventAttribute3.call.apply(_EventAttribute3, [this].concat(args)));
+
+	        _this4.event = "click";
+	        return _this4;
 	    }
 
 	    return ClickAttribute;
@@ -6890,14 +6981,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function OnEnterAttribute() {
 	        _classCallCheck(this, OnEnterAttribute);
 
-	        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	            args[_key2] = arguments[_key2];
+	        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	            args[_key3] = arguments[_key3];
 	        }
 
-	        var _this4 = _possibleConstructorReturn(this, _KeyCodeAttribute.call.apply(_KeyCodeAttribute, [this].concat(args)));
+	        var _this5 = _possibleConstructorReturn(this, _KeyCodeAttribute.call.apply(_KeyCodeAttribute, [this].concat(args)));
 
-	        _this4.keyCodes = [13];
-	        return _this4;
+	        _this5.keyCodes = [13];
+	        return _this5;
 	    }
 
 	    return OnEnterAttribute;
@@ -6911,14 +7002,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function OnEscapeAttribute() {
 	        _classCallCheck(this, OnEscapeAttribute);
 
-	        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	            args[_key3] = arguments[_key3];
+	        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	            args[_key4] = arguments[_key4];
 	        }
 
-	        var _this5 = _possibleConstructorReturn(this, _KeyCodeAttribute2.call.apply(_KeyCodeAttribute2, [this].concat(args)));
+	        var _this6 = _possibleConstructorReturn(this, _KeyCodeAttribute2.call.apply(_KeyCodeAttribute2, [this].concat(args)));
 
-	        _this5.KeyCodes = [27];
-	        return _this5;
+	        _this6.KeyCodes = [27];
+	        return _this6;
 	    }
 
 	    return OnEscapeAttribute;

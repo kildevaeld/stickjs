@@ -1,9 +1,9 @@
 import {DIContainer, IHandlerFunc, ConstructionInfo, DIBadKeyError, Resolver, FactoryActivator} from 'di'
 import {StickDependencyError} from './typings'
 import {Repository, ItemMap} from './repository'
-import {DependencyType, setActivator} from './internal'
+import {DependencyType, setActivator, DIServiceConfig} from './internal'
 import * as utils from 'utilities'
-
+import {Metadata} from 'di/lib/meta'
 import {ControllerFactory} from './controller.factory'
 
 export * from 'di'
@@ -18,7 +18,7 @@ export function tryCatch(fn:Function, ctx?:any, args?:any[]): [any,Error] {
 
 	return [result, error];
 }
-
+// TODO: Handle instances in unregister
 export class Container extends DIContainer {
 	__instances: Map<any, any>
 
@@ -36,7 +36,7 @@ export class Container extends DIContainer {
 	hasHandler(name:string, parent?:boolean, repository?:boolean): boolean {
 		let has = super.hasHandler(name, parent)
 
-    return (!has && repository) ? Repository.hasAny(name) : has;
+        return (!has && repository) ? Repository.hasAny(name) : has;
 
 	}
 
@@ -100,8 +100,40 @@ export class Container extends DIContainer {
 
 				return singleton
 			}
-		})
+		});
 	}
+    
+    registerService(key: any, fn: Function, targetKey: any = undefined) {
+        let name: string;
+        if (typeof key === 'string') {
+            name = key;
+        } else {
+            name = key.name;
+        }
+        let configKey = name + 'Provider'; 
+        let Config = <FunctionConstructor>Metadata.getOwn(DIServiceConfig, fn, targetKey);
+        
+        if (Config != null) {
+            if (this.hasHandler(configKey, false, false)) {
+                throw new Error(`Provider for '${name}' already defined`);
+            }
+            let config = new Config();
+            this.registerInstance(configKey, config);
+            //
+        }
+        
+        return this.registerHandler(key, (x) => {
+			if (this.__instances.has(key)) {
+				return this.__instances.get(key)
+			} else {
+				let singleton = this.invoke(fn, null, targetKey)
+				this.__instances.set(key, singleton)
+                this.unregister(configKey);
+				return singleton
+			}
+		})
+        
+    }
 
 	registerInstance(key: any, instance: any, track:boolean = false) {
 
@@ -152,7 +184,7 @@ export class Container extends DIContainer {
 				this.registerInstance(item.name, factory, true);
 				break;
 			case DependencyType.Service:
-				this.registerSingleton(item.name, item.handler);
+				this.registerService(item.name, item.handler);
 				break;
 			case DependencyType.Factory:
 				if (typeof item.handler === 'function') {

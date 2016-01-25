@@ -26,6 +26,7 @@ export declare class ModuleFactory {
      * @return {Promise}
      */
     create(options?: ModuleCreateOptions): utils.IPromise<any>;
+    configure<T>(name: string): utils.IPromise<T>;
     private resolveTemplate(ctx, options);
     destroy(): void;
 }
