@@ -66,9 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var u = __webpack_require__(6);
 	exports.utils = u;
 	__export(__webpack_require__(58));
-	var collection_1 = __webpack_require__(47);
-	exports.Collection = collection_1.Collection;
-	exports.NestedModel = collection_1.NestedModel;
+	__export(__webpack_require__(47));
 	exports.ready = u.domReady();
 
 /***/ },
@@ -12405,9 +12403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'context',
 	        set: function set(context) {
 	            if (this._context && this._context instanceof collection_1.Model) {
-	                console.log('HERE', this._context.listeners['change'].length);
 	                this._context.off('change', this._onModelChange, this);
-	                console.log('HERE AGAIN', this._context.listeners['change'].length);
 	            }
 	            if (context != null && context instanceof collection_1.Model) {
 	                context.on('change', this._onModelChange, this);

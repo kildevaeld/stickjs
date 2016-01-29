@@ -20,9 +20,9 @@ export class TemplateView extends View {
 	set context(context: any) {
 
 		if (this._context && this._context instanceof Model) {
-			console.log('HERE', this._context.listeners['change'].length)
+
 			this._context.off('change', this._onModelChange, this);
-      console.log('HERE AGAIN', this._context.listeners['change'].length)
+
 		}
 		if (context != null && context instanceof Model) {
     	context.on('change', this._onModelChange, this);
