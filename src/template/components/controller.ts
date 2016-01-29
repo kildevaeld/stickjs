@@ -37,6 +37,7 @@ export const Controller: ComponentDefinition = {
 	},
 
 	onDestroy () {
+
 		if (this.factory) {
 			this.factory.destroy()
 		}

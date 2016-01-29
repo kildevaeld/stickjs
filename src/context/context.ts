@@ -50,7 +50,7 @@ export abstract class Context implements IContext {
 		this.__mediator = mediator
 		this.__model = new NestedModel();
 		this.__onchange = utils.bind(this.__onchange, this);
-		this.__model.on('change', utils.bind(this.__onModelChange, this));
+		this.__model.on('change', this.__onModelChange, this);
 		this.__subscribers = new Map()
 	}
 
@@ -69,6 +69,7 @@ export abstract class Context implements IContext {
 	get $parent (): IContext {
     return this.__parent;
 	}
+
 
 	$call(fn:Function, ctx?:any, args?:any[]) {
 		this.$observe();
@@ -104,21 +105,21 @@ export abstract class Context implements IContext {
 			},
 			id: utils.uniqueId("ctx")
 		}
-		
-		this.__subscribers.set(handler, ev)	
+
+		this.__subscribers.set(handler, ev)
 		this.__mediator.subscribe(event, ev.handler, this)
-		
+
 		return ev.id
 	}
-	
+
 	__onModelChange () {
 		let changed = this.__model.changed
-		
+
 		for (let k in changed) {
 			if (this[k] == changed[k]) continue
-			this[k] = changed[k]; 
+			this[k] = changed[k];
 		}
-		
+
 	}
 
 	$unsubscribe(event:string, handler:ISubscriber|string): IContext {
@@ -135,12 +136,12 @@ export abstract class Context implements IContext {
 			ev = this.__subscribers.get(handler);
 			key = handler;
 		}
-		
+
 		if (ev !== null) {
 			this.__mediator.unsubscribe(event, ev.handler);
 			this.__subscribers.delete(key);
 		}
-		
+
 		return this;
 
 	}
@@ -223,12 +224,13 @@ export abstract class Context implements IContext {
   	}
 		return attr
 	}
-	
+
 
 	$destroy () {
 		for (let [k, v] of this.__subscribers) {
 			this.__mediator.unsubscribe(v.event, k)
 		}
+    (<any>this.__model).off('change', this.__onModelChange, this);
 		this.__subscribers.clear()
 	}
 }

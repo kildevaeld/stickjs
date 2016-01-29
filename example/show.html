@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="../build/stick.js"></script>
+    <script>
+
+      var factory = stick.module('app', function ($context) {
+        $context.show = false;
+
+      });
+
+      stick.ready(function () {
+        factory.create({
+          el: document.body
+        });
+      });
+
+    </script>
+  </head>
+  <body>
+    <button onclick="{{show = !show}}">Toggle</button>
+    <show when="{{show}}">
+      This is visible when show = true
+    </show>
+    <hide when="{{show}}">
+      This is visible when show = false
+    </hide>
+  </body>
+</html>

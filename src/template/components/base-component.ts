@@ -38,14 +38,14 @@ export class BaseComponent implements Component {
 			}).catch((e) => {
 				throw e
 			})*/
-            this.initialize.call(this, container);
+      this.initialize.call(this, container);
 
 		}
 
 		initialize () {
 
 		}
-        
+
 
 		setAttribute (key:string, value:any) {
 			this._attributes[key]  = value

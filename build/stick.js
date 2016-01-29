@@ -3846,10 +3846,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.document = document;
 	        this.start = start || document.createTextNode('');
 	        this.end = end || document.createTextNode('');
+
 	        if (!this.start.parentNode) {
+
 	            var parent = document.createDocumentFragment();
 	            parent.appendChild(this.start);
 	            parent.appendChild(this.end);
+	            //console.log(this.start.parentNode)
+	            this.__parent = parent;
 	        }
 	    }
 
@@ -4576,7 +4580,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.__mediator = mediator;
 	        this.__model = new collection_1.NestedModel();
 	        this.__onchange = utils.bind(this.__onchange, this);
-	        this.__model.on('change', utils.bind(this.__onModelChange, this));
+	        this.__model.on('change', this.__onModelChange, this);
 	        this.__subscribers = new Map();
 	    }
 
@@ -4786,6 +4790,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 
+	            this.__model.off('change', this.__onModelChange, this);
 	            this.__subscribers.clear();
 	        }
 	    }, {
@@ -12292,6 +12297,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function TemplateView(section, template, context, options) {
 	        _classCallCheck(this, TemplateView);
 
+	        //this._onModelChange = bind(this._onModelChange, this);
+
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TemplateView).call(this, section, template, context, options));
 
 	        if (options.delegator) {
@@ -12306,8 +12313,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _createClass(TemplateView, [{
 	        key: '_onModelChange',
-	        value: function _onModelChange() {
-	            var changed = this._context.changed;
+	        value: function _onModelChange(model) {
+	            if (this.context == undefined) {
+	                console.log('context is undefined', model, this);
+	            }
+	            var changed = model.changed;
 	            for (var k in changed) {
 	                this.set(k, changed[k]);
 	            }
@@ -12373,15 +12383,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'remove',
 	        value: function remove() {
+	            if (this._context && this._context instanceof collection_1.Model) {
+	                this._context.off('change', this._onModelChange, this);
+	            }
 	            _get(Object.getPrototypeOf(TemplateView.prototype), 'remove', this).call(this);
-	            delete this._container;
-	            delete this._delegator;
-	            delete this._context;
 	        }
 	    }, {
 	        key: '$destroy',
 	        value: function $destroy() {
 	            this.remove();
+	            delete this._container;
+	            delete this._delegator;
+	            this._context = null;
 	        }
 	    }, {
 	        key: 'container',
@@ -12392,11 +12405,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'context',
 	        set: function set(context) {
 	            if (this._context && this._context instanceof collection_1.Model) {
-	                this._context.off('change', this._onModelChange);
+	                console.log('HERE', this._context.listeners['change'].length);
+	                this._context.off('change', this._onModelChange, this);
+	                console.log('HERE AGAIN', this._context.listeners['change'].length);
 	            }
 	            if (context != null && context instanceof collection_1.Model) {
 	                context.on('change', this._onModelChange, this);
 	            }
+	            //console.log('context', this._context, context);
 	            this._context = context;
 	        },
 	        get: function get() {
@@ -12708,7 +12724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Show = {
 	    initialize: function initialize($context) {},
 	    update: function update() {
-	        var show = !!this._attributes.when;
+	        var show = this._attributes.when;
 	        if (this._show === show) {
 	            if (this._subview) {
 	                this._subview.update();
@@ -12717,26 +12733,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        this._show = show;
 	        if (show) {
-	            this._subview = this.childTemplate.view(this.view.context, {
-	                parent: this.view,
-	                container: this.view._container
-	            });
+	            if (!this._subview) {
+	                this._subview = this.childTemplate.view(this.view.context, {
+	                    parent: this.view,
+	                    container: this.view._container
+	                });
+	            }
 	            this.section.appendChild(this._subview.render());
 	        } else {
 	            if (this._subview) {
 	                this._subview.remove();
 	            }
-	            this._subview = void 0;
 	        }
 	    },
 	    onDestroy: function destroy() {
-	        if (this._subview) this._subview.remove();
+	        console.log('on destroy');
+	        if (this._subview) this._subview.$destroy();
 	    }
 	};
 	exports.Hide = {
 	    initialize: function initialize($context) {},
 	    update: function update() {
-	        var hide = !!this._attributes.when;
+	        var hide = this._attributes.when;
 	        if (this._hide === hide) {
 	            if (this._subview) {
 	                this._subview.update();
@@ -12745,20 +12763,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        this._hide = hide;
 	        if (!hide) {
-	            this._subview = this.childTemplate.view(this.view.context, {
-	                parent: this.view,
-	                container: this.view._container
-	            });
+	            if (!this._subview) {
+	                this._subview = this.childTemplate.view(this.view.context, {
+	                    parent: this.view,
+	                    container: this.view._container
+	                });
+	            }
 	            this.section.appendChild(this._subview.render());
 	        } else {
 	            if (this._subview) {
 	                this._subview.remove();
 	            }
-	            this._subview = void 0;
 	        }
 	    },
 	    onDestroy: function destroy() {
-	        if (this._subview) this._subview.remove();
+	        if (this._subview) this._subview.$destroy();
 	    }
 	};
 
@@ -12869,11 +12888,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        //this.$context.call(fn, undefined, e)
 	        fn(e);
 	    },
-	    destroy: function destroy() {
+	    onDestroy: function destroy() {
 	        //debug('removed event listener %s: %o', this.event, this.value);
 	        utilities_1.undelegate(this._container, this._attributes.selector, 'click', this._onEvent);
 	        //this.view.removeListener(this.ref, this.event, this._onEvent);
-	        this._subview.remove();
+	        this._subview.$destroy();
 	    }
 	};
 

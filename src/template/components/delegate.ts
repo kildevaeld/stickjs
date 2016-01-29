@@ -47,11 +47,11 @@ export const Delegate: ComponentDefinition = {
         //this.$context.call(fn, undefined, e)
         fn(e);
     },
-    destroy: function destroy() {
+    onDestroy: function destroy() {
         //debug('removed event listener %s: %o', this.event, this.value);
         undelegate(this._container, this._attributes.selector, 'click', this._onEvent);
 
         //this.view.removeListener(this.ref, this.event, this._onEvent);
-        this._subview.remove();
+        this._subview.$destroy();
     }
 }

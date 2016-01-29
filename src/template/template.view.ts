@@ -1,6 +1,7 @@
 import {View, IDelegator} from 'templ/lib/view'
 import {Model,NestedModel} from 'collection'
 import {DIContainer} from 'di'
+import {bind} from 'utilities';
 
 export interface TemplateViewOptions {
 	parent?: TemplateView
@@ -19,21 +20,27 @@ export class TemplateView extends View {
 	set context(context: any) {
 
 		if (this._context && this._context instanceof Model) {
-			this._context.off('change', this._onModelChange);
+			console.log('HERE', this._context.listeners['change'].length)
+			this._context.off('change', this._onModelChange, this);
+      console.log('HERE AGAIN', this._context.listeners['change'].length)
 		}
 		if (context != null && context instanceof Model) {
     	context.on('change', this._onModelChange, this);
 		}
-
+    //console.log('context', this._context, context);
 		this._context = context
+
 	}
 
 	get context(): any {
 		return this._context
 	}
 
-	_onModelChange () {
-      let changed = this._context.changed
+	_onModelChange (model) {
+			if (this.context == undefined) {
+          console.log('context is undefined', model, this);
+			}
+      let changed = model.changed
       for (let k in changed) {
           this.set(k, changed[k])
       }
@@ -42,6 +49,7 @@ export class TemplateView extends View {
 	constructor(section:any, template:any, context:any,options?:TemplateViewOptions) {
 			super(section, template, context, options)
 
+      //this._onModelChange = bind(this._onModelChange, this);
 			if (options.delegator) {
 				this._delegator = options.delegator
 			}
@@ -108,6 +116,7 @@ export class TemplateView extends View {
 			context = this.root.context
 		}
 
+
 		key = (<any>key).join('.')
 		if (!value) {
 			if (!(this.context instanceof Model)) {
@@ -121,13 +130,17 @@ export class TemplateView extends View {
 	}
 
 	remove () {
-		super.remove()
-		delete this._container
-		delete this._delegator
-		delete this._context
+    if (this._context && this._context instanceof Model) {
+    	this._context.off('change', this._onModelChange, this);
+    }
+
+    super.remove()
 	}
 
 	$destroy () {
 		this.remove()
+    delete this._container
+    delete this._delegator
+    this._context = null;
 	}
 }
