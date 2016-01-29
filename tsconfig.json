@@ -39,7 +39,10 @@
     "src/template/index.ts",
     "src/template/template.view.ts",
     "src/template/components/base-component.ts",
+    "src/template/components/controller.ts",
+    "src/template/components/delegate.ts",
     "src/template/components/repeat.ts",
-    "src/template/components/controller.ts"
+    "src/template/components/show.ts",
+    "src/template/components/unsafe.ts"
   ]
 }

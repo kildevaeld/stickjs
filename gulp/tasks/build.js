@@ -2,4 +2,4 @@
 
 const gulp = require('gulp');
 
-gulp.task('build', ['typescript','bundle', 'babel'])
+gulp.task('build', ['typescript','bundle'])

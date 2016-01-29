@@ -1,5 +1,5 @@
 import {DependencyType, getDependencies, DIServiceConfig} from './internal'
-import {find} from 'utilities';
+import {find, has} from 'utilities';
 import {Metadata} from 'di'
 
 
@@ -10,6 +10,11 @@ export interface ItemMap {
 	config?:any
 }
 
+
+var fnToStr = Function.prototype.toString;
+var isNonArrowFnRegex = /^\s*function/;
+var isArrowFnWithParensRegex = /^\([^\)]*\) *=>/;
+var isArrowFnWithoutParensRegex = /^[^=]*=>/;
 
 export module Repository {
 	export const items = [];
@@ -23,14 +28,13 @@ export module Repository {
 		}
 
 		let config = Metadata.get(DIServiceConfig, target)
-
+        
 		items.push({
 			name: name,
 			handler: target,
 			type: type,
 			config: config
 		});
-
 	}
 
 	export function hasAny(name:string): boolean {

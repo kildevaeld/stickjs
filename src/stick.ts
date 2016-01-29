@@ -28,7 +28,7 @@ export function factory(name: string, factory: any | any[]) {
 		let [fn] = getDependencies(factory);
 
 		if (!fn) throw new StickError('factory');
-
+        
 		Repository.add(DependencyType.Factory, name, fn);
 
 }
@@ -96,23 +96,17 @@ export function module(name: string, definition: Function | Object | any[] = nul
 }
 
 
-export function component(name: string, handler: ComponentDefinition | any[]) {
+export function component(name: string, handler: ComponentDefinition|Function) {
 
-	let component: AttributeDefinition
-	let [c, deps] = getDependencies(handler)
+	let component: ComponentDefinition
+	
 
-	if (typeof c === 'function') {
+	if (typeof handler === 'function') {
 		component = {
-			initialize: <any>c,
+			initialize: <any>handler,
 		}
-	} else if (utils.isObject(c) && typeof (<any>c).initialize === 'function') {
-		if (deps && deps.length) {
-			(<any>c).initialize.inject = deps
-		} else {
-			getDependencies((<any>c).initialize);
-		}
-
-		component = c;
+	} else if (utils.isObject(handler) && typeof (<any>handler).initialize === 'function') {
+		component = <ComponentDefinition>handler;
 	} else {
 		throw new StickError("component should be a function or an object");
 	}

@@ -187,6 +187,7 @@ export class Container extends DIContainer {
 				this.registerService(item.name, item.handler);
 				break;
 			case DependencyType.Factory:
+                
 				if (typeof item.handler === 'function') {
 					setActivator(item.handler, FactoryActivator.instance);
 					this.registerSingleton(item.name, item.handler);

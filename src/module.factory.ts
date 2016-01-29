@@ -206,7 +206,8 @@ export class ModuleFactory {
         return utils.Promise.resolve(view);
       }
       
-      promise = this.container.get('$templateResolver')(options.template)
+      
+      promise = this.container.get('$templateResolver')(options.template);
 
     } else if (!options.el) {
       return utils.Promise.reject(new StickError("no element or template"));

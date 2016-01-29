@@ -2,14 +2,20 @@ import {component} from '../stick'
 
 export * from './template.view'
 
-import {Controller} from './components/controller'
-import {Repeat} from './components/repeat'
+import {Controller} from './components/controller';
+import {Repeat} from './components/repeat';
+import {Show, Hide} from './components/show';
+import {Unsafe} from './components/unsafe';
+import {Delegate} from './components/delegate';
 
 import * as templ from 'templ'
 
-
-component('controller', ['$container', Controller])
-component('repeat', <any>Repeat);
+component('controller', Controller);
+component('repeat', Repeat);
+component('hide', Hide);
+component('show', Show);
+component('unsafe', Unsafe);
+component('delegate', Delegate);
 
 export * from './components/base-component'
 

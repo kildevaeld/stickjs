@@ -3,17 +3,17 @@
 	<head>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 		<script src="../build/stick.js"></script>
-			
+
 	</head>
 	<body>
-		
+
 		<script id="page1" type="text/template">
 			<h1>page 1: {{title}}</h1>
 		</script>
 		<script id="page2" type="text/template">
 			<h1>page2 : {{title}}</h1>
 		</script>
-		
+
 		<div id="app">
 			{{title}} {{count}}
 			<button onclick="{{count = count + 1}}">click</button>
@@ -25,47 +25,47 @@
 				<li><a href="#page1">page 1</a>
 				<li><a href="#page2">page 2</a>
 			</ul>
-			
+
 			<controller name="main">
 				Main controller {{title}}
 				<a href="#hello">Tryk</a>
 			</controller>
 			<div class="controller"></div>
 		</div>
-		
+
 		<script>
 			'use strict';
 			console.log(stick)
-			
+
 			stick.component('fa', {
 				initialize: function () {
-					
-				
+
+
 					var i = document.createElement('i');
 					this.section.appendChild(i)
 					i.classList.add('fa')
-					
-					
-					
+
+
+
 					if (this.attributes.name) {
 						i.classList.add("fa-" + this.attributes.name);
 					}
-					
-					
+
+
 				}
 			})
-			
+
 			var factory = stick.module('app', ['$context', '$router', function ($context, $router) {
 				$context.title = "Hey hoe"
 				$context.count = 0
 				//$router.route('hello', function () {
 					//$context.title = 'Hey joe'
 				//})//
-				
+
 				$context.items = [{
 					name: "test"
 				}];
-				
+
 				$context.$subscribe('event', function (a) {
 					console.log('hello', a)
 					$context.title += ' rap rap'
@@ -80,11 +80,11 @@
 					target: '.controller'
 				}).router.history.loadUrl();
 			}]);
-			
+
 			factory.controller('main', {
 				initialize: function ($context) {
 					$context.title = 'test';
-					
+
 				}
 			})
 			.controller('page1', function ($context) {
@@ -95,21 +95,21 @@
 				var i = document.querySelector('i');
 				i.setAttribute('name', 'check')
 			});
-            
+
             factory.configure('$routerProvider').then((p) => {
-                p.pushState = true;
+                p.pushState = false;
             })
-            
+
 			factory.create({
 				el: document.querySelector('#app')
 			}).then(function (a) {
 				console.log(a);
-				
+
 			})
-            
-           
-			
-			
+
+
+
+
 		</script>
 	</body>
 </html>

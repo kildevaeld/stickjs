@@ -1,24 +1,28 @@
-/// <reference path="../typings" />
-
-import {View} from 'templ/lib/view'
+import {View, IDelegator} from 'templ/lib/view'
 import {Model,NestedModel} from 'collection'
 import {DIContainer} from 'di'
+
+export interface TemplateViewOptions {
+	parent?: TemplateView
+	container: DIContainer
+	delegator?: IDelegator
+}
 
 export class TemplateView extends View {
 	_context: any
 	_container: DIContainer
+
+	get container (): DIContainer {
+      return this._container;
+	}
+
 	set context(context: any) {
 
 		if (this._context && this._context instanceof Model) {
-			//this._context.off('change');
+			this._context.off('change', this._onModelChange);
 		}
 		if (context != null && context instanceof Model) {
-			context.on('change', function () {
-				let changed = context.changed
-				for (let k in changed) {
-					this.set(k, changed[k])
-				}
-			}, this)
+    	context.on('change', this._onModelChange, this);
 		}
 
 		this._context = context
@@ -29,18 +33,24 @@ export class TemplateView extends View {
 	}
 
 	_onModelChange () {
-
+      let changed = this._context.changed
+      for (let k in changed) {
+          this.set(k, changed[k])
+      }
 	}
 
-	constructor(section:any, template:any, context:any,options?:any) {
+	constructor(section:any, template:any, context:any,options?:TemplateViewOptions) {
 			super(section, template, context, options)
 
 			if (options.delegator) {
 				this._delegator = options.delegator
 			}
+
 			if (options.container) {
 				this._container = options.container
 			}
+
+      if (!this.container) throw new Error("template view: no container set");
 
 	}
 
@@ -67,7 +77,7 @@ export class TemplateView extends View {
 			} else if (key[0] === 'root') {
 				(<string[]>key).shift()
 				this.root.set(key, val);
-			} else {				
+			} else {
 				this.context.set((<string[]>key).join('.'), val)
 
 			}

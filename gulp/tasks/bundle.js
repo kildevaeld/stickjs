@@ -10,7 +10,7 @@ gulp.task('bundle', ['typescript'], () => {
 		.pipe(webpack({
 			module: {
 				loaders: [
-					{
+					/*{
 						test: /\.js?$/,
 						exclude: /(node_modules|bower_components)/,
 						loader: 'babel',
@@ -18,7 +18,7 @@ gulp.task('bundle', ['typescript'], () => {
         			optional: ['es7.decorators'],
         			stage: 0
       			}
-					}
+					}*/
 				]
 			},
 			output: {
