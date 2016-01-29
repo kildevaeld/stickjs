@@ -726,6 +726,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            EventEmitter.debugCallback(this.constructor.name, this.name, eventName, args);
 	        var event, a, len = events.length, index, i;
 	        var calls = [];
+	       
 	        for (i = 0; i < events.length; i++) {
 	            event = events[i];
 	            a = args;
@@ -840,10 +841,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.indexOf = indexOf;
 	function find(array, callback, ctx) {
-	    var v;
-	    for (var i = 0, ii = array.length; i < ii; i++) {
-	        if (callback.call(ctx, array[i]))
-	            return array[i];
+	    var i, v;
+	    for (i = 0; i < array.length; i++) {
+	        v = array[i];
+	        if (callback.call(ctx, v))
+	            return v;
 	    }
 	    return null;
 	}
@@ -869,7 +871,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    })
 	        .sort(function (left, right) {
-	        var a = left.criteria, b = right.criteria;
+	        var a = left.criteria;
+	        var b = right.criteria;
 	        if (a !== b) {
 	            if (a > b || a === void 0)
 	                return 1;
@@ -1688,22 +1691,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Request;
 	})();
 	exports.Request = Request;
-	(function (HttpMethod) {
-	    HttpMethod[HttpMethod["Get"] = 0] = "Get";
-	    HttpMethod[HttpMethod["Post"] = 1] = "Post";
-	    HttpMethod[HttpMethod["Put"] = 2] = "Put";
-	    HttpMethod[HttpMethod["Delete"] = 3] = "Delete";
-	    HttpMethod[HttpMethod["Patch"] = 4] = "Patch";
-	    HttpMethod[HttpMethod["Head"] = 5] = "Head";
-	})(exports.HttpMethod || (exports.HttpMethod = {}));
-	var HttpMethod = exports.HttpMethod;
-	exports.request = {};
-	['get', 'post', 'put', 'delete', 'patch', 'head']
-	    .forEach(function (m) {
-	    exports.request[m === 'delete' ? 'del' : m] = function (url) {
-	        return new Request(m.toUpperCase(), url);
-	    };
-	});
+	var request;
+	(function (request) {
+	    function get(url) {
+	        return new Request('GET', url);
+	    }
+	    request.get = get;
+	    function post(url) {
+	        return new Request('POST', url);
+	    }
+	    request.post = post;
+	    function put(url) {
+	        return new Request('PUT', url);
+	    }
+	    request.put = put;
+	    function del(url) {
+	        return new Request('DELETE', url);
+	    }
+	    request.del = del;
+	})(request = exports.request || (exports.request = {}));
 
 
 /***/ },
@@ -6672,7 +6678,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.onclick = event_1.ClickAttribute;
 	exports.onenter = event_1.OnEnterAttribute;
 	exports.onescape = event_1.OnEscapeAttribute;
-	exports.onchange = event_1.ChangeAttribute;
 	exports.checked = value_1.ValueAttribute;
 	exports.style = style_1.StyleAttribute;
 	exports.focus = focus_1.FocusAttribute;
@@ -6933,11 +6938,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.KeyCodeAttribute = KeyCodeAttribute;
 
-	var ChangeAttribute = function (_EventAttribute2) {
-	    _inherits(ChangeAttribute, _EventAttribute2);
+	var ClickAttribute = function (_EventAttribute2) {
+	    _inherits(ClickAttribute, _EventAttribute2);
 
-	    function ChangeAttribute() {
-	        _classCallCheck(this, ChangeAttribute);
+	    function ClickAttribute() {
+	        _classCallCheck(this, ClickAttribute);
 
 	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
 	            args[_key] = arguments[_key];
@@ -6945,29 +6950,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var _this3 = _possibleConstructorReturn(this, _EventAttribute2.call.apply(_EventAttribute2, [this].concat(args)));
 
-	        _this3.event = "change";
+	        _this3.event = "click";
 	        return _this3;
-	    }
-
-	    return ChangeAttribute;
-	}(EventAttribute);
-
-	exports.ChangeAttribute = ChangeAttribute;
-
-	var ClickAttribute = function (_EventAttribute3) {
-	    _inherits(ClickAttribute, _EventAttribute3);
-
-	    function ClickAttribute() {
-	        _classCallCheck(this, ClickAttribute);
-
-	        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	            args[_key2] = arguments[_key2];
-	        }
-
-	        var _this4 = _possibleConstructorReturn(this, _EventAttribute3.call.apply(_EventAttribute3, [this].concat(args)));
-
-	        _this4.event = "click";
-	        return _this4;
 	    }
 
 	    return ClickAttribute;
@@ -6981,14 +6965,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function OnEnterAttribute() {
 	        _classCallCheck(this, OnEnterAttribute);
 
-	        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	            args[_key3] = arguments[_key3];
+	        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	            args[_key2] = arguments[_key2];
 	        }
 
-	        var _this5 = _possibleConstructorReturn(this, _KeyCodeAttribute.call.apply(_KeyCodeAttribute, [this].concat(args)));
+	        var _this4 = _possibleConstructorReturn(this, _KeyCodeAttribute.call.apply(_KeyCodeAttribute, [this].concat(args)));
 
-	        _this5.keyCodes = [13];
-	        return _this5;
+	        _this4.keyCodes = [13];
+	        return _this4;
 	    }
 
 	    return OnEnterAttribute;
@@ -7002,14 +6986,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function OnEscapeAttribute() {
 	        _classCallCheck(this, OnEscapeAttribute);
 
-	        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	            args[_key4] = arguments[_key4];
+	        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	            args[_key3] = arguments[_key3];
 	        }
 
-	        var _this6 = _possibleConstructorReturn(this, _KeyCodeAttribute2.call.apply(_KeyCodeAttribute2, [this].concat(args)));
+	        var _this5 = _possibleConstructorReturn(this, _KeyCodeAttribute2.call.apply(_KeyCodeAttribute2, [this].concat(args)));
 
-	        _this6.KeyCodes = [27];
-	        return _this6;
+	        _this5.KeyCodes = [27];
+	        return _this5;
 	    }
 
 	    return OnEscapeAttribute;
