@@ -52,9 +52,8 @@ export class Router extends EventEmitter  {
         this.trigger('route', name, args);
         //this.history.trigger('route', this, name, args);
       });
+      
       return this;
-
-		return this
 	}
 
   // Execute a route handler with the provided parameters.  This is an

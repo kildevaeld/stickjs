@@ -133,7 +133,7 @@ export class HistoryApi extends EventEmitter {
 
 			if (current === this.fragment) return false;
 			if (!this.loadUrl()) {
-        this.trigger('route:unmatched');
+                this.trigger('route:unmatched');
 			}
 		}
 

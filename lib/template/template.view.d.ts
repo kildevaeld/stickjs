@@ -6,8 +6,8 @@ export interface TemplateViewOptions {
     delegator?: IDelegator;
 }
 export declare class TemplateView extends View {
-    _context: any;
-    _container: DIContainer;
+    private _context;
+    private _container;
     container: DIContainer;
     context: any;
     _onModelChange(model: any): void;

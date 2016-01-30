@@ -12,8 +12,8 @@ export const Repeat: ComponentDefinition = {
     },
 
     update() {
-        this._children = this._children || [];
-        this._collection = this._collection || [];
+        //this._children = this._children || [];
+        //this._collection = this._collection || [];
         var as = this['as'];
         var each = this['each'];
         var key = this['key'] || "key";
@@ -88,7 +88,7 @@ export const Repeat: ComponentDefinition = {
         }, this);
 
         this._children.splice(n).forEach(function(child) {
-            (<any>child).remove();
+            (<any>child).destroy();
         });
 
 
@@ -122,7 +122,7 @@ export const Repeat: ComponentDefinition = {
         }
 
         for (let child of this._children) {
-            child.remove();
+            child.destroy();
         }
     }
 }

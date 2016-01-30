@@ -62,10 +62,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	__webpack_require__(1);
-	__webpack_require__(81);
+	__webpack_require__(77);
 	var u = __webpack_require__(6);
 	exports.utils = u;
-	__export(__webpack_require__(58));
+	__export(__webpack_require__(54));
 	__export(__webpack_require__(47));
 	exports.ready = u.domReady();
 
@@ -81,9 +81,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	__export(__webpack_require__(2));
-	__export(__webpack_require__(77));
-	__export(__webpack_require__(78));
-	__export(__webpack_require__(80));
+	__export(__webpack_require__(73));
+	__export(__webpack_require__(74));
+	__export(__webpack_require__(76));
 
 /***/ },
 /* 2 */
@@ -110,7 +110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var annotations_1 = __webpack_require__(15);
 	var controller_factory_1 = __webpack_require__(28);
 	var module_factory_1 = __webpack_require__(43);
-	var stick_1 = __webpack_require__(58);
+	var stick_1 = __webpack_require__(54);
 	var internal_1 = __webpack_require__(16);
 	stick_1.decorator("route", function () {
 	    return function (target) {
@@ -140,7 +140,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        _classCallCheck(this, RouterService);
 
-	        console.log(options);
 	        options.execute = options.execute || utils.bind(this.__execute, this);
 	        this.router = new router_1.Router(options);
 	        this.context = ctx;
@@ -3844,18 +3843,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.document = document;
 	        this.start = start || document.createTextNode('');
 	        this.end = end || document.createTextNode('');
-
 	        if (!this.start.parentNode) {
-
 	            var parent = document.createDocumentFragment();
 	            parent.appendChild(this.start);
 	            parent.appendChild(this.end);
-	            //console.log(this.start.parentNode)
-	            this.__parent = parent;
 	        }
 	    }
 
 	    FragmentSection.prototype.appendChild = function appendChild(node) {
+	        //console.log(document.body.appendChild(node))
 	        this.end.parentNode.insertBefore(node, this.end);
 	    };
 
@@ -4452,7 +4448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var object_observer_context_1 = __webpack_require__(45);
-	var dirty_object_context_1 = __webpack_require__(57);
+	var dirty_object_context_1 = __webpack_require__(53);
 	function createContext(model, mediator) {
 	    if (typeof Object.observe === 'function') {
 	        return new object_observer_context_1.ObjectObserveProxy(mediator);
@@ -4824,9 +4820,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(50));
 	__export(__webpack_require__(51));
 	__export(__webpack_require__(52));
-	__export(__webpack_require__(53));
-	__export(__webpack_require__(54));
-	__export(__webpack_require__(56));
 
 
 /***/ },
@@ -5150,12 +5143,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    __extends(Model, _super);
 	    function Model(attributes, options) {
 	        if (attributes === void 0) { attributes = {}; }
-	        if (options === void 0) { options = {}; }
 	        options = options || {};
 	        this._attributes = {};
-	        this.options = options;
-	        if (options.parse)
-	            attributes = this.parse(attributes);
 	        this.set(attributes, null, { silent: true });
 	        this.uid = utils_1.uniqueId('uid');
 	        this._changed = {};
@@ -5166,20 +5155,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        get: function () {
 	            if (this.idAttribute in this._attributes)
 	                return this._attributes[this.idAttribute];
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Model.prototype, "isNew", {
-	        get: function () {
-	            return this.id == null;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Model.prototype, "isDirty", {
-	        get: function () {
-	            return this.hasChanged();
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -5290,13 +5265,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return JSON.parse(JSON.stringify(this._attributes));
 	    };
 	    Model.prototype.clone = function () {
-	        return new (this.constructor)(this._attributes, this.options);
-	    };
-	    Model.prototype.parse = function (attr, options) {
-	        return attr;
-	    };
-	    Model.prototype.remove = function (options) {
-	        this.trigger('remove', this, this.collection, options);
+	        return new (this.constructor)(this._attributes);
 	    };
 	    return Model;
 	})(object_1.BaseObject);
@@ -5585,493 +5554,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var objects_1 = __webpack_require__(9);
-	var collection_1 = __webpack_require__(48);
-	var rest_model_1 = __webpack_require__(54);
-	var promises_1 = __webpack_require__(11);
-	var persistence_1 = __webpack_require__(55);
-	var RestCollection = (function (_super) {
-	    __extends(RestCollection, _super);
-	    function RestCollection(models, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, models, options);
-	        if (options.url)
-	            this.url = options.url;
-	    }
-	    RestCollection.prototype.getURL = function () {
-	        return typeof this.url === 'function' ? this.url() : this.url;
-	    };
-	    RestCollection.prototype.fetch = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        var url = this.getURL();
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        this.trigger('before:sync');
-	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (results) {
-	            _this[options.reset ? 'reset' : 'set'](results.content, options);
-	            _this.trigger('sync');
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
-	            throw e;
-	        });
-	    };
-	    RestCollection.prototype.create = function (value, options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        var model;
-	        var url = this.getURL();
-	        if (url == null)
-	            throw new Error('Url or rootURL no specified');
-	        options.url = url;
-	        if (value instanceof rest_model_1.RestModel) {
-	            model = value;
-	        }
-	        else {
-	            model = new this.Model(value, { parse: true });
-	        }
-	        if (options.wait === void 0)
-	            options.wait = true;
-	        if (!options.wait)
-	            this.add(model, options);
-	        this.trigger('before:create', this, model, value, options);
-	        model.save().then(function () {
-	            if (!options.wait)
-	                _this.add(model, options);
-	            _this.trigger('create', _this, model, value, options);
-	            if (options.complete)
-	                options.complete(null, model);
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
-	            if (options.complete)
-	                options.complete(e, null);
-	        });
-	        return model;
-	    };
-	    RestCollection.prototype.sync = function (method, model, options) {
-	        return persistence_1.sync(method, model, options);
-	    };
-	    return RestCollection;
-	})(collection_1.Collection);
-	exports.RestCollection = RestCollection;
-
-
-/***/ },
-/* 54 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var objects_1 = __webpack_require__(9);
-	var promises_1 = __webpack_require__(11);
-	var model_1 = __webpack_require__(50);
-	var persistence_1 = __webpack_require__(55);
-	function normalize_path(url, id) {
-	    var i, p = "";
-	    if ((i = url.indexOf('?')) >= 0) {
-	        p = url.substr(i);
-	        url = url.substr(0, i);
-	    }
-	    if (url[url.length - 1] !== '/')
-	        url += '/';
-	    return url + id + p;
-	}
-	exports.normalize_path = normalize_path;
-	var RestModel = (function (_super) {
-	    __extends(RestModel, _super);
-	    function RestModel(attr, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, attr, options);
-	        this.idAttribute = 'id';
-	        if (options.url) {
-	            this.rootURL = options.url;
-	        }
-	    }
-	    RestModel.prototype.getURL = function (id) {
-	        var url = this.rootURL;
-	        if (this.collection && this.collection.getURL()) {
-	            url = this.collection.getURL();
-	        }
-	        if (id && url) {
-	            url = normalize_path(url, this.id);
-	        }
-	        return url;
-	    };
-	    RestModel.prototype.fetch = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        var url = this.getURL();
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        this.trigger('before:fetch', this, options);
-	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (result) {
-	            if (result)
-	                _this.set(_this.parse(result.content, options), options);
-	            _this.trigger('fetch', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            if (e) {
-	                throw e;
-	            }
-	            return _this;
-	        });
-	    };
-	    RestModel.prototype.save = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        this.trigger('before:save', this, options);
-	        var method = persistence_1.RestMethod[this.isNew ? 'Create' : options.changed ? 'Patch' : "Update"];
-	        var url = this.getURL(this.id);
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        return this.sync(method, this, options)
-	            .then(function (result) {
-	            _this.set(result.content, options);
-	            _this.trigger('save', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            throw e;
-	        });
-	    };
-	    RestModel.prototype.remove = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        if (this.isNew) {
-	            _super.prototype.remove.call(this, options);
-	            return promises_1.Promise.resolve(this);
-	        }
-	        var url = this.getURL(this.id);
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        this.trigger('before:remove', this, options);
-	        if (!options.wait)
-	            _super.prototype.remove.call(this, options);
-	        options.url = url;
-	        return this.sync(persistence_1.RestMethod.Delete, this, options)
-	            .then(function (result) {
-	            _super.prototype.remove.call(_this, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            throw e;
-	        });
-	    };
-	    RestModel.prototype.sync = function (method, model, options) {
-	        return persistence_1.sync(method, model, options);
-	    };
-	    return RestModel;
-	})(model_1.Model);
-	exports.RestModel = RestModel;
-
-
-/***/ },
-/* 55 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var promises_1 = __webpack_require__(11);
-	var utils_1 = __webpack_require__(8);
-	var request_1 = __webpack_require__(13);
-	(function (RestMethod) {
-	    RestMethod[RestMethod["Create"] = 0] = "Create";
-	    RestMethod[RestMethod["Update"] = 1] = "Update";
-	    RestMethod[RestMethod["Read"] = 2] = "Read";
-	    RestMethod[RestMethod["Patch"] = 3] = "Patch";
-	    RestMethod[RestMethod["Delete"] = 4] = "Delete";
-	})(exports.RestMethod || (exports.RestMethod = {}));
-	var RestMethod = exports.RestMethod;
-	;
-	var xmlRe = /^(?:application|text)\/xml/;
-	var jsonRe = /^application\/json/;
-	var getData = function (accepts, xhr) {
-	    if (accepts == null)
-	        accepts = xhr.getResponseHeader('content-type');
-	    if (xmlRe.test(accepts)) {
-	        return xhr.responseXML;
-	    }
-	    else if (jsonRe.test(accepts) && xhr.responseText !== '') {
-	        return JSON.parse(xhr.responseText);
-	    }
-	    else {
-	        return xhr.responseText;
-	    }
-	};
-	var isValid = function (xhr) {
-	    return (xhr.status >= 200 && xhr.status < 300) ||
-	        (xhr.status === 304) ||
-	        (xhr.status === 0 && window.location.protocol === 'file:');
-	};
-	function sync(method, model, options) {
-	    var http;
-	    switch (method) {
-	        case RestMethod.Create:
-	            http = 'POST';
-	            break;
-	        case RestMethod.Update:
-	            http = "PUT";
-	            break;
-	        case RestMethod.Patch:
-	            http = "PATCH";
-	            break;
-	        case RestMethod.Delete:
-	            http = "DELETE";
-	            break;
-	        case RestMethod.Read:
-	            http = "GET";
-	            break;
-	        default:
-	            return promises_1.Promise.reject(new Error("Sync: does not recognise method: " + method));
-	    }
-	    var xhr = utils_1.ajax();
-	    var query, url = options.url;
-	    if (options.params)
-	        query = request_1.queryParam(options.params);
-	    if (query) {
-	        var sep = (options.url.indexOf('?') === -1) ? '?' : '&';
-	        url += sep + query.substring(1);
-	    }
-	    return new promises_1.Promise(function (resolve, reject) {
-	        xhr.onreadystatechange = function () {
-	            if (xhr.readyState !== 4)
-	                return;
-	            var response = {
-	                method: method,
-	                status: xhr.status,
-	                content: getData(options.headers['Accept'], xhr)
-	            };
-	            utils_1.proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
-	            if (isValid(xhr)) {
-	                return resolve(response);
-	            }
-	            else {
-	                var error = new Error('Server responded with status of ' + xhr.statusText);
-	                return reject(error);
-	            }
-	        };
-	        xhr.open(http, url, true);
-	        if (!(options.headers && options.headers['Accept'])) {
-	            options.headers = {
-	                Accept: "*/*"
-	            };
-	        }
-	        if (options.headers)
-	            for (var key in options.headers) {
-	                xhr.setRequestHeader(key, options.headers[key]);
-	            }
-	        if (options.beforeSend)
-	            options.beforeSend(xhr);
-	        xhr.send(model.toJSON());
-	    });
-	}
-	exports.sync = sync;
-
-
-/***/ },
-/* 56 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var collection_1 = __webpack_require__(48);
-	var rest_collection_1 = __webpack_require__(53);
-	var promises_1 = __webpack_require__(11);
-	var persistence_1 = __webpack_require__(55);
-	var objects_1 = __webpack_require__(9);
-	var request_1 = __webpack_require__(13);
-	var PARAM_TRIM_RE = /[\s'"]/g;
-	var URL_TRIM_RE = /[<>\s'"]/g;
-	function queryStringToParams(qs) {
-	    var kvp, k, v, ls, params = {}, decode = decodeURIComponent;
-	    var kvps = qs.split('&');
-	    for (var i = 0, l = kvps.length; i < l; i++) {
-	        var param = kvps[i];
-	        kvp = param.split('='), k = kvp[0], v = kvp[1];
-	        if (v == null)
-	            v = true;
-	        k = decode(k), v = decode(v), ls = params[k];
-	        if (Array.isArray(ls))
-	            ls.push(v);
-	        else if (ls)
-	            params[k] = [ls, v];
-	        else
-	            params[k] = v;
-	    }
-	    return params;
-	}
-	var PaginatedCollection = (function (_super) {
-	    __extends(PaginatedCollection, _super);
-	    function PaginatedCollection(models, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, models, options);
-	        this._state = { first: 1, last: -1, current: 1, size: 10 };
-	        this._link = {};
-	        this.queryParams = {
-	            page: 'page',
-	            size: 'pageSize'
-	        };
-	        if (options.queryParams) {
-	            objects_1.extend(this.queryParams, options.queryParams);
-	        }
-	        if (options.firstPage)
-	            this._state.first = options.firstPage;
-	        if (options.pageSize)
-	            this._state.size = options.pageSize;
-	        this._state.current = this._state.first;
-	        this._page = new collection_1.Collection();
-	        this._page.Model = this.Model;
-	    }
-	    Object.defineProperty(PaginatedCollection.prototype, "page", {
-	        get: function () {
-	            return this._page;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    PaginatedCollection.prototype.getPreviousPage = function (options) {
-	        options = options ? objects_1.extend({}, options) : {};
-	        options.page = this._state.current - 1;
-	        return this.getPage(options);
-	    };
-	    PaginatedCollection.prototype.getNextPage = function (options) {
-	        options = options ? objects_1.extend({}, options) : {};
-	        options.page = this._state.current + 1;
-	        return this.getPage(options);
-	    };
-	    PaginatedCollection.prototype.getPage = function (options) {
-	        options = options ? objects_1.extend({}, options) : {};
-	        if (options.page === void 0)
-	            return promises_1.Promise.reject(new Error("No page"));
-	        if (this._state.last < options.page && this._state.last != -1) {
-	            options.page = this._state.last;
-	        }
-	        else if (options.page < this._state.first) {
-	            options.page = this._state.first;
-	        }
-	        return this.fetch(options);
-	    };
-	    PaginatedCollection.prototype.fetch = function (options) {
-	        var _this = this;
-	        if (options === void 0) { options = {}; }
-	        options = options ? objects_1.extend({}, options) : {};
-	        var url;
-	        if (!objects_1.has(options, 'page')) {
-	            options.page = this._state.current;
-	        }
-	        var params = options.params ? objects_1.extend({}, options.params) : {};
-	        if (objects_1.has(params, this.queryParams.page))
-	            delete params[this.queryParams.page];
-	        url = this._link[options.page];
-	        if (!url) {
-	            url = this.getURL();
-	        }
-	        if (!url)
-	            return promises_1.Promise.reject(new Error("no url specified"));
-	        var idx = url.indexOf('?');
-	        if (idx > -1) {
-	            params = objects_1.extend(params, queryStringToParams(url.substr(0, idx + 1)));
-	            url = url.substr(0, idx);
-	        }
-	        if (!objects_1.has(params, this.queryParams.page)) {
-	            params[this.queryParams.page] = options.page;
-	        }
-	        options.params = params;
-	        options.url = url;
-	        this.trigger('before:fetch', this, options);
-	        params[this.queryParams.size] = this._state.size;
-	        if (!this._link[options.page + '']) {
-	            this._link[options.page] = url + request_1.queryParam({ page: options.page });
-	        }
-	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (resp) {
-	            _this._processResponse(resp, options);
-	            _this.trigger('sync', _this, resp, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
-	            throw e;
-	        });
-	    };
-	    PaginatedCollection.prototype._processResponse = function (resp, options) {
-	        var currentPage = options.page;
-	        var links = this._parseLinkHeaders(resp);
-	        if (links.first)
-	            this._link[this._state.first] = links.first;
-	        if (links.prev)
-	            this._link[currentPage - 1] = links.prev;
-	        if (links.next)
-	            this._link[currentPage + 1] = links.next;
-	        if (links.last) {
-	            var last = links.last;
-	            var idx = last.indexOf('?');
-	            if (idx > -1) {
-	                var params = queryStringToParams(last.substr(idx + 1));
-	                if (objects_1.has(params, this.queryParams.page)) {
-	                    this._link[params[this.queryParams.page]] = last;
-	                    this._state.last = parseInt(params[this.queryParams.page]);
-	                }
-	            }
-	        }
-	        this._state.current = currentPage;
-	        var data = resp.content;
-	        if (data && !Array.isArray(data))
-	            data = [data];
-	        if (!data)
-	            return this;
-	        data = this.parse(data);
-	        for (var i = 0, ii = data.length; i < ii; i++) {
-	            data[i] = new this.Model(data[i], { parse: true });
-	        }
-	        this[options.reset ? 'reset' : 'set'](data, options);
-	        this.page.reset(data);
-	        return this;
-	    };
-	    PaginatedCollection.prototype._parseLinkHeaders = function (resp) {
-	        var link = {};
-	        if (typeof resp['getResponseHeader'] !== 'function') {
-	            return link;
-	        }
-	        var linkHeader = resp['getResponseHeader']('Link');
-	        if (!linkHeader)
-	            return link;
-	        linkHeader = linkHeader.split(',');
-	        var relations = ['first', 'prev', 'next', 'last'];
-	        for (var i = 0, ii = linkHeader.length; i < ii; i++) {
-	            var linkParts = linkHeader[i].split(';'), url = linkParts[0].replace(URL_TRIM_RE, ''), params = linkParts.slice(1);
-	            for (var x = 0, xx = params.length; x < xx; x++) {
-	                var paramParts = params[x].split('='), key = paramParts[0].replace(PARAM_TRIM_RE, ''), value = paramParts[1].replace(PARAM_TRIM_RE, '');
-	                if (key == 'rel' && !!~relations.indexOf(value))
-	                    link[value] = url;
-	            }
-	        }
-	        return link;
-	    };
-	    return PaginatedCollection;
-	})(rest_collection_1.RestCollection);
-	exports.PaginatedCollection = PaginatedCollection;
-
-
-/***/ },
-/* 57 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -6189,7 +5671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.DirtyObjectObserver = DirtyObjectObserver;
 
 /***/ },
-/* 58 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6201,9 +5683,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var repository_1 = __webpack_require__(27);
 	var utils = __webpack_require__(6);
 	var module_factory_1 = __webpack_require__(43);
-	var container_1 = __webpack_require__(59);
-	var base_component_1 = __webpack_require__(60);
-	var templ = __webpack_require__(61);
+	var container_1 = __webpack_require__(55);
+	var base_component_1 = __webpack_require__(56);
+	var templ = __webpack_require__(57);
 	var annotations = __webpack_require__(15);
 	exports.decorators = annotations;
 	function service(name, definition) {
@@ -6320,7 +5802,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.modifier = modifier;
 
 /***/ },
-/* 59 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6591,7 +6073,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Container = Container;
 
 /***/ },
-/* 60 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6607,25 +6089,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function BaseComponent(section, vvnode, attributes, view) {
 	        _classCallCheck(this, BaseComponent);
 
+	        console.log(attributes);
 	        if (this.update) {
 	            this.update = utilities_1.bind(this.update, this);
 	        }
 	        this.section = section;
 	        this.vnode = vvnode;
 	        this.attributes = attributes;
-	        this._attributes = {};
 	        this.view = view;
 	        this.document = view.template.options.document;
 	        if (vvnode.childNodes) this.childTemplate = vnode_1.template(vnode_1.fragment(vvnode.childNodes), view.template.options);
 	        for (var key in attributes) {
 	            this.setAttribute(key, attributes[key]);
-	        }var container = this.view._container;
-	        /*resolveDependencies(this.initialize, container)
-	        .then(deps => {
-	            callFunc(this.initialize, this, deps);
-	        }).catch((e) => {
-	            throw e
-	        })*/
+	        }var container = this.view.container;
 	        this.initialize.call(this, container);
 	    }
 
@@ -6635,12 +6111,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'setAttribute',
 	        value: function setAttribute(key, value) {
-	            this._attributes[key] = value;
+	            this.attributes[key] = value;
 	        }
 	    }, {
 	        key: 'removeAttribute',
 	        value: function removeAttribute(key) {
-	            this._attributes[key] = void 0;
+	            this.attributes[key] = void 0;
+	        }
+	    }, {
+	        key: 'getAttribute',
+	        value: function getAttribute(key) {
+	            return this.attributes[key];
 	        }
 	    }, {
 	        key: 'destroy',
@@ -6658,20 +6139,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.BaseComponent = BaseComponent;
 
 /***/ },
-/* 61 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var repository_1 = __webpack_require__(62);
+	var repository_1 = __webpack_require__(58);
 	var vnode = __webpack_require__(30);
-	var components = __webpack_require__(63);
-	var attributes = __webpack_require__(67);
-	var modifiers = __webpack_require__(73);
+	var components = __webpack_require__(59);
+	var attributes = __webpack_require__(63);
+	var modifiers = __webpack_require__(69);
 	var utils = __webpack_require__(35);
-	var view_1 = __webpack_require__(66);
-	var compiler = __webpack_require__(74);
-	var binding_1 = __webpack_require__(76);
+	var view_1 = __webpack_require__(62);
+	var compiler = __webpack_require__(70);
+	var binding_1 = __webpack_require__(72);
 	exports.version = "$$version$$";
 	function attribute(name, attr) {
 	    if (typeof attr !== 'function') {
@@ -6710,7 +6191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.compile = compile;
 
 /***/ },
-/* 62 */
+/* 58 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6746,7 +6227,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Repository = Repository;
 
 /***/ },
-/* 63 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6756,11 +6237,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	    }
 	}
-	__export(__webpack_require__(64));
-	__export(__webpack_require__(65));
+	__export(__webpack_require__(60));
+	__export(__webpack_require__(61));
 
 /***/ },
-/* 64 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6803,7 +6284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.BaseComponent = BaseComponent;
 
 /***/ },
-/* 65 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6814,8 +6295,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var component_1 = __webpack_require__(64);
-	var view_1 = __webpack_require__(66);
+	var component_1 = __webpack_require__(60);
+	var view_1 = __webpack_require__(62);
 	function _each(target, iterate) {
 	    if (!target) return;
 	    if (target.forEach) {
@@ -6895,7 +6376,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.repeat = Repeat;
 
 /***/ },
-/* 66 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -7140,7 +6621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.View = View;
 
 /***/ },
-/* 67 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7150,11 +6631,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	    }
 	}
-	var value_1 = __webpack_require__(68);
-	var event_1 = __webpack_require__(70);
-	var style_1 = __webpack_require__(71);
-	var focus_1 = __webpack_require__(72);
-	__export(__webpack_require__(69));
+	var value_1 = __webpack_require__(64);
+	var event_1 = __webpack_require__(66);
+	var style_1 = __webpack_require__(67);
+	var focus_1 = __webpack_require__(68);
+	__export(__webpack_require__(65));
 	exports.value = value_1.ValueAttribute;
 	exports.onclick = event_1.ClickAttribute;
 	exports.onenter = event_1.OnEnterAttribute;
@@ -7165,7 +6646,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.focus = focus_1.FocusAttribute;
 
 /***/ },
-/* 68 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7176,8 +6657,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var base_1 = __webpack_require__(69);
-	var view_1 = __webpack_require__(66);
+	var base_1 = __webpack_require__(65);
+	var view_1 = __webpack_require__(62);
 	var utils = __webpack_require__(35);
 	var _events = ['change', 'keyup', 'input'];
 
@@ -7282,7 +6763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.ValueAttribute = ValueAttribute;
 
 /***/ },
-/* 69 */
+/* 65 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -7314,7 +6795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.BaseAttribute = BaseAttribute;
 
 /***/ },
-/* 70 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7327,8 +6808,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var base_1 = __webpack_require__(69);
-	var view_1 = __webpack_require__(66);
+	var base_1 = __webpack_require__(65);
+	var view_1 = __webpack_require__(62);
 	var utils = __webpack_require__(35);
 	var debug = utils.debug('attributes:event');
 
@@ -7505,7 +6986,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.OnEscapeAttribute = OnEscapeAttribute;
 
 /***/ },
-/* 71 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7516,7 +6997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var base_1 = __webpack_require__(69);
+	var base_1 = __webpack_require__(65);
 
 	var StyleAttribute = function (_base_1$BaseAttribute) {
 	    _inherits(StyleAttribute, _base_1$BaseAttribute);
@@ -7555,7 +7036,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.StyleAttribute = StyleAttribute;
 
 /***/ },
-/* 72 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7566,7 +7047,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var base_1 = __webpack_require__(69);
+	var base_1 = __webpack_require__(65);
 
 	var FocusAttribute = function (_base_1$BaseAttribute) {
 	    _inherits(FocusAttribute, _base_1$BaseAttribute);
@@ -7598,7 +7079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.FocusAttribute = FocusAttribute;
 
 /***/ },
-/* 73 */
+/* 69 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -7628,7 +7109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.round = Math.round;
 
 /***/ },
-/* 74 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7637,7 +7118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var parser_1 = __webpack_require__(75);
+	var parser_1 = __webpack_require__(71);
 	function compile(src, options) {
 	    var str = transpile(src);
 	    return new Function("return " + str)();
@@ -7966,7 +7447,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 
 /***/ },
-/* 75 */
+/* 71 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -12109,7 +11590,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 /***/ },
-/* 76 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12188,7 +11669,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.binding = binding;
 
 /***/ },
-/* 77 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12242,14 +11723,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.HttpService = HttpService;
 
 /***/ },
-/* 78 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Stick = __webpack_require__(58);
-	var template_view_1 = __webpack_require__(79);
-	var templ = __webpack_require__(61);
+	var Stick = __webpack_require__(54);
+	var template_view_1 = __webpack_require__(75);
+	var templ = __webpack_require__(57);
 	var utils = __webpack_require__(6);
 	Stick.factory('$templateResolver', function () {
 	    return function (name) {
@@ -12271,7 +11752,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}]);
 
 /***/ },
-/* 79 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12286,7 +11767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var view_1 = __webpack_require__(66);
+	var view_1 = __webpack_require__(62);
 	var collection_1 = __webpack_require__(47);
 
 	var TemplateView = function (_view_1$View) {
@@ -12408,7 +11889,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (context != null && context instanceof collection_1.Model) {
 	                context.on('change', this._onModelChange, this);
 	            }
-	            //console.log('context', this._context, context);
 	            this._context = context;
 	        },
 	        get: function get() {
@@ -12422,7 +11902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.TemplateView = TemplateView;
 
 /***/ },
-/* 80 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12479,7 +11959,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Mediator = Mediator;
 
 /***/ },
-/* 81 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12489,23 +11969,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	    }
 	}
-	var stick_1 = __webpack_require__(58);
-	__export(__webpack_require__(79));
-	var controller_1 = __webpack_require__(82);
-	var repeat_1 = __webpack_require__(83);
-	var show_1 = __webpack_require__(84);
-	var unsafe_1 = __webpack_require__(85);
-	var delegate_1 = __webpack_require__(86);
+	var stick_1 = __webpack_require__(54);
+	__export(__webpack_require__(75));
+	var controller_1 = __webpack_require__(78);
+	var repeat_1 = __webpack_require__(79);
+	var show_1 = __webpack_require__(80);
+	var unsafe_1 = __webpack_require__(81);
+	var delegate_1 = __webpack_require__(82);
 	stick_1.component('controller', controller_1.Controller);
 	stick_1.component('repeat', repeat_1.Repeat);
 	stick_1.component('hide', show_1.Hide);
 	stick_1.component('show', show_1.Show);
 	stick_1.component('unsafe', unsafe_1.Unsafe);
 	stick_1.component('delegate', delegate_1.Delegate);
-	__export(__webpack_require__(60));
+	__export(__webpack_require__(56));
 
 /***/ },
-/* 82 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12517,8 +11997,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this = this;
 
 	        if (this.attributes['name']) {
-	            this.name = this._attributes['name'];
-	            this.as = this._attributes['as'] || this.name;
+	            this.name = this.attributes['name'];
+	            this.as = this.attributes['as'] || this.name;
 	        }
 	        this.factory = $container.get(this.name);
 	        if (!(this.factory instanceof controller_factory_1.ControllerFactory)) {
@@ -12588,7 +12068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}*/
 
 /***/ },
-/* 83 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12712,7 +12192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 84 */
+/* 80 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -12778,7 +12258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 85 */
+/* 81 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -12843,7 +12323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 86 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

@@ -9,12 +9,11 @@ export class BaseComponent implements Component {
 		section: Section
 		vnode: VNode
 		attributes: AttributeMap
-		_attributes: any
-		view: IView
+		view: TemplateView
 		document:Document
 		childTemplate:Template
-		constructor(section:Section, vvnode:VNode, attributes:AttributeMap, view:IView) {
-
+		constructor(section:Section, vvnode:VNode, attributes:AttributeMap, view:TemplateView) {
+            console.log(attributes)
 			if ((<any>this).update) {
 				(<any>this).update = bind((<any>this).update, this);
 			}
@@ -22,23 +21,17 @@ export class BaseComponent implements Component {
 			this.section = section
 			this.vnode = vvnode
 			this.attributes = attributes
-            this._attributes = {};
+
 			this.view = view
 			this.document = view.template.options.document
 
 			if (vvnode.childNodes) this.childTemplate = template(fragment(vvnode.childNodes), view.template.options);
   		    for (var key in attributes) this.setAttribute(key, attributes[key]);
 
-			let container = (<TemplateView>this.view)._container
+			let container = this.view.container
 
 
-			/*resolveDependencies(this.initialize, container)
-			.then(deps => {
-				callFunc(this.initialize, this, deps);
-			}).catch((e) => {
-				throw e
-			})*/
-      this.initialize.call(this, container);
+            this.initialize.call(this, container);
 
 		}
 
@@ -48,12 +41,16 @@ export class BaseComponent implements Component {
 
 
 		setAttribute (key:string, value:any) {
-			this._attributes[key]  = value
+			this.attributes[key]  = value
 		}
 
 		removeAttribute(key:string) {
-			this._attributes[key] = void 0
+			this.attributes[key] = void 0
 		}
+        
+        getAttribute(key:string) {
+            return this.attributes[key];
+        }
 
 		destroy () {
 			let a = <any>this

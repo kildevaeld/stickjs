@@ -30,7 +30,6 @@ export class ControllerFactory {
 	create (options:ControllerCreateOptions): utils.IPromise<any> {
 
 		if (this.container.hasInstance(this.name)) {
-
 			return utils.Promise.resolve(this.container.get(this.name));
 		}
 

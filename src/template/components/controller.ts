@@ -1,3 +1,4 @@
+
 /// <reference path="../../typings" />
 
 //import {components, View, compile, vnode} from 'templ'
@@ -12,8 +13,8 @@ import {ComponentDefinition} from '../index'
 export const Controller: ComponentDefinition = {
 	initialize ($container) {
 		if (this.attributes['name']) {
-			this.name = this._attributes['name']
-			this.as = this._attributes['as'] || this.name
+			this.name = this.attributes['name']
+			this.as = this.attributes['as'] || this.name
 		}
 
 		this.factory = $container.get(this.name);
