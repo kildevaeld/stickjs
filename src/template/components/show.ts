@@ -3,7 +3,7 @@
 import {ComponentDefinition} from '../index'
 
 export const Show: ComponentDefinition = {
-  initialize: function initialize($context) {
+  initialize: function initialize() {
 
   },
   update: function update() {
@@ -43,7 +43,7 @@ export const Show: ComponentDefinition = {
 }
 
 export const Hide: ComponentDefinition = {
-  initialize: function initialize($context) {
+  initialize: function initialize() {
 
   },
   update: function update() {

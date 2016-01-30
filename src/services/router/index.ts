@@ -41,12 +41,12 @@ export class RouterOptions implements IRouterOptions {
 
 
 @config(RouterOptions)
-@inject('$context', '$container', '$routerProvider')
+@inject('$container', '$routerProvider')
 @service('$router')
 /** Router */
 export class RouterService {
     router: Router
-    context: IContext
+    //context: IContext
     container: Container
     _currentController: ControllerFactory
     swap: any
@@ -76,7 +76,7 @@ export class RouterService {
 
         options.execute = options.execute || utils.bind(this.__execute, this);
         this.router = new Router(options);
-        this.context = ctx;
+        //this.context = ctx;
         this.container = container;
         this.router.history.start()
     }
@@ -144,7 +144,8 @@ export class RouterService {
             parameters: args
         });
 
-        this.context.$call(callback, this.context, args)
+        utils.callFunc(callback, this, args);
+        //this.context.$call(callback, this.context, args)
     }
 
     private __handleController(options: RouteOptions): RouteHandler {

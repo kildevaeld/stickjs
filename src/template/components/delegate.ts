@@ -4,7 +4,7 @@ import {bind, delegate, undelegate} from 'utilities';
 import {ComponentDefinition} from '../index'
 
 export const Delegate: ComponentDefinition = {
-    initialize: function initialize($context) {
+    initialize: function initialize($container) {
         this._onEvent = bind(this._onEvent, this);
 
         //stick.utils.delegate(this.ref, this.attributes.selector, 'click', this._onEvent);
@@ -24,7 +24,7 @@ export const Delegate: ComponentDefinition = {
 
         this.section.appendChild(this._container);
 
-        this.$context = $context;
+        //this.$context = $context;
 
         delegate(this._container, this._attributes.selector, 'click', this._onEvent);
     },
