@@ -13,7 +13,7 @@ export class BaseComponent implements Component {
 		document:Document
 		childTemplate:Template
 		constructor(section:Section, vvnode:VNode, attributes:AttributeMap, view:TemplateView) {
-            console.log(attributes)
+            
 			if ((<any>this).update) {
 				(<any>this).update = bind((<any>this).update, this);
 			}

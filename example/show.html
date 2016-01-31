@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
+ 		<script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>       
     <script src="../build/stick.js"></script>
     <script>
 
-      var factory = stick.module('app', function ($context) {
-        $context.show = false;
+      var factory = stick.module('app', function ($state) {
+        $state.set('show', true);
 
       });
 

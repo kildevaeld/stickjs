@@ -1,5 +1,4 @@
 import { Router, RouteHandler, IRouterOptions } from './router';
-import { IContext } from '../../context';
 import { Container } from '../../container';
 import { ControllerFactory } from '../../controller.factory';
 export interface RouteOptions {
@@ -18,7 +17,6 @@ export declare class RouterOptions implements IRouterOptions {
 }
 export declare class RouterService {
     router: Router;
-    context: IContext;
     container: Container;
     _currentController: ControllerFactory;
     swap: any;
@@ -30,7 +28,7 @@ export declare class RouterService {
      * @param {Container} container
      * @constructor RouterService
      */
-    constructor(ctx: IContext, container: Container, options?: IRouterOptions);
+    constructor(container: Container, options?: IRouterOptions);
     private swapElements(target, element);
     /**
      * Notfound handler

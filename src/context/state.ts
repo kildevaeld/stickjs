@@ -2,6 +2,7 @@
 import {NestedModel, ModelSetOptions} from 'collection';
 import {DIContainer} from 'di';
 import * as utils from 'utilities';
+import {inject} from '../annotations';
 
 function isObject(a:any): a is Object {
     return a === Object(a);
@@ -32,11 +33,12 @@ export const get_atributes = function(attributes:any) {
   return { attr, deferred };
 };
 
+@inject('$container')
 export class State extends NestedModel {
-    private _parent: Context;
+    private _parent: State;
     private _container: DIContainer;
     
-    get parent(): Context {
+    get parent(): State {
         return this._parent;
     }
     
@@ -44,9 +46,8 @@ export class State extends NestedModel {
         return this._container;
     }
     
-    constructor(container:DIContainer, parent?:Context) {
+    constructor(container:DIContainer) {
         super();
-        this._parent = parent;
         this._container = container;
     }
     
@@ -80,7 +81,7 @@ export class State extends NestedModel {
         
         if (!utils.isEmpty(unset)) {
             for (let key in unset) {
-                this.unset(key, null);
+                super.set(key, null, {unset:true});
             }
         }
         
@@ -93,7 +94,10 @@ export class State extends NestedModel {
     }*/
     
     
-    public createChild(): Context {
-        return new Context(this.container, this);
+    public createChild(container?:DIContainer): State {
+        if (!container) container = this.container.createChild();
+        let state = new State(container);
+        state._parent = state;
+        return state;
     }
 }

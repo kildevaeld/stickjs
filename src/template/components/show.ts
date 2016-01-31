@@ -7,11 +7,11 @@ export const Show: ComponentDefinition = {
 
   },
   update: function update() {
-    var show = this._attributes.when;
+    var show = this.attributes.when;
 
     if (this._show === show) {
       if (this._subview) {
-        this._subview.update()
+        this._subview.update();
       }
       return;
     }
@@ -22,7 +22,8 @@ export const Show: ComponentDefinition = {
       if (!this._subview) {
         this._subview = this.childTemplate.view(this.view.context, {
           parent: this.view,
-          container: this.view._container
+          container: this.view.container,
+          target: this.view.target
         });
       }
 
@@ -47,11 +48,11 @@ export const Hide: ComponentDefinition = {
 
   },
   update: function update() {
-    var hide = this._attributes.when;
+    var hide = this.attributes.when;
 
     if (this._hide === hide) {
       if (this._subview) {
-        this._subview.update()
+        this._subview.update();
       }
       return;
     }
@@ -62,7 +63,8 @@ export const Hide: ComponentDefinition = {
       if (!this._subview) {
         this._subview = this.childTemplate.view(this.view.context, {
           parent: this.view,
-          container: this.view._container
+          container: this.view.container,
+          target: this.view.target
         });
       }
 

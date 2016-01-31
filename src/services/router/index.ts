@@ -72,7 +72,7 @@ export class RouterService {
 	 * @param {Container} container
 	 * @constructor RouterService
 	 */
-    constructor(ctx: IContext, container: Container, options: IRouterOptions = {}) {
+    constructor(container: Container, options: IRouterOptions = {}) {
 
         options.execute = options.execute || utils.bind(this.__execute, this);
         this.router = new Router(options);
@@ -82,7 +82,7 @@ export class RouterService {
     }
 
     private swapElements(target: HTMLElement, element: HTMLElement) {
-
+        
         if (this.swap) {
             this.swap(target, element);
             return
@@ -143,7 +143,7 @@ export class RouterService {
             fragment: name,
             parameters: args
         });
-
+       
         utils.callFunc(callback, this, args);
         //this.context.$call(callback, this.context, args)
     }
@@ -185,7 +185,9 @@ export class RouterService {
                 this._currentController = factory;
                 let template = factory.container.get('template');
                 this.swapElements(target, template.render())
-            })
+            }).catch( e => {
+               console.error(e) 
+            });
 
         }
     }

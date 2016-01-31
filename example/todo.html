@@ -1,50 +1,58 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <script src="../build/stick.js"></script>
     <script>
-      
-      var factory = stick.module('app', function ($context) {
-        $context.addTodo = function (e) {
-          if ($context.todo != "" && $context.todo != undefined) {
-            $context.todos.push({
-              name: $context.todo,
+        var factory = stick.module('app', function ($state) {
+        this.addTodo = function (e) {
+          var todo = $state.get('todo');
+          if (todo != "" && todo != undefined) {
+            $state.get('todos').push({
+              name: todo,
               done: false
             });
-            $context.todo = "";
+            console.log($state)
+            //$state.unset('todo');
+            //$state.todo = "";
           }
-        }
+         
+        };
         
-        $context.todoDone = function (model) {
+        this.todoDone = function (model) {
           model.set('done', true); 
           
         }
-        $context.removeTodo = function (model) {
-          $context.todos.remove(model)
-          console.log($context.todos)
+        this.removeTodo = function (model) {
+          $state.get('todos').remove(model);
+     
         }
+        $state.set('todos', new stick.Collection());
+        $state.set('todo', '')
         
-        $context.todos = new stick.Collection();
-        
+       
       });
       
       stick.ready(function () {
         factory.create({
           el: document.body
+        }).catch(function (e) {
+          console.error(e)
         });
       });
-      
     </script>
-  </head>
-  <body>
+</head>
+
+<body>
     <input type="text" onenter="{{addTodo}}" value="{{<~>todo}}" />
     <button onclick="{{addTodo}}">Add</button>
     <ul>
-      <li repeat.each="{{todos}}" repeat.as="todo">
-        {{todo.name}} {{todo.done ? '&#10003;' : ''}}
-        <button onclick="{{root.todoDone(todo)}}">Done</button>
-        <button onclick="{{root.removeTodo(todo)}}">Remove</button>
-      </li>
+        <li repeat.each="{{todos}}" repeat.as="todo">
+            {{todo.name}} {{todo.done ? '&#10003;' : ''}}
+            <button onclick="{{root.todoDone(todo)}}">Done</button>
+            <button onclick="{{root.removeTodo(todo)}}">Remove</button>
+        </li>
     </ul>
-  </body>
+</body>
+
 </html>

@@ -3,6 +3,7 @@
 	<head>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 		<script src="../build/stick.js"></script>
+ 		<script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>       
 
 	</head>
 	<body>
@@ -31,6 +32,7 @@
 				<a href="#hello">Tryk</a>
 			</controller>
 			<div class="controller"></div>
+            
 		</div>
 
 		<script>
@@ -55,21 +57,22 @@
 				}
 			})
 
-			var factory = stick.module('app', ['$context', '$router', function ($context, $router) {
-				$context.title = "Hey hoe"
-				$context.count = 0
-				//$router.route('hello', function () {
-					//$context.title = 'Hey joe'
-				//})//
+			var factory = stick.module('app', ['$state', '$router', function ($state, $router) {
+				
+                $state.set({
+                    title: 'Hey Joe',
+                    count: 0,
+                    items: [{
+                        name: 'Test'
+                    }]
+                })
+				
+		
 
-				$context.items = [{
-					name: "test"
-				}];
-
-				$context.$subscribe('event', function (a) {
+				/*$context.$subscribe('event', function (a) {
 					console.log('hello', a)
 					$context.title += ' rap rap'
-				})
+				})*/
 				$router.route('page1', {
 					controller: 'page1',
 					template: 'page1',
@@ -82,21 +85,23 @@
 			}]);
 
 			factory.controller('main', {
-				initialize: function ($context) {
-					$context.title = 'test';
+				initialize: function ($state) {
+					$state.set('title', 'Hello')
 
 				}
 			})
-			.controller('page1', function ($context) {
-				$context.title = 'La lal la'
-				$context.$publish('event', {name:'test'})
-			}).controller('page2', function ($context) {
-				$context.title = 'li li li'
+			.controller('page1', function ($state) {
+                $state.set('title', 'La lal la');
+				//$context.title = 'La lal la'
+				//$context.$publish('event', {name:'test'})
+			}).controller('page2', function ($state) {
+                console.log('Page2', $state)
+				$state.set('title', 'Li li li')
 				var i = document.querySelector('i');
 				i.setAttribute('name', 'check')
 			});
 
-            factory.configure('$routerProvider').then((p) => {
+            factory.configure('$routerProvider').then(function (p) {
                 p.pushState = false;
             })
 
@@ -105,7 +110,9 @@
 			}).then(function (a) {
 				console.log(a);
 
-			})
+			}).catch(function (e) {
+                console.error(e)
+            })
 
 
 

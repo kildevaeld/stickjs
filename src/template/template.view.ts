@@ -7,12 +7,13 @@ export interface TemplateViewOptions {
     parent?: TemplateView;
     container: DIContainer;
     delegator?: IDelegator;
+    target?:any
 }
 
 export class TemplateView extends View {
     private _context: any;
     private _container: DIContainer;
-
+    private _target: any;
     get container(): DIContainer {
         return this._container;
     }
@@ -27,11 +28,15 @@ export class TemplateView extends View {
             context.on('change', this._onModelChange, this);
         }
         this._context = context
-
+        
     }
 
     get context(): any {
         return this._context
+    }
+    
+    get target(): any {
+        return this._target;
     }
 
     _onModelChange(model) {
@@ -55,9 +60,12 @@ export class TemplateView extends View {
         if (options.container) {
             this._container = options.container
         }
+        this._target = options.target;
 
         if (!this.container) throw new Error("template view: no container set");
-
+        
+        
+        
     }
 
     set(key: string | string[], val: any, silent: boolean = false) {
@@ -99,21 +107,10 @@ export class TemplateView extends View {
 
         let value, context = this.context;
 
-        if (key[0].substr(0, 1) === "@") {
-            key[0] = key[0].substr(1);
-            (<string[]>key).unshift('this');
-        }
-
-        if (key[0] === 'this') {
-            (<any>key).shift();
-            if (key.length === 0) {
-                value = this.context
-            }
-        } else if (key[0] === 'root') {
+        if (key[0] === '$root') {
             (<any>key).shift();
             context = this.root.context
         }
-
 
         key = (<any>key).join('.')
         if (!value) {
@@ -122,9 +119,20 @@ export class TemplateView extends View {
             } else {
                 value = context.get(key)
             }
+           
+            if (value == null && this._target != null) {
+                
+                value = this._target[<string>key];
+                
+                if (typeof value === 'function') {
+                    value = bind(value, this._target);
+                }
+               
+            }
         }
 
         return value;
+        
     }
 
     remove() {

@@ -145,9 +145,10 @@ export class Container extends DIContainer {
 	}
 
 	clear () {
-		for (let key of this.__instances.keys()) {
-				this.destroy(key);
-			}
+        let keys = this.__instances.keys();
+        for (let key of keys) {
+            this.destroy(key);
+        }
 	}
 
 	destroy(key: any = null, fn: (arg: any) => void = null) {
@@ -156,7 +157,7 @@ export class Container extends DIContainer {
 				this.destroy(key, fn);
 			}
 			delete this.constructionInfo
-      this.constructionInfo = new Map()
+            this.constructionInfo = new Map()
 			//this.entries
 
 			return

@@ -69,7 +69,8 @@ export const Repeat: ComponentDefinition = {
 
                 child = this.childTemplate.view(properties, {
                     parent: parent,
-                    container: parent.container
+                    container: parent.container,
+                    target: parent.target
                 });
 
 

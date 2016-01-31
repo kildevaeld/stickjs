@@ -1,6 +1,6 @@
 import { Container } from './container';
 import * as utils from 'utilities';
-import { IContext } from './context';
+import { State } from './context/state';
 import { TemplateView } from './template/template.view';
 import { Template } from 'templ/lib/vnode';
 export interface ControllerCreateOptions {
@@ -14,6 +14,6 @@ export declare class ControllerFactory {
     name: string;
     constructor(name: string, controller: FunctionConstructor, container: Container);
     create(options: ControllerCreateOptions): utils.IPromise<any>;
-    resolveTemplate(ctx: IContext, options: ControllerCreateOptions): utils.IPromise<TemplateView>;
+    resolveTemplate(state: State, options: ControllerCreateOptions): utils.IPromise<TemplateView>;
     destroy(): void;
 }

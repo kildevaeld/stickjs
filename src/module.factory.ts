@@ -6,18 +6,18 @@ import {FactoryActivator} from 'di'
 import * as utils from 'utilities'
 import {Template} from 'templ/lib/vnode'
 import {TemplateView} from './template/template.view'
-import {getContext, IContext} from './context'
+import {State} from './context/state';
 
 import {TemplateCreator} from './services/template'
 import {ControllerFactory} from './controller.factory'
-import {Observer} from './observer'
+//import {Observer} from './observer'
 
 export type ControllerDefinition = FunctionConstructor|Object|any[];
 
 export interface ModuleCreateOptions {
 	el?: HTMLElement
 	parent?:Container
-  template?: string | Template
+    template?: string | Template
 }
 
 export class ModuleFactory {
@@ -85,8 +85,6 @@ export class ModuleFactory {
 		if (fn && typeof fn === 'function') {
 			setDependencyType(DependencyType.Service)(fn);
 			this.container.registerService(name, fn);
-            //this.container.registerSingleton(name, fn);
-
 		} else {
 			throw new StickError('service should be a function');
 		}
@@ -127,42 +125,41 @@ export class ModuleFactory {
 			return utils.Promise.resolve(this.container.get(this.name));
 		}
 
-		this.container.registerSingleton('$context', getContext());
+        
+		this.container.registerSingleton('$state', State);
 
-		let ctx: IContext = this.container.get('$context');
+		let state: State = this.container.get('$state');
 
-		if (options.parent) {
+		/*if (options.parent) {
             this.container.parent = options.parent;
             if (options.parent.hasHandler('$context')) {
                 (<any>ctx).__parent = options.parent.get('$context');
             }
-		}
+		}*/
 
 		if (options.template || options.el) {
-            return this.resolveTemplate(ctx, options)
+            return this.resolveTemplate(state, options)
 			.then((template) => {
 
                 this.container.registerInstance("template", template, true);
 
+                
+                
+                let m = this.container.get(this.name);
+                (<any>template)._target = m;
+                
                 if (options.el) {
                     let el = this.container.get('template').render()
                     options.el.innerHTML = '';
                     options.el.appendChild(el);
                     this.container.registerInstance('$elm', options.el, true)
                 }
-
-                ctx.$observe()
-                let mod = this.container.get(this.name);
-                ctx.$unobserve();
-                return mod;
+                
+                return m;
 			});
 		} 
-		
-		ctx.$observe()
-		let mod = this.container.get(this.name);
-		ctx.$unobserve();
 
-		return utils.Promise.resolve(mod)
+		return utils.Promise.resolve(this.container.get(this.name))
 	}
 
   public configure<T>(name:string): utils.IPromise<T> {
@@ -189,7 +186,7 @@ export class ModuleFactory {
       return utils.Promise.reject(new Error('No provider for ' + name.replace('Provider','')));
   }
 
-  private resolveTemplate(ctx: IContext, options: ModuleCreateOptions): utils.IPromise<TemplateView> {
+  private resolveTemplate(state: State, options: ModuleCreateOptions): utils.IPromise<TemplateView> {
     let $template: TemplateCreator = this.container.get('$templateCreator');
     let promise: utils.IPromise<string>
     if (options.el) {
@@ -200,7 +197,7 @@ export class ModuleFactory {
   
     if (!promise && options.template) {
       if (options.template instanceof Template) {
-        let view = (<Template>options.template).view((<any>ctx).__model, {
+        let view = (<Template>options.template).view(state, {
           container: this.container
         });
         return utils.Promise.resolve(view);
@@ -214,7 +211,7 @@ export class ModuleFactory {
     }
 
     return promise.then((templateString) => {
-      return $template(templateString, (<any>ctx).__model)
+      return $template(templateString, state);
     })
   }
 

@@ -1,6 +1,8 @@
 import {Container} from './container';
 import * as utils from 'utilities';
-import {IContext} from './context'
+//import {IContext} from './context'
+import {State} from './context/state';
+
 import {setActivator} from './internal'
 import {FactoryActivator} from 'di'
 import {TemplateCreator, TemplateResolver} from './services/template'
@@ -35,25 +37,22 @@ export class ControllerFactory {
 
 		this.container.registerSingleton(this.name, this.controller);
 
-		let $context: IContext = this.container.get('$context');
+		let $state: State = this.container.get('$state').createChild(this.container);
+		this.container.registerInstance('$state', $state, true);
 
 
-		this.container.registerInstance('$context', $context.$createChild(), true);
+        let contextName = options.contextName || this.name
 
-		$context = this.container.get('$context');
-
-    let contextName = options.contextName || this.name
-
-		return this.resolveTemplate($context, options)
+		return this.resolveTemplate($state, options)
 		.then( template => {
-			this.container.registerInstance('template', template, true);
-
-      let el = template.render();
-
-			$context.$observe();
+			
+            this.container.registerInstance('template', template, true);
+                
+            
 			let controller = this.container.get(this.name);
-      $context[contextName] = controller;
-			$context.$unobserve();
+            (<any>template)._target = controller;
+			let el = template.render();
+            $state.set(contextName, controller);
 
 			if (options.el) {
 				options.el.innerHTML = '';
@@ -66,7 +65,7 @@ export class ControllerFactory {
 
 	}
 
-	resolveTemplate(ctx:IContext, options:ControllerCreateOptions): utils.IPromise<TemplateView> {
+	resolveTemplate(state:State, options:ControllerCreateOptions): utils.IPromise<TemplateView> {
 		let $template: TemplateCreator = this.container.get('$templateCreator');
 		let promise: utils.IPromise<string>
 		if (options.el) {
@@ -74,8 +73,8 @@ export class ControllerFactory {
 			promise = utils.Promise.resolve(templateString)
 		} else if (options.template) {
 			if (options.template instanceof Template) {
-				let view = (<Template>options.template).view((<any>ctx).__model, {
-					container:this.container
+				let view = (<Template>options.template).view(state, {
+					container:this.container,
 				});
 				return utils.Promise.resolve(view);
 			}
@@ -87,7 +86,7 @@ export class ControllerFactory {
 		}
 
 		return promise.then((templateString) => {
-			return $template(templateString, (<any>ctx).__model)
+			return $template(templateString, state)
 		})
 	}
 
