@@ -3847,11 +3847,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var parent = document.createDocumentFragment();
 	            parent.appendChild(this.start);
 	            parent.appendChild(this.end);
+	            // Chrome bug. If the reference to the newly created dparent
+	            // Chrome (v8?) will release it, and the parent will become null;
+	            this.__parent = parent;
 	        }
 	    }
 
 	    FragmentSection.prototype.appendChild = function appendChild(node) {
-	        //console.log(document.body.appendChild(node))
 	        this.end.parentNode.insertBefore(node, this.end);
 	    };
 
@@ -11510,7 +11512,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.remove();
 	            delete this._container;
 	            delete this._delegator;
-	            this._context = null;
+	            this.context = null;
 	        }
 	    }, {
 	        key: 'container',
@@ -11718,16 +11720,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 	var collection_1 = __webpack_require__(45);
-	var index_1 = __webpack_require__(6);
 	exports.Repeat = {
 	    initialize: function initialize() {
 	        this._children = [];
 	        this._collection = [];
-	        this.id = index_1.uniqueId();
 	    },
 	    update: function update() {
-	        //this._children = this._children || [];
-	        //this._collection = this._collection || [];
 	        var as = this['as'];
 	        var each = this['each'];
 	        var key = this['key'] || "key";
@@ -11784,7 +11782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            n++;
 	        }, this);
 	        this._children.splice(n).forEach(function (child) {
-	            child.destroy();
+	            child.$destroy();
 	        });
 	    },
 	    __addEventListeners: function __addEventListeners(collection) {
@@ -11815,7 +11813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for (var _iterator = this._children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	                var child = _step.value;
 
-	                child.destroy();
+	                child.$destroy();
 	            }
 	        } catch (err) {
 	            _didIteratorError = true;

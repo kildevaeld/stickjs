@@ -1,6 +1,6 @@
 
 import {Collection, IModel, NestedModel} from 'collection'
-import {uniqueId, bind} from 'utilities/lib/index'
+import {bind} from 'utilities/lib/index'
 import {ComponentDefinition} from '../index'
 
 export const Repeat: ComponentDefinition = {
@@ -8,12 +8,11 @@ export const Repeat: ComponentDefinition = {
     initialize() {
         this._children = []
         this._collection = [];
-        this.id = uniqueId();
+        
     },
 
     update() {
-        //this._children = this._children || [];
-        //this._collection = this._collection || [];
+        
         var as = this['as'];
         var each = this['each'];
         var key = this['key'] || "key";
@@ -89,7 +88,7 @@ export const Repeat: ComponentDefinition = {
         }, this);
 
         this._children.splice(n).forEach(function(child) {
-            (<any>child).destroy();
+            (<any>child).$destroy();
         });
 
 
@@ -123,7 +122,7 @@ export const Repeat: ComponentDefinition = {
         }
 
         for (let child of this._children) {
-            child.destroy();
+            child.$destroy();
         }
     }
 }

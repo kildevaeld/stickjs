@@ -2,6 +2,9 @@
 <html>
 
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>       
+   
     <script src="../build/stick.js"></script>
     <script>
         var factory = stick.module('app', function ($state) {
@@ -49,8 +52,8 @@
     <ul>
         <li repeat.each="{{todos}}" repeat.as="todo">
             {{todo.name}} {{todo.done ? '&#10003;' : ''}}
-            <button onclick="{{root.todoDone(todo)}}">Done</button>
-            <button onclick="{{root.removeTodo(todo)}}">Remove</button>
+            <button onclick="{{todoDone(todo)}}">Done</button>
+            <button onclick="{{removeTodo(todo)}}">Remove</button>
         </li>
     </ul>
 </body>

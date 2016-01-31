@@ -147,6 +147,6 @@ export class TemplateView extends View {
         this.remove()
         delete this._container
         delete this._delegator
-        this._context = null;
+        this.context = null;
     }
 }
