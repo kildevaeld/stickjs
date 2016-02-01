@@ -50,12 +50,12 @@ export class RouterService {
     container: Container
     _currentController: ControllerFactory
     swap: any
-    private _target: HTMLElement;
+    private _target: string|HTMLElement;
 
-    get target(): HTMLElement {
+    get target(): string|HTMLElement {
         return this._target;
     }
-    set target(target: HTMLElement) {
+    set target(target: string|HTMLElement) {
         this._target = target
     }
 
@@ -161,7 +161,11 @@ export class RouterService {
             } else if (options.target && options.target instanceof Element) {
                 target = <HTMLElement>options.target;
             } else {
-                target = this.target
+                if (typeof this.target === 'string') {
+                    target = <HTMLElement>document.querySelector(<string>this.target);
+                } else {
+                    target = <HTMLElement>this.target;
+                }
             }
 
             if (target == null) {

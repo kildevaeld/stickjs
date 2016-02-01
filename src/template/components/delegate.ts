@@ -26,7 +26,7 @@ export const Delegate: ComponentDefinition = {
 
         //this.$context = $context;
 
-        delegate(this._container, this._attributes.selector, 'click', this._onEvent);
+        delegate(this._container, this.attributes.selector, 'click', this._onEvent);
     },
     update: function update() { },
     _onEvent: function _onEvent(e) {
@@ -38,7 +38,7 @@ export const Delegate: ComponentDefinition = {
             fn = this.value;
         }*/
 
-        var fn = this._attributes.click;
+        var fn = this.attributes.click;
 
         if (typeof fn !== 'function') {
             //return;
@@ -49,7 +49,7 @@ export const Delegate: ComponentDefinition = {
     },
     onDestroy: function destroy() {
         //debug('removed event listener %s: %o', this.event, this.value);
-        undelegate(this._container, this._attributes.selector, 'click', this._onEvent);
+        undelegate(this._container, this.attributes.selector, 'click', this._onEvent);
 
         //this.view.removeListener(this.ref, this.event, this._onEvent);
         this._subview.$destroy();

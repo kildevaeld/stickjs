@@ -8,7 +8,7 @@ export const Unsafe: ComponentDefinition = {
     
   },
   update: function update() {
-	 var value = this._attributes.html;
+	 var value = this.attributes.html;
 
     // dirty check if is a binding
     if (typeof value === "object" && value.evaluate) {

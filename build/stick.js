@@ -238,7 +238,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                } else if (options.target && options.target instanceof Element) {
 	                    target = options.target;
 	                } else {
-	                    target = _this.target;
+	                    if (typeof _this.target === 'string') {
+	                        target = document.querySelector(_this.target);
+	                    } else {
+	                        target = _this.target;
+	                    }
 	                }
 	                if (target == null) {
 	                    throw new Error('[router] target not defined');
@@ -11911,7 +11915,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Unsafe = {
 	    initialize: function initialize() {},
 	    update: function update() {
-	        var value = this._attributes.html;
+	        var value = this.attributes.html;
 	        // dirty check if is a binding
 	        if ((typeof value === "undefined" ? "undefined" : _typeof(value)) === "object" && value.evaluate) {
 	            value = void 0;
@@ -11988,7 +11992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._container.appendChild(view.render());
 	        this.section.appendChild(this._container);
 	        //this.$context = $context;
-	        utilities_1.delegate(this._container, this._attributes.selector, 'click', this._onEvent);
+	        utilities_1.delegate(this._container, this.attributes.selector, 'click', this._onEvent);
 	    },
 	    update: function update() {},
 	    _onEvent: function _onEvent(e) {
@@ -11999,7 +12003,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	            fn = this.value;
 	        }*/
-	        var fn = this._attributes.click;
+	        var fn = this.attributes.click;
 	        if (typeof fn !== 'function') {
 	            //return;
 	            throw new Error('[event] value is not a function');
@@ -12009,7 +12013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    onDestroy: function destroy() {
 	        //debug('removed event listener %s: %o', this.event, this.value);
-	        utilities_1.undelegate(this._container, this._attributes.selector, 'click', this._onEvent);
+	        utilities_1.undelegate(this._container, this.attributes.selector, 'click', this._onEvent);
 	        //this.view.removeListener(this.ref, this.event, this._onEvent);
 	        this._subview.$destroy();
 	    }

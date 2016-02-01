@@ -21,7 +21,7 @@ export declare class RouterService {
     _currentController: ControllerFactory;
     swap: any;
     private _target;
-    target: HTMLElement;
+    target: string | HTMLElement;
     setTarget(target: HTMLElement | string): void;
     /**
      * @param {IContext} ctx
