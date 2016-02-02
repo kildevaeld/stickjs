@@ -28,15 +28,19 @@ export class TemplateView extends View {
             context.on('change', this._onModelChange, this);
         }
         this._context = context
-        
+
     }
 
     get context(): any {
         return this._context
     }
-    
+
     get target(): any {
         return this._target;
+    }
+
+    setTarget(target:any) {
+      this._target = target;
     }
 
     _onModelChange(model) {
@@ -63,9 +67,9 @@ export class TemplateView extends View {
         this._target = options.target;
 
         if (!this.container) throw new Error("template view: no container set");
-        
-        
-        
+
+
+
     }
 
     set(key: string | string[], val: any, silent: boolean = false) {
@@ -119,20 +123,20 @@ export class TemplateView extends View {
             } else {
                 value = context.get(key)
             }
-           
+
             if (value == null && this._target != null) {
-                
+
                 value = this._target[<string>key];
-                
+
                 if (typeof value === 'function') {
                     value = bind(value, this._target);
                 }
-               
+
             }
         }
 
         return value;
-        
+
     }
 
     remove() {

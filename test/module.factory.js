@@ -1,3 +1,4 @@
+'use strict';
 /* global describe:true,it:true,before:true, beforeEach:true */
 const ModuleFactory = require('../lib/module.factory').ModuleFactory;
 const Container = require('../lib/container').Container;
@@ -49,11 +50,11 @@ describe('ModuleFactory', () => {
 
 			factory.controller('main', spy);
 
-			factory.container.hasHandler('main').should.equal(true);
+			factory.container.hasHandler('main').should.equal(true, 'handler');
 
 			let controller = factory.container.get('main')
 
-			spy.calledOnce.should.equal(true);
+			spy.calledOnce.should.equal(true, 'should be calledOnce');
 			spy.calledOn(controller).should.equal(true);
 
 			controller.should.be.an.Object();

@@ -3,7 +3,7 @@
 	<head>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 		<script src="../build/stick.js"></script>
- 		<script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>       
+ 		<script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>
 
 	</head>
 	<body>
@@ -32,7 +32,7 @@
 				<a href="#hello">Tryk</a>
 			</controller>
 			<div class="controller"></div>
-            
+
 		</div>
 
 		<script>
@@ -58,7 +58,7 @@
 			})
 
 			var factory = stick.module('app', ['$state', '$router', function ($state, $router) {
-				
+
                 $state.set({
                     title: 'Hey Joe',
                     count: 0,
@@ -66,8 +66,8 @@
                         name: 'Test'
                     }]
                 })
-				
-		
+
+
 
 				/*$context.$subscribe('event', function (a) {
 					console.log('hello', a)
@@ -81,7 +81,7 @@
 					controller: 'page2',
 					template: 'page2',
 					target: '.controller'
-				}).router.history.loadUrl();
+				}).reload();
 			}]);
 
 			factory.controller('main', {

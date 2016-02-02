@@ -1,4 +1,5 @@
 import { Container } from './container';
+import { EventEmitter } from 'eventsjs';
 import * as utils from 'utilities';
 import { Template } from 'templ/lib/vnode';
 export declare type ControllerDefinition = FunctionConstructor | Object | any[];
@@ -7,7 +8,7 @@ export interface ModuleCreateOptions {
     parent?: Container;
     template?: string | Template;
 }
-export declare class ModuleFactory {
+export declare class ModuleFactory extends EventEmitter {
     name: string;
     module: FunctionConstructor;
     container: Container;
@@ -24,7 +25,11 @@ export declare class ModuleFactory {
      * @method create
      * @params {Object} options
      * @return {Promise}
-     */
+     *
+     * Call onTemplateRender (), onElementAttached
+     * emits before:template:render, template:render, before:element:attached, element:attached
+     *
+    */
     create(options?: ModuleCreateOptions): utils.IPromise<any>;
     configure<T>(name: string): utils.IPromise<T>;
     private resolveTemplate(state, options);

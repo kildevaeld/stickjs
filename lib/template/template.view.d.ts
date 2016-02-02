@@ -13,6 +13,7 @@ export declare class TemplateView extends View {
     container: DIContainer;
     context: any;
     target: any;
+    setTarget(target: any): void;
     _onModelChange(model: any): void;
     constructor(section: any, template: any, context: any, options?: TemplateViewOptions);
     set(key: string | string[], val: any, silent?: boolean): any;

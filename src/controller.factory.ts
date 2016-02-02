@@ -1,5 +1,6 @@
 import {Container} from './container';
 import * as utils from 'utilities';
+import {EventEmitter} from 'eventsjs';
 //import {IContext} from './context'
 import {State} from './context/state';
 
@@ -8,7 +9,7 @@ import {FactoryActivator} from 'di'
 import {TemplateCreator, TemplateResolver} from './services/template'
 import {StickError} from './typings'
 import {TemplateView} from './template/template.view'
-import {Template} from 'templ/lib/vnode' 
+import {Template} from 'templ/lib/vnode'
 
 export interface ControllerCreateOptions {
 	el?: HTMLElement
@@ -16,12 +17,13 @@ export interface ControllerCreateOptions {
 	contextName: string
 }
 
-export class ControllerFactory {
+export class ControllerFactory extends EventEmitter {
 	controller: FunctionConstructor
 	container: Container
 	name: string
 
 	constructor (name:string, controller:FunctionConstructor, container:Container) {
+    super();
 		this.container = container
 		this.controller = controller
 		this.name = name;
@@ -29,6 +31,13 @@ export class ControllerFactory {
 
 	}
 
+	/**
+	 * Create an instance of a controller
+	 * @param  {ControllerCreateOptions} options
+	 * @return {utils.IPromise<any>}
+	 * Call onTemplateRender (), onElementAttached
+	 * emits before:template:render, template:render, before:element:attached, element:attached
+	 */
 	create (options:ControllerCreateOptions): utils.IPromise<any> {
 
 		if (this.container.hasInstance(this.name)) {
@@ -41,24 +50,53 @@ export class ControllerFactory {
 		this.container.registerInstance('$state', $state, true);
 
 
-        let contextName = options.contextName || this.name
+    let contextName = options.contextName || this.name
 
 		return this.resolveTemplate($state, options)
 		.then( template => {
-			
-            this.container.registerInstance('template', template, true);
-                
-            
+
+      this.container.registerInstance('template', template, true);
+
+
 			let controller = this.container.get(this.name);
-            (<any>template)._target = controller;
+      template.setTarget(controller)
+
+      $state.set(contextName, controller);
+
+      this.trigger('before:template:render');
+
 			let el = template.render();
-            $state.set(contextName, controller);
 
-			if (options.el) {
-				options.el.innerHTML = '';
-				options.el.appendChild(el);
+      if (el instanceof DocumentFragment) {
 
-			}
+      	if ((<any>el).children.length === 1) {
+          el = (<any>el).firstChild;
+        } else {
+          let div = document.createElement('controller');
+          div.appendChild(el);
+          el = div;
+        }
+      }
+
+      this.container.registerInstance('$el', el, true)
+
+      if (typeof controller.onTemplateRender === 'function') {
+          controller.onTemplateRender.call(controller, el, template);
+      }
+
+      this.trigger('template:render');
+
+
+      if (options.el) {
+          this.trigger('before:element:attached', options.el);
+          options.el.innerHTML = '';
+          options.el.appendChild(el);
+          if (typeof controller.onElementAttached === 'function') {
+              controller.onElementAttached.call(controller, el, options.el);
+          }
+          this.trigger('element:attached', el, options.el)
+      }
+
 			return controller;
 		});
 

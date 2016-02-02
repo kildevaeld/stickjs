@@ -82,7 +82,7 @@ export class RouterService {
     }
 
     private swapElements(target: HTMLElement, element: HTMLElement) {
-        
+
         if (this.swap) {
             this.swap(target, element);
             return
@@ -121,7 +121,9 @@ export class RouterService {
     }
 
     public reload() {
-        this.router.history.loadUrl()
+      setTimeout(() => {
+        this.router.history.loadUrl();
+      });
     }
 
 
@@ -143,7 +145,7 @@ export class RouterService {
             fragment: name,
             parameters: args
         });
-       
+
         utils.callFunc(callback, this, args);
         //this.context.$call(callback, this.context, args)
     }
@@ -190,7 +192,7 @@ export class RouterService {
                 let template = factory.container.get('template');
                 this.swapElements(target, template.render())
             }).catch( e => {
-               console.error(e) 
+               console.error(e)
             });
 
         }
