@@ -150,8 +150,9 @@ export class ModuleFactory extends EventEmitter {
 				let el = this.container.get('template').render()
 
 				if (el instanceof DocumentFragment) {
+					// FIXME:
 					if (el.children.length === 1) {
-						el = el.firstChild();
+						//el = el.firstChild;
 					} else {
 						let div = document.createElement('module');
 						div.appendChild(el);

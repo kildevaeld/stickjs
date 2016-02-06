@@ -3,8 +3,8 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>       
-   
+    <script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>
+
     <script src="../build/stick.js"></script>
     <script>
         var factory = stick.module('app', function ($state) {
@@ -15,27 +15,31 @@
               name: todo,
               done: false
             });
-            console.log($state)
-            //$state.unset('todo');
-            //$state.todo = "";
+            $state.set('todo', '');
           }
-         
+
+          console.log($state);
+
         };
-        
+
         this.todoDone = function (model) {
-          model.set('done', true); 
-          
+
+          model.set('done', true);
+          console.log('DONE', model)
+
+          //$state.trigger('change');
+
         }
         this.removeTodo = function (model) {
           $state.get('todos').remove(model);
-     
+
         }
         $state.set('todos', new stick.Collection());
         $state.set('todo', '')
-        
-       
+
+
       });
-      
+
       stick.ready(function () {
         factory.create({
           el: document.body
