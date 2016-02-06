@@ -14,8 +14,10 @@ export class TemplateView extends View {
     private _context: any;
     private _container: DIContainer;
     private _target: any;
+
     get container(): DIContainer {
-        return this._container;
+        if (this._container) return this._container;
+        return this.parent ? (<any>this.parent).container : undefined;
     }
 
     set context(context: any) {
@@ -36,7 +38,9 @@ export class TemplateView extends View {
     }
 
     get target(): any {
-        return this._target;
+        if (this._target) return this._target;
+        return this.parent ? (<any>this.parent).target : undefined;
+
     }
 
     setTarget(target:any) {
@@ -120,7 +124,9 @@ export class TemplateView extends View {
             context = this.root.context
         }
 
-        key = (<any>key).join('.')
+        key = (<any>key).join('.');
+
+        
         if (!value) {
             if (!(this.context instanceof Model)) {
                 value = super.get(key)
@@ -128,12 +134,12 @@ export class TemplateView extends View {
                 value = context.get(key)
             }
 
-            if (value == null && this._target != null) {
+            if (value == null && this.target != null) {
 
-                value = this._target[<string>key];
+                value = this.target[<string>key];
 
                 if (typeof value === 'function') {
-                    value = bind(value, this._target);
+                    value = bind(value, this.target);
                 }
 
             }
@@ -148,13 +154,13 @@ export class TemplateView extends View {
             this._context.off('change', this._onModelChange, this);
         }
 
-        super.remove()
+        super.remove();
     }
 
     $destroy() {
-        this.remove()
-        delete this._container
-        delete this._delegator
+        this.remove();
+        delete this._container;
+        delete this._delegator;
         this.context = null;
     }
 }
