@@ -37,21 +37,21 @@ export const get_atributes = function(attributes:any) {
 export class State extends NestedModel {
     private _parent: State;
     private _container: DIContainer;
-    
+
     get parent(): State {
         return this._parent;
     }
-    
+
     get container(): DIContainer {
         return this._container;
     }
-    
+
     constructor(container:DIContainer) {
         super();
         this._container = container;
     }
-    
-    
+
+
     public set(key: string | Object, val?: any): this {
         let opts: ModelSetOptions = {},
             value = {},
@@ -65,35 +65,30 @@ export class State extends NestedModel {
         } else if (isObject(key)) {
             value = key;
         }
-        
+
         let {attr, deferred} = get_atributes(value);
-        
+
         if (!utils.isEmpty(deferred)) {
             utils.objectToPromise(deferred)
             .then( obj => {
-               super.set(obj) 
+               this.set(obj)
             });
         }
-        
+
         if (!utils.isEmpty(attr)) {
             super.set(attr, opts);
         }
-        
+
+
         if (!utils.isEmpty(unset)) {
-            for (let key in unset) {
-                super.set(key, null, {unset:true});
-            }
+            // Should unset
+            super.set(unset)
         }
-        
-       
+
+
         return this;
     }
-    
-    /*public get(key:any): any {
-        
-    }*/
-    
-    
+
     public createChild(container?:DIContainer): State {
         if (!container) container = this.container.createChild();
         let state = new State(container);

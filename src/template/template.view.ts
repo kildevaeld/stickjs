@@ -46,8 +46,10 @@ export class TemplateView extends View {
     _onModelChange(model) {
         if (this.context == undefined) {
             console.log('context is undefined', model, this);
+            return
         }
-        let changed = model.changed
+        let changed = this.context.changed
+
         for (let k in changed) {
             this.set(k, changed[k])
         }
@@ -68,14 +70,15 @@ export class TemplateView extends View {
 
         if (!this.container) throw new Error("template view: no container set");
 
-
-
     }
 
     set(key: string | string[], val: any, silent: boolean = false) {
+
         if (!silent) {
+
             if (!(this.context instanceof Model)) {
-                return super.set(key, val)
+                super.set(key, val)
+                return this.update();
             }
 
             if (!Array.isArray(key)) key = (<string>key).split(/[,.]/);
@@ -96,6 +99,7 @@ export class TemplateView extends View {
                 (<string[]>key).shift()
                 this.root.set(key, val);
             } else {
+
                 this.context.set((<string[]>key).join('.'), val)
 
             }

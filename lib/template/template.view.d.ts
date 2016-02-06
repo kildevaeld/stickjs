@@ -16,7 +16,7 @@ export declare class TemplateView extends View {
     setTarget(target: any): void;
     _onModelChange(model: any): void;
     constructor(section: any, template: any, context: any, options?: TemplateViewOptions);
-    set(key: string | string[], val: any, silent?: boolean): any;
+    set(key: string | string[], val: any, silent?: boolean): void;
     get(key: string | string[]): any;
     remove(): void;
     $destroy(): void;
