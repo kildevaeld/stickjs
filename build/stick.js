@@ -658,6 +658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports) {
 
+	"use strict";
 	var idCounter = 0;
 	function getID() {
 	    return "" + (++idCounter);
@@ -746,9 +747,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            .concat(this._listeners['all'] || []);
 	        if (EventEmitter.debugCallback)
 	            EventEmitter.debugCallback(this.constructor.name, this.name, eventName, args);
-	        var event, a, len = events.length, index, i;
+	        var event, a, len = events.length, index;
 	        var calls = [];
-	        for (i = 0; i < events.length; i++) {
+	        for (var i = 0, ii = events.length; i < ii; i++) {
 	            event = events[i];
 	            a = args;
 	            if (event.name == 'all') {
@@ -809,7 +810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.off();
 	    };
 	    return EventEmitter;
-	})();
+	}());
 	exports.EventEmitter = EventEmitter;
 
 
@@ -4911,7 +4912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (value instanceof model_1.Model)
 	            return value;
 	        if (objects_1.isObject(value))
-	            return new this.Model(value);
+	            return new this.Model(value, { parse: true });
 	        throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
 	    };
 	    Collection.prototype._removeReference = function (model, options) {
@@ -5106,14 +5107,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.listenTo(obj, event, fn, ctx, true);
 	    };
 	    EventEmitter.prototype.stopListening = function (obj, event, callback) {
-	        var listeningTo = this._listeningTo;
-	        if (!listeningTo)
-	            return this;
+	        var listeningTo = this._listeningTo || {};
 	        var remove = !event && !callback;
-	        if (!callback && typeof event === 'object')
-	            callback = this;
 	        if (obj)
-	            (listeningTo = {})[obj.listenId] = obj;
+	            listeningTo[obj.listenId] = obj;
 	        for (var id in listeningTo) {
 	            obj = listeningTo[id];
 	            obj.off(event, callback, this);
@@ -5518,10 +5515,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.indexOf = indexOf;
 	function find(array, callback, ctx) {
-	    var v;
-	    for (var i = 0, ii = array.length; i < ii; i++) {
-	        if (callback.call(ctx, array[i]))
-	            return array[i];
+	    var i, v;
+	    for (i = 0; i < array.length; i++) {
+	        v = array[i];
+	        if (callback.call(ctx, v))
+	            return v;
 	    }
 	    return null;
 	}
@@ -5547,7 +5545,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    })
 	        .sort(function (left, right) {
-	        var a = left.criteria, b = right.criteria;
+	        var a = left.criteria;
+	        var b = right.criteria;
 	        if (a !== b) {
 	            if (a > b || a === void 0)
 	                return 1;
@@ -6577,22 +6576,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Request;
 	})();
 	exports.Request = Request;
-	(function (HttpMethod) {
-	    HttpMethod[HttpMethod["Get"] = 0] = "Get";
-	    HttpMethod[HttpMethod["Post"] = 1] = "Post";
-	    HttpMethod[HttpMethod["Put"] = 2] = "Put";
-	    HttpMethod[HttpMethod["Delete"] = 3] = "Delete";
-	    HttpMethod[HttpMethod["Patch"] = 4] = "Patch";
-	    HttpMethod[HttpMethod["Head"] = 5] = "Head";
-	})(exports.HttpMethod || (exports.HttpMethod = {}));
-	var HttpMethod = exports.HttpMethod;
-	exports.request = {};
-	['get', 'post', 'put', 'delete', 'patch', 'head']
-	    .forEach(function (m) {
-	    exports.request[m === 'delete' ? 'del' : m] = function (url) {
-	        return new Request(m.toUpperCase(), url);
-	    };
-	});
+	var request;
+	(function (request) {
+	    function get(url) {
+	        return new Request('GET', url);
+	    }
+	    request.get = get;
+	    function post(url) {
+	        return new Request('POST', url);
+	    }
+	    request.post = post;
+	    function put(url) {
+	        return new Request('PUT', url);
+	    }
+	    request.put = put;
+	    function del(url) {
+	        return new Request('DELETE', url);
+	    }
+	    request.del = del;
+	})(request = exports.request || (exports.request = {}));
 
 
 /***/ },
@@ -6659,6 +6661,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        enumerable: true,
 	        configurable: true
 	    });
+	    PaginatedCollection.prototype.hasNext = function () {
+	        return this.hasPage(this._state.current + 1);
+	    };
+	    PaginatedCollection.prototype.hasPage = function (page) {
+	        if (this._state.last > -1) {
+	            return page <= this._state.last;
+	        }
+	        return false;
+	    };
 	    PaginatedCollection.prototype.getPreviousPage = function (options) {
 	        options = options ? objects_1.extend({}, options) : {};
 	        options.page = this._state.current - 1;
@@ -6700,7 +6711,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return promises_1.Promise.reject(new Error("no url specified"));
 	        var idx = url.indexOf('?');
 	        if (idx > -1) {
-	            params = objects_1.extend(params, queryStringToParams(url.substr(0, idx + 1)));
+	            params = objects_1.extend(params, queryStringToParams(url.substr(idx + 1)));
 	            url = url.substr(0, idx);
 	        }
 	        if (!objects_1.has(params, this.queryParams.page)) {
@@ -6716,7 +6727,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
 	            .then(function (resp) {
 	            _this._processResponse(resp, options);
-	            _this.trigger('sync', _this, resp, options);
+	            _this.trigger('fetch', _this, resp, options);
 	            return _this;
 	        }).catch(function (e) {
 	            _this.trigger('error', e);
@@ -6751,9 +6762,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        data = this.parse(data);
 	        for (var i = 0, ii = data.length; i < ii; i++) {
-	            data[i] = new this.Model(data[i], { parse: true });
+	            data[i] = this._prepareModel(data[i]);
 	        }
-	        this[options.reset ? 'reset' : 'set'](data, options);
+	        this.add(data);
 	        this.page.reset(data);
 	        return this;
 	    };
@@ -7996,6 +8007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        //this.event = "keydown"
 	        //this.keyCodes = []
 
+
 	        _this2.keyCodes = [];
 	        _this2.event = "keydown";
 	        return _this2;
@@ -8259,11 +8271,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype.transpile = function transpile(source) {
 	        return this._root(parser_1.parser.parse(source));
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._root = function _root(elements) {
 	        var buffer = "(function(fragment, element, text, comment, dynamic, createBindingClass) {";
@@ -8275,12 +8289,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype._expression = function _expression(expression) {
 	        return this["_" + expression[0]](expression);
 	    };
 	    /**
 	     * check for stuff like <li repeat.each={{items}}></li>
 	     */
+
 
 	    Transpiler.prototype._element = function _element(expression) {
 	        var exprs = {};
@@ -8305,11 +8321,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype._doctype = function _doctype(expression) {
 	        return "text('<!DOCTYPE " + expression[1] + ">')";
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._children = function _children(children) {
 	        var items = [];
@@ -8328,6 +8346,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._element2 = function _element2(expression) {
 	        var buffer = "element('" + expression[1] + "'";
@@ -8387,6 +8406,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype.__addReference = function __addReference(expression) {
 	        var name = "_" + ++this._refCounter;
 	        this._refs[name] = expression;
@@ -8394,6 +8414,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._block = function _block(expression) {
 	        // TODO - check for unbound expressions here
@@ -8404,17 +8425,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype._text = function _text(expression) {
 	        return "text('" + expression[1] + "')";
 	    };
 	    /**
 	     */
 
+
 	    Transpiler.prototype._comment = function _comment(expression) {
 	        return "comment('" + expression[1] + "')";
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._hash = function _hash(expression) {
 	        var items = expression[1];
@@ -8427,11 +8451,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype._script = function _script(expression) {
 	        return this._expression(expression[1]);
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._referenceKeyPath = function _referenceKeyPath(expression) {
 	        var keypath = [];
@@ -8453,6 +8479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype._reference = function _reference(expression) {
 	        var keypath = this._referenceKeyPath(expression[1]);
 	        if (expression[2]) {
@@ -8465,11 +8492,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype._string = function _string(expression) {
 	        return "'" + expression[1] + "'";
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._operator = function _operator(expression) {
 	        return this._expression(expression[2]) + expression[1] + this._expression(expression[3]);
@@ -8477,11 +8506,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype._condition = function _condition(expression) {
 	        return this._expression(expression[1]) + "?" + this._expression(expression[2]) + ":" + this._expression(expression[3]);
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._literal = function _literal(expression) {
 	        return expression[1];
@@ -8489,17 +8520,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype._not = function _not(expression) {
 	        return "!" + this._expression(expression[1]);
 	    };
 	    /**
 	     */
 
+
 	    Transpiler.prototype._negative = function _negative(expression) {
 	        return "-" + this._expression(expression[1]);
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._call = function _call(expression) {
 	        var buffer = "this.view.call(" + this._referenceKeyPath(expression[1][1]) + ", [";
@@ -8508,6 +8542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype._modifier = function _modifier(expression) {
 	        return "this.options.modifiers." + expression[1] + "(" + expression[2].map(this._expression).join(",") + ")";
@@ -8519,11 +8554,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     */
 
+
 	    Transpiler.prototype._group = function _group(expression) {
 	        return "(" + this._expression(expression[1]) + ")";
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype.__findExpressions = function __findExpressions(type, expr) {
 	        var exprs = [];
@@ -8534,6 +8571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    /**
 	     */
+
 
 	    Transpiler.prototype.__traverse = function __traverse(expr, iterator) {
 	        iterator(expr);
@@ -8548,6 +8586,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 	/**
 	 */
+
 
 	function _dashToCamelCase(string) {
 	    return string.split("-").map(function (part, i) {
