@@ -31,6 +31,7 @@ export const Delegate: ComponentDefinition = {
     update: function update() { },
     _onEvent: function _onEvent(e) {
         var self = this;
+        
         //let fn;
         /*if (this.value instanceof templ.Assignment) {
             fn = this.value.assign;

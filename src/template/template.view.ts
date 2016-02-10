@@ -1,7 +1,10 @@
+declare var require:any;
 import {View, IDelegator} from 'templ/lib/view'
 import {Model, NestedModel} from 'collection'
 import {DIContainer} from 'di'
-import {bind} from 'utilities';
+import {bind, uniqueId, nextTick} from 'utilities';
+
+const debug = require('debug')('stick:template:view');
 
 export interface TemplateViewOptions {
     parent?: TemplateView;
@@ -14,7 +17,12 @@ export class TemplateView extends View {
     private _context: any;
     private _container: DIContainer;
     private _target: any;
-
+    private _id: string;
+    
+    get id () {
+        return this._id
+    }
+     
     get container(): DIContainer {
         if (this._container) return this._container;
         return this.parent ? (<any>this.parent).container : undefined;
@@ -54,9 +62,10 @@ export class TemplateView extends View {
         }
         let changed = this.context.changed
 
-        for (let k in changed) {
-            this.set(k, changed[k])
-        }
+        //for (let k in changed) {
+        //    this.set(k, changed[k])
+        //}
+        this.update();
     }
 
     constructor(section: any, template: any, context: any, options?: TemplateViewOptions) {
@@ -71,9 +80,9 @@ export class TemplateView extends View {
             this._container = options.container
         }
         this._target = options.target;
-
+	    this._id = uniqueId("templ");
         if (!this.container) throw new Error("template view: no container set");
-
+        debug("%s: Template view created with state %s", this.id, this.context.uid);
     }
 
     set(key: string | string[], val: any, silent: boolean = false) {
@@ -103,7 +112,7 @@ export class TemplateView extends View {
                 (<string[]>key).shift()
                 this.root.set(key, val);
             } else {
-
+                
                 this.context.set((<string[]>key).join('.'), val)
 
             }
@@ -112,9 +121,23 @@ export class TemplateView extends View {
 
         this.update()
     }
+    
+    render (): HTMLElement {
+        debug("%s: Render", this.id);
+        return <HTMLElement>super.render();
+    }
+    
+    update() {
+        debug("%s: Start updating", this.id);
+        /*nextTick(() => {
+            super.update();
+        });*/
+        super.update();
+        
+    }
 
     get(key: string | string[]): any {
-
+	    debug("%s: Get value for key: %j", this.id, key); 
         if (!Array.isArray(key)) key = (<string>key).split(/[,.]/);
 
         let value, context = this.context;
@@ -126,7 +149,7 @@ export class TemplateView extends View {
 
         key = (<any>key).join('.');
 
-        
+
         if (!value) {
             if (!(this.context instanceof Model)) {
                 value = super.get(key)
@@ -153,14 +176,15 @@ export class TemplateView extends View {
         if (this._context && this._context instanceof Model) {
             this._context.off('change', this._onModelChange, this);
         }
-
+        debug("%s: Remove", this.id);
         super.remove();
     }
 
     $destroy() {
+        debug("%s: Destroy", this.id);
         this.remove();
-        delete this._container;
-        delete this._delegator;
-        this.context = null;
+        //delete this._container;
+        //delete this._delegator;
+        //this.context = null;
     }
 }

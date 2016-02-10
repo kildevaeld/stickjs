@@ -1,5 +1,5 @@
 import {getDependencies, DependencyType, setActivator} from './internal'
-import {StickError} from './typings'
+import {StickError} from './errors'
 import {Repository} from './repository'
 import * as utils from 'utilities'
 
@@ -9,7 +9,7 @@ import {AttributeDefinition, ComponentDefinition} from './template/index'
 import {BaseComponent} from './template/components/base-component'
 import {AttributeConstructor} from 'templ/lib/vnode';
 import * as templ from 'templ';
-import * as annotations from './annotations'
+import * as annotations from './decorators'
 
 export const decorators = annotations
 

@@ -1,6 +1,3 @@
-
-/// <reference path="../../typings" />
-
 //import {components, View, compile, vnode} from 'templ'
 import {DIContainer} from 'di'
 import {isPromise, IPromise, Promise} from 'utilities/lib/index'
@@ -32,9 +29,16 @@ export const Controller: ComponentDefinition = {
 			template: template,
 			contextName: this.as
 		}).then( controller => {
-			let template = this.factory.container.get('template');
-			this.section.appendChild(template.render());
+			let el = this.factory.container.get('$el');
+			this.section.appendChild(el);
 		});
+	},
+
+	update() {
+		if (this.factory.container.hasHandler('template')) {
+			this.factory.container.get('template').update();
+		}
+
 	},
 
 	onDestroy () {

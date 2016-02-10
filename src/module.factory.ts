@@ -1,119 +1,140 @@
+declare var require: any;
 import {Container} from './container'
 import {getDependencies, setActivator, DependencyType, setDependencyType} from './internal'
 import {EventEmitter} from 'eventsjs';
 import {Repository} from './repository';
-import {StickError} from './typings'
+import {StickError} from './errors'
 import {FactoryActivator} from 'di'
 import * as utils from 'utilities'
 import {Template} from 'templ/lib/vnode'
 import {TemplateView} from './template/template.view'
-import {State} from './context/state';
+import {State} from './state';
 
 import {TemplateCreator} from './services/template'
 import {ControllerFactory} from './controller.factory'
 //import {Observer} from './observer'
+const debug = require('debug')('stick:factory:module');
+
 
 export type ControllerDefinition = FunctionConstructor | Object | any[];
 
 export interface ModuleCreateOptions {
-	el?: HTMLElement
-	parent?: Container
-	template?: string | Template
+    el?: HTMLElement
+    parent?: Container
+    template?: string | Template
 }
 
 export class ModuleFactory extends EventEmitter {
-	name: string
-	module: FunctionConstructor
-	container: Container
+    name: string;
+    module: FunctionConstructor;
+    container: Container;
+    private _id: string;
+    
+    get id () {
+        return this._id;
+    }
+    
+    constructor(name: string, module: FunctionConstructor, container: Container) {
+        super();
+        if (arguments.length != 3) {
+            throw new Error();
+        }
 
-	constructor(name: string, module: FunctionConstructor, container: Container) {
-		super();
-		if (arguments.length != 3) {
-			throw new Error();
-		}
+        this.name = name
+        this.module = module
+        this.container = container
 
-		this.name = name
-		this.module = module
-		this.container = container
+        if (typeof module === 'function' && module.name == "") {
+            Object.defineProperty(module, 'name', {
+                value: name
+            });
 
-		this.container.registerSingleton(name, module);
-		this.container.registerInstance('$container', this.container);
-	}
+        }
+        this._id = utils.uniqueId("mod");
+        debug("%s: Module factory created: '%s', container: %s", this.id, name, this.container.id);
 
-	controller(name: string, definition: ControllerDefinition): ModuleFactory {
+        this.container.registerSingleton(name, module);
+        this.container.registerInstance('$container', this.container);
+    }
 
-		let [def, deps] = getDependencies(definition)
+    controller(name: string, definition: ControllerDefinition): ModuleFactory {
 
-		if (def) {
-			let fn
-			if (typeof def !== 'function' && utils.isObject(def)) {
-				let copy = utils.extend({}, def);
-				if (typeof (<any>def).initialize === 'function') {
-					fn = (<any>def).initialize
-					delete (<any>copy).initialize
-				} else if (typeof def.constructor === 'function') {
-					fn = def.constructor
-					delete copy.constructor
-				}
+        let [def, deps] = getDependencies(definition)
 
-				if (!deps || deps.length == 0) {
-					getDependencies(fn);
-				}
+        if (def) {
+            let fn
+            if (typeof def !== 'function' && utils.isObject(def)) {
+                let copy = utils.extend({}, def);
+                if (typeof (<any>def).initialize === 'function') {
+                    fn = (<any>def).initialize
+                    delete (<any>copy).initialize
+                } else if (typeof def.constructor === 'function') {
+                    fn = def.constructor
+                    delete copy.constructor
+                }
 
-				utils.assign(fn.prototype, copy);
+                if (!deps || deps.length == 0) {
+                    getDependencies(fn);
+                }
 
-			} else if (typeof def === 'function') {
-				fn = def
-			}
+                utils.assign(fn.prototype, copy);
 
-			if (typeof fn !== 'function') {
-				throw new StickError('controller defition should be a function or an object literal')
-			}
-			setDependencyType(DependencyType.Controller)(fn);
+            } else if (typeof def === 'function') {
+                fn = def
+            }
 
-			let factory = new ControllerFactory(name, fn, this.container.createChild());
-			this.container.registerInstance(name, factory, true);
+            if (typeof fn !== 'function') {
+                throw new StickError('controller defition should be a function or an object literal')
+            }
+            setDependencyType(DependencyType.Controller)(fn);
+	        
+            let factory = new ControllerFactory(name, fn, this.container.createChild());
+            this.container.registerInstance(name, factory, true);
+            debug("%s: Register controller: '%s', %s", this.id, name, factory.id); 
 
-		} else {
-			throw new StickError("controller definition should be a function, function constructor or a object literal");
-		}
+        } else {
+            throw new StickError("controller definition should be a function, function constructor or a object literal");
+        }
 
-		return this;
-		}
+        return this;
+    }
 
-	service(name: string | FunctionConstructor, definition: Function): ModuleFactory {
-		let [fn] = getDependencies(definition);
+    service(name: string | FunctionConstructor, definition: Function): ModuleFactory {
+        let [fn] = getDependencies(definition);
 
-		if (fn && typeof fn === 'function') {
-			setDependencyType(DependencyType.Service)(fn);
-			this.container.registerService(name, fn);
-		} else {
-			throw new StickError('service should be a function');
-		}
 
-		return this
-	}
+
+        if (fn && typeof fn === 'function') {
+            setDependencyType(DependencyType.Service)(fn);
+            this.container.registerService(name, fn);
+            debug("%s Register service %s", this.id, name);
+        } else {
+            throw new StickError('service should be a function');
+        }
+
+        return this
+    }
 
 	/**
 	 * Create a factory function
 	 * @param {String} name
 	 */
-		factory(name: string, factory: any | any[]): ModuleFactory {
+    factory(name: string, factory: any | any[]): ModuleFactory {
 
-				let [fn] = getDependencies(factory);
+        let [fn] = getDependencies(factory);
 
-				if (!fn) throw new StickError('factory');
+        if (!fn) throw new StickError('factory');
+        debug("%s Register factory %s", this.id, name);
+        if (typeof fn === 'function') {
+            setDependencyType(DependencyType.Factory)(fn);
+            setActivator(fn, FactoryActivator.instance);
+            this.container.registerSingleton(name, fn)
+        } else {
+            this.container.registerInstance(name, fn);
+        }
 
-				if (typeof fn === 'function') {
-						setDependencyType(DependencyType.Factory)(fn);
-						setActivator(fn, FactoryActivator.instance);
-						this.container.registerSingleton(name, fn)
-				} else {
-						this.container.registerInstance(name, fn);
-				}
-
-				return this;
-		}
+        return this;
+    }
 
 	/**
 	 * Create a new instance of the module
@@ -125,121 +146,123 @@ export class ModuleFactory extends EventEmitter {
 	 * emits before:template:render, template:render, before:element:attached, element:attached
 	 *
 	*/
-	create(options: ModuleCreateOptions = {}): utils.IPromise<any> {
-		// There can only be one.
-		if (this.container.hasInstance(this.name)) {
-			return utils.Promise.resolve(this.container.get(this.name));
-		}
+    create(options: ModuleCreateOptions = {}): utils.IPromise<any> {
+        // There can only be one.
+        if (this.container.hasInstance(this.name)) {
+            debug("%s: Resolving module %s", this.id, this.name); 
+            return utils.Promise.resolve(this.container.get(this.name));
+        }
 
-		this.container.registerSingleton('$state', State);
+        this.container.registerSingleton('$state', State);
 
-		let state: State = this.container.get('$state');
+        let state: State = this.container.get('$state');
+	    debug("%s: Creating module %s", this.id, this.name); 
+        if (options.template || options.el) {
+           
+            return this.resolveTemplate(state, options)
+                .then((template) => {
 
-		if (options.template || options.el) {
-			return this.resolveTemplate(state, options)
-			.then((template) => {
+                    this.container.registerInstance("template", template, true);
 
-				this.container.registerInstance("template", template, true);
+                    let m = this.container.get(this.name);
+                    template.setTarget(m);
+                    //(<any>template)._target = m;
 
-				let m = this.container.get(this.name);
-				template.setTarget(m);
-				//(<any>template)._target = m;
+                    this.trigger('before:template:render');
 
-				this.trigger('before:template:render');
+                    let el = this.container.get('template').render()
 
-				let el = this.container.get('template').render()
+                    if (el instanceof DocumentFragment) {
+                        // FIXME:
+                        if (el.children.length === 1) {
+                            //el = el.firstChild;
+                        } else {
+                            let div = document.createElement('module');
+                            div.appendChild(el);
+                            el = div;
+                        }
+                    }
 
-				if (el instanceof DocumentFragment) {
-					// FIXME:
-					if (el.children.length === 1) {
-						//el = el.firstChild;
-					} else {
-						let div = document.createElement('module');
-						div.appendChild(el);
-						el = div;
-					}
-				}
+                    this.container.registerInstance('$el', el, true);
 
-				this.container.registerInstance('$el', el, true);
+                    if (typeof m.onTemplateRender === 'function') {
+                        m.onTemplateRender.call(m, el, template);
+                    }
 
-				if (typeof m.onTemplateRender === 'function') {
-					m.onTemplateRender.call(m, el, template);
-				}
+                    this.trigger('template:render');
 
-				this.trigger('template:render');
+                    if (options.el) {
+                        this.trigger('before:element:attached', options.el);
+                        options.el.innerHTML = '';
+                        options.el.appendChild(el);
+                        if (typeof m.onElementAttached === 'function') {
+                            m.onElementAttached.call(m, el, options.el);
+                        }
+                        this.trigger('element:attached', el, options.el)
+                    }
 
- 				if (options.el) {
-					this.trigger('before:element:attached', options.el);
-					options.el.innerHTML = '';
-					options.el.appendChild(el);
-					if (typeof m.onElementAttached === 'function') {
-						m.onElementAttached.call(m, el, options.el);
-					}
-					this.trigger('element:attached', el, options.el)
-				}
+                    return m;
+                });
+        }
 
-				return m;
-			});
-		}
+        return utils.Promise.resolve(this.container.get(this.name))
+    }
 
-		return utils.Promise.resolve(this.container.get(this.name))
-	}
+    public configure<T>(name: string): utils.IPromise<T> {
+        let configName = name;
+        if (!/Provider$/.test(name)) {
+            configName = name + 'Provider';
+        } else {
+            name = name.replace('Provider', '');
+        }
 
-		public configure<T>(name: string): utils.IPromise<T> {
-				let configName = name;
-				if (!/Provider$/.test(name)) {
-						configName = name + 'Provider';
-				} else {
-						name = name.replace('Provider', '');
-				}
+        let provider;
+        // Check if provider is registered
+        if (this.container.hasHandler(configName, false, false)) {
+            return Promise.resolve(this.container.get(name));
+            // Register module, if exists, at try loading the provider again
+        } else if (Repository.has(DependencyType.Service, name)) {
+            let serv = Repository.get(DependencyType.Service, name);
+            this.container.register(serv);
+            if (this.container.hasHandler(configName, false, false)) {
+                return Promise.resolve(this.container.get(configName));
+            }
+        }
 
-				let provider;
-				// Check if provider is registered
-				if (this.container.hasHandler(configName, false, false)) {
-						return Promise.resolve(this.container.get(name));
-						// Register module, if exists, at try loading the provider again
-				} else if (Repository.has(DependencyType.Service, name)) {
-						let serv = Repository.get(DependencyType.Service, name);
-						this.container.register(serv);
-						if (this.container.hasHandler(configName, false, false)) {
-								return Promise.resolve(this.container.get(configName));
-						}
-				}
+        return utils.Promise.reject(new Error('No provider for ' + name.replace('Provider', '')));
+    }
 
-				return utils.Promise.reject(new Error('No provider for ' + name.replace('Provider', '')));
-		}
+    private resolveTemplate(state: State, options: ModuleCreateOptions): utils.IPromise<TemplateView> {
+        let $template: TemplateCreator = this.container.get('$templateCreator');
+        let promise: utils.IPromise<string>
+        if (options.el) {
+            if (options.template == null) {
+                promise = utils.Promise.resolve(options.el.innerHTML)
+            }
+        }
 
-		private resolveTemplate(state: State, options: ModuleCreateOptions): utils.IPromise<TemplateView> {
-				let $template: TemplateCreator = this.container.get('$templateCreator');
-				let promise: utils.IPromise<string>
-				if (options.el) {
-						if (options.template == null) {
-								promise = utils.Promise.resolve(options.el.innerHTML)
-						}
-				}
-
-				if (!promise && options.template) {
-						if (options.template instanceof Template) {
-								let view = (<Template>options.template).view(state, {
-										container: this.container
-								});
-								return utils.Promise.resolve(view);
-						}
-
-
-						promise = this.container.get('$templateResolver')(options.template);
-
-				} else if (!options.el) {
-						return utils.Promise.reject(new StickError("no element or template"));
-				}
-
-				return promise.then((templateString) => {
-						return $template(templateString, state);
-				})
-		}
+        if (!promise && options.template) {
+            if (options.template instanceof Template) {
+                let view = (<Template>options.template).view(state, {
+                    container: this.container
+                });
+                return utils.Promise.resolve(view);
+            }
 
 
-		destroy() {
-				//this.container.destroy();
-		}
+            promise = this.container.get('$templateResolver')(options.template);
+
+        } else if (!options.el) {
+            return utils.Promise.reject(new StickError("no element or template"));
+        }
+
+        return promise.then((templateString) => {
+            return $template(templateString, state);
+        })
+    }
+
+
+    destroy() {
+        //this.container.destroy();
+    }
 }

@@ -12,6 +12,8 @@ export declare class ModuleFactory extends EventEmitter {
     name: string;
     module: FunctionConstructor;
     container: Container;
+    private _id;
+    id: string;
     constructor(name: string, module: FunctionConstructor, container: Container);
     controller(name: string, definition: ControllerDefinition): ModuleFactory;
     service(name: string | FunctionConstructor, definition: Function): ModuleFactory;

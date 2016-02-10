@@ -1,8 +1,10 @@
-
+declare var require:any;
 import {NestedModel, ModelSetOptions} from 'collection';
-import {DIContainer} from 'di';
+import {DIContainer} from 'stick.di';
 import * as utils from 'utilities';
-import {inject} from '../annotations';
+import {inject} from './decorators';
+
+const debug = require('debug')('stick:state');
 
 function isObject(a:any): a is Object {
     return a === Object(a);
@@ -49,6 +51,7 @@ export class State extends NestedModel {
     constructor(container:DIContainer) {
         super();
         this._container = container;
+        debug('%s: State created', this.uid);
     }
 
 
@@ -69,6 +72,7 @@ export class State extends NestedModel {
         let {attr, deferred} = get_atributes(value);
 
         if (!utils.isEmpty(deferred)) {
+            debug("%s: Resolve deferred values: %j",this.uid, Object.keys(deferred));
             utils.objectToPromise(deferred)
             .then( obj => {
                this.set(obj)
@@ -76,6 +80,7 @@ export class State extends NestedModel {
         }
 
         if (!utils.isEmpty(attr)) {
+            debug("%s: Set attributes: %j", this.uid, Object.keys(attr));
             super.set(attr, opts);
         }
 
@@ -90,9 +95,17 @@ export class State extends NestedModel {
     }
 
     public createChild(container?:DIContainer): State {
+        
         if (!container) container = this.container.createChild();
         let state = new State(container);
         state._parent = state;
+        debug("%s: Create child %s", this.uid, state.uid);
         return state;
     }
+    
+    $destroy () {
+        super.destroy();
+        debug("%s: State destroyed", this.uid);
+    }
+    
 }

@@ -2,7 +2,7 @@ import {Router, RouteHandler, IRouterOptions} from './router';
 import {IContext} from '../../context';
 import * as utils from 'utilities';
 import {Container} from '../../container';
-import {service, inject, config} from '../../annotations';
+import {service, inject, config} from '../../decorators';
 import {ControllerFactory} from '../../controller.factory';
 import {ModuleFactory} from '../../module.factory';
 import {decorator} from '../../stick';
@@ -182,7 +182,8 @@ export class RouterService {
 
             factory.create({
                 template: options.template,
-                parent: this.container
+                parent: this.container/*,
+                el: target*/
             }).then(controller => {
 
                 if (this._currentController != null) {

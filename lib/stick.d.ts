@@ -1,6 +1,6 @@
 import { ComponentDefinition } from './template/index';
 import { AttributeConstructor } from 'templ/lib/vnode';
-import * as annotations from './annotations';
+import * as annotations from './decorators';
 export declare const decorators: typeof annotations;
 export declare function service(name: string, definition: Function): void;
 export declare function factory(name: string, factory: any | any[]): void;

@@ -1,7 +1,7 @@
 import { Container } from './container';
 import * as utils from 'utilities';
 import { EventEmitter } from 'eventsjs';
-import { State } from './context/state';
+import { State } from './state';
 import { TemplateView } from './template/template.view';
 import { Template } from 'templ/lib/vnode';
 export interface ControllerCreateOptions {
@@ -13,6 +13,8 @@ export declare class ControllerFactory extends EventEmitter {
     controller: FunctionConstructor;
     container: Container;
     name: string;
+    private _id;
+    id: string;
     constructor(name: string, controller: FunctionConstructor, container: Container);
     /**
      * Create an instance of a controller

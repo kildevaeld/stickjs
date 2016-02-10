@@ -1,6 +1,6 @@
 
 import * as utils from 'utilities'
-import {Metadata, DIContainer} from 'di'
+import {Metadata, DIContainer} from 'stick.di'
 
 const paramRegEx = /function[^(]*\(([^)]*)\)/i
 

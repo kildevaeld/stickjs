@@ -1,5 +1,5 @@
 import { NestedModel } from 'collection';
-import { DIContainer } from 'di';
+import { DIContainer } from 'stick.di';
 export declare const get_atributes: (attributes: any) => {
     attr: {};
     deferred: {};
@@ -12,4 +12,5 @@ export declare class State extends NestedModel {
     constructor(container: DIContainer);
     set(key: string | Object, val?: any): this;
     createChild(container?: DIContainer): State;
+    $destroy(): void;
 }

@@ -10,6 +10,8 @@ export declare class TemplateView extends View {
     private _context;
     private _container;
     private _target;
+    private _id;
+    id: string;
     container: DIContainer;
     context: any;
     target: any;
@@ -17,6 +19,8 @@ export declare class TemplateView extends View {
     _onModelChange(model: any): void;
     constructor(section: any, template: any, context: any, options?: TemplateViewOptions);
     set(key: string | string[], val: any, silent?: boolean): void;
+    render(): HTMLElement;
+    update(): void;
     get(key: string | string[]): any;
     remove(): void;
     $destroy(): void;

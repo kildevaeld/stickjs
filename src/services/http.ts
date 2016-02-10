@@ -1,4 +1,4 @@
-import {service} from '../annotations'
+import {service} from '../decorators'
 import {request, Request} from 'utilities'
 
 @service('$http')

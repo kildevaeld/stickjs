@@ -1,5 +1,5 @@
 'use strict';
-import {service,inject} from '../annotations'
+import {service,inject} from '../decorators'
 import {EventEmitter} from 'eventsjs'
 
 @service('$mediator')

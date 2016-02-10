@@ -1,6 +1,6 @@
 import {DependencyType, getDependencies, DIServiceConfig} from './internal'
 import {find, has} from 'utilities';
-import {Metadata} from 'di'
+import {Metadata} from 'stick.di'
 
 
 export interface ItemMap {
@@ -29,6 +29,11 @@ export module Repository {
 
 		let config = Metadata.get(DIServiceConfig, target)
         
+        if (typeof target === 'function' && target.name == "")  {
+            Object.defineProperty(target, 'name', {
+                value: name
+            });
+        }
 		items.push({
 			name: name,
 			handler: target,

@@ -58,5 +58,4 @@ export class BaseComponent implements Component {
 				a.onDestroy();
 			}
 		}
-
 }

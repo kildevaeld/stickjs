@@ -1,6 +1,6 @@
-import { DIContainer, ConstructionInfo } from 'di';
+import { DIContainer, ConstructionInfo } from 'stick.di';
 import { ItemMap } from './repository';
-export * from 'di';
+export * from 'stick.di';
 export declare function tryCatch(fn: Function, ctx?: any, args?: any[]): [any, Error];
 export declare class Container extends DIContainer {
     __instances: Map<any, any>;

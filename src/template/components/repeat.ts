@@ -41,7 +41,7 @@ export const Repeat: ComponentDefinition = {
     },
 
     _update() {
-
+	   
         var properties;
         var as = this['as'];
         var parent = this.view
@@ -104,7 +104,7 @@ export const Repeat: ComponentDefinition = {
     __removeEventListeners<T extends IModel>(collection: Collection<T>) {
         collection.off('remove', this._update)
         collection.off('add', this._update)
-        collection.reset('reset', this._update)
+        collection.off('reset', this._update)
     },
 
     setAttribute(key: string, value: any) {

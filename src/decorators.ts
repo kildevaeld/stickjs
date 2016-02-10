@@ -1,13 +1,13 @@
 
 import {DependencyType, setDependencyType,DIServiceConfig, Metakey} from './internal'
 import {camelcase, find} from 'utilities'
-import {Metadata} from 'di'
+import {Metadata, inject} from 'stick.di'
 import {Repository} from './repository'
-export {inject} from 'di'
+
+export * from 'stick.di/lib/decorators';
 
 export function controller (controllerName?:string): ClassDecorator {
 	return function (target:Function) {
-		
 		let name = controllerName||camelcase(target.name);
 		Repository.add(DependencyType.Controller, name, target);
 		

@@ -31,6 +31,10 @@
 
         }
         this.removeTodo = function (model) {
+          console.log(model.collection, $state);
+          $state.get('todos').on('remove', () => {
+              console.log('on remove');
+          })
           $state.get('todos').remove(model);
 
         }
