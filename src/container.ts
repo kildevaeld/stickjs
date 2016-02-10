@@ -1,6 +1,6 @@
-import {Metadata, DIContainer, IHandlerFunc, ConstructionInfo, 
-    DIBadKeyError, Resolver, FactoryActivator} from 'stick.di'
-    
+import {Metadata, DIContainer, IHandlerFunc, ConstructionInfo,
+    DIBadKeyError, Resolver, FactoryActivator, ClassActivator} from 'stick.di'
+
 import {StickDependencyError} from './errors'
 import {Repository, ItemMap} from './repository'
 import {DependencyType, setActivator, DIServiceConfig} from './internal'
@@ -94,6 +94,9 @@ export class Container extends DIContainer {
                 return this.__instances.get(key)
             } else {
                 let singleton = this.invoke(fn, null, targetKey)
+                if (utils.isPromise(singleton)) {
+                    
+                }
                 this.__instances.set(key, singleton)
 
                 return singleton
@@ -140,6 +143,41 @@ export class Container extends DIContainer {
             this.__instances.set(key, instance);
         }
 
+    }
+
+    public invoke(fn: Function, deps?: any[], targetKey?: string): any {
+        var info = this._getOrCreateConstructionSet(fn, targetKey)
+
+        try {
+            var keys, args;
+            if (info.dependencyResolver) {
+                args = info.dependencyResolver.resolveDependencies(fn);
+            } else {
+                args = this.resolveDependencies(fn, targetKey)
+            }
+
+            if (deps !== undefined && Array.isArray(deps)) {
+                args = args.concat(deps);
+            }
+            
+            /*return utils.arrayToPromise(args)
+            .then((args) => {
+                return (<any>info.activator).invoke(fn, args, targetKey, keys);
+            })*/
+
+            //debug("%s: invoking '%s', with dependencies:", this.id, fn.name, args);
+            return (<any>info.activator).invoke(fn, args, targetKey, keys);
+
+        } catch (e) {
+
+            var activatingText = info.activator instanceof ClassActivator ? 'instantiating' : 'invoking';
+            var message = `Error ${activatingText} ${(<any>fn).name}.`
+
+            message += ' Check the inner error for details.'
+
+            throw new StickDependencyError(message, [e]);
+
+        }
     }
 
     clear() {

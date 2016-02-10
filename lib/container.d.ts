@@ -11,6 +11,7 @@ export declare class Container extends DIContainer {
     registerSingleton(key: any, fn: Function, targetKey?: any): void;
     registerService(key: any, fn: Function, targetKey?: any): void;
     registerInstance(key: any, instance: any, track?: boolean): void;
+    invoke(fn: Function, deps?: any[], targetKey?: string): any;
     clear(): void;
     destroy(key?: any, fn?: (arg: any) => void): void;
     register(item: ItemMap): void;

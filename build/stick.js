@@ -3874,6 +3874,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'destroy',
 	        value: function destroy() {
 	            debug("%s: Destroying controller '%s'", this.id, this.name);
+	            var controller = this.container.get(this.name);
+	            if (typeof controller.onDestroy === 'function') {
+	                controller.onDestroy.call(controller);
+	            }
 	            this.container.clear();
 	            this.container.entries.clear();
 	        }
@@ -3921,10 +3925,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var StickDependencyError = function (_StickError) {
 	    _inherits(StickDependencyError, _StickError);
 
-	    function StickDependencyError() {
+	    function StickDependencyError(message, errors) {
 	        _classCallCheck(this, StickDependencyError);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(StickDependencyError).apply(this, arguments));
+	        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(StickDependencyError).call(this, message));
+
+	        _this2.errors = errors;
+	        return _this2;
 	    }
 
 	    return StickDependencyError;
@@ -9289,6 +9296,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return _this2.__instances.get(key);
 	                } else {
 	                    var singleton = _this2.invoke(fn, null, targetKey);
+	                    if (utils.isPromise(singleton)) {}
 	                    _this2.__instances.set(key, singleton);
 	                    return singleton;
 	                }
@@ -9335,6 +9343,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _get(Object.getPrototypeOf(Container.prototype), 'registerInstance', this).call(this, key, instance);
 	            if (track) {
 	                this.__instances.set(key, instance);
+	            }
+	        }
+	    }, {
+	        key: 'invoke',
+	        value: function invoke(fn, deps, targetKey) {
+	            var info = this._getOrCreateConstructionSet(fn, targetKey);
+	            try {
+	                var keys, args;
+	                if (info.dependencyResolver) {
+	                    args = info.dependencyResolver.resolveDependencies(fn);
+	                } else {
+	                    args = this.resolveDependencies(fn, targetKey);
+	                }
+	                if (deps !== undefined && Array.isArray(deps)) {
+	                    args = args.concat(deps);
+	                }
+	                /*return utils.arrayToPromise(args)
+	                .then((args) => {
+	                    return (<any>info.activator).invoke(fn, args, targetKey, keys);
+	                })*/
+	                //debug("%s: invoking '%s', with dependencies:", this.id, fn.name, args);
+	                return info.activator.invoke(fn, args, targetKey, keys);
+	            } catch (e) {
+	                var activatingText = info.activator instanceof stick_di_1.ClassActivator ? 'instantiating' : 'invoking';
+	                var message = 'Error ' + activatingText + ' ' + fn.name + '.';
+	                message += ' Check the inner error for details.';
+	                throw new errors_1.StickDependencyError(message, [e]);
 	            }
 	        }
 	    }, {

@@ -8,4 +8,10 @@ export class StickError extends Error {
 }
 
 
-export class StickDependencyError extends StickError { }
+export class StickDependencyError extends StickError { 
+    errors: Error[];
+    constructor(message?:string, errors?:Error[]) {
+        super(message);
+        this.errors = errors;
+    }
+}

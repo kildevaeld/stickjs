@@ -153,6 +153,13 @@ export class ControllerFactory extends EventEmitter {
 
     destroy() {
         debug("%s: Destroying controller '%s'", this.id, this.name);
+
+        let controller = this.container.get(this.name);
+
+        if (typeof controller.onDestroy === 'function') {
+            controller.onDestroy.call(controller);
+        }
+
         this.container.clear();
         this.container.entries.clear()
     }
