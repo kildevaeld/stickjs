@@ -55,6 +55,11 @@ export class State extends NestedModel {
     }
 
 
+    public get(key: string): any {
+        debug("%s: Get attribute: %s", this.uid, key);
+        return super.get(key);
+    }
+
     public set(key: string | Object, val?: any): this {
         let opts: ModelSetOptions = {},
             value = {},
@@ -87,6 +92,7 @@ export class State extends NestedModel {
 
         if (!utils.isEmpty(unset)) {
             // Should unset
+            debug("%s: Unset attributes: %j", this.uid, Object.keys(unset));
             super.set(unset)
         }
 
@@ -95,17 +101,17 @@ export class State extends NestedModel {
     }
 
     public createChild(container?:DIContainer): State {
-        
+
         if (!container) container = this.container.createChild();
         let state = new State(container);
         state._parent = state;
         debug("%s: Create child %s", this.uid, state.uid);
         return state;
     }
-    
+
     $destroy () {
         super.destroy();
         debug("%s: State destroyed", this.uid);
     }
-    
+
 }

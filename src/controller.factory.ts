@@ -23,11 +23,11 @@ export class ControllerFactory extends EventEmitter {
     container: Container;
     name: string;
     private _id: string;
-    
+
     get id (): string {
         return this._id;
     }
-    
+
     constructor(name: string, controller: FunctionConstructor, container: Container) {
         super();
         this.container = container
@@ -62,16 +62,16 @@ export class ControllerFactory extends EventEmitter {
 
 
         let contextName = options.contextName || this.name
-        
-	    debug("%s: Creating controller '%s' as '%s'", this.id, this.name, contextName);
-        let controller = this.container.get(this.name); 
+
+
+
         return this.resolveTemplate($state, options)
             .then(template => {
-	            debug("%s: Created template: %s", this.id, template.id); 
+	            debug("%s: Created template: %s", this.id, template.id);
                 this.container.registerInstance('template', template, true);
+                debug("%s: Instantiating controller '%s' as '%s'", this.id, this.name, contextName);
+                let controller = this.container.get(this.name);
 
-
-                //let controller = this.container.get(this.name);
                 template.setTarget(controller)
 
                 $state.set(contextName, controller);
@@ -80,15 +80,24 @@ export class ControllerFactory extends EventEmitter {
 
                 let el = template.render();
 
-                if (el instanceof DocumentFragment) {
+                const wrap = (el:Node) => {
+                    let div = document.createElement('controller');
+                    div.setAttribute('name', this.name);
 
+                    if (contextName != this.name) div.setAttribute('as', contextName);
+
+                    div.appendChild(el);
+                    return div;
+                }
+
+                if (el.nodeType === 11 || el.nodeType === 3) {
                     if ((<any>el).children.length === 1) {
-                        el = (<any>el).firstChild;
+                        el = el.firstChild.nodeType === 3 ? wrap(el) : el.firstChild;
+
                     } else {
-                        let div = document.createElement('controller');
-                        div.appendChild(el);
-                        el = div;
+                        el = wrap(el);
                     }
+
                 }
 
                 this.container.registerInstance('$el', el, true)
@@ -143,7 +152,7 @@ export class ControllerFactory extends EventEmitter {
     }
 
     destroy() {
-        debug("%s: Destroying controller '%s'", this.id, this.name); 
+        debug("%s: Destroying controller '%s'", this.id, this.name);
         this.container.clear();
         this.container.entries.clear()
     }

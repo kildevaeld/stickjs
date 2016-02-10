@@ -67,6 +67,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.utils = u;
 	__export(__webpack_require__(78));
 	__export(__webpack_require__(61));
+	//export * from './decorators';
 	exports.ready = u.domReady();
 
 /***/ },
@@ -1867,12 +1868,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	exports.service = service;
-	function factory(factoryName) {
-	    return function (target) {
-	        repository_1.Repository.add(internal_1.DependencyType.Factory, factoryName, target);
-	    };
-	}
-	exports.factory = factory;
+	/*export function factory(factoryName:string): ClassDecorator {
+	    return function (target:Function) {
+
+	        Repository.add(DependencyType.Factory, factoryName, target);
+
+	    }
+	}*/
 	function config(config) {
 	    return function (target) {
 	        stick_di_1.Metadata.define(internal_1.DIServiceConfig, config, target, undefined);
@@ -3805,23 +3807,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var $state = this.container.get('$state').createChild(this.container);
 	            this.container.registerInstance('$state', $state, true);
 	            var contextName = options.contextName || this.name;
-	            debug("%s: Creating controller '%s' as '%s'", this.id, this.name, contextName);
-	            var controller = this.container.get(this.name);
 	            return this.resolveTemplate($state, options).then(function (template) {
 	                debug("%s: Created template: %s", _this2.id, template.id);
 	                _this2.container.registerInstance('template', template, true);
-	                //let controller = this.container.get(this.name);
+	                debug("%s: Instantiating controller '%s' as '%s'", _this2.id, _this2.name, contextName);
+	                var controller = _this2.container.get(_this2.name);
 	                template.setTarget(controller);
 	                $state.set(contextName, controller);
 	                _this2.trigger('before:template:render');
 	                var el = template.render();
-	                if (el instanceof DocumentFragment) {
+	                var wrap = function wrap(el) {
+	                    var div = document.createElement('controller');
+	                    div.setAttribute('name', _this2.name);
+	                    if (contextName != _this2.name) div.setAttribute('as', contextName);
+	                    div.appendChild(el);
+	                    return div;
+	                };
+	                if (el.nodeType === 11 || el.nodeType === 3) {
 	                    if (el.children.length === 1) {
-	                        el = el.firstChild;
+	                        el = el.firstChild.nodeType === 3 ? wrap(el) : el.firstChild;
 	                    } else {
-	                        var div = document.createElement('controller');
-	                        div.appendChild(el);
-	                        el = div;
+	                        el = wrap(el);
 	                    }
 	                }
 	                _this2.container.registerInstance('$el', el, true);
@@ -6817,6 +6823,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(State, [{
+	        key: "get",
+	        value: function get(key) {
+	            debug("%s: Get attribute: %s", this.uid, key);
+	            return _get(Object.getPrototypeOf(State.prototype), "get", this).call(this, key);
+	        }
+	    }, {
 	        key: "set",
 	        value: function set(key, val) {
 	            var _this2 = this;
@@ -6851,6 +6863,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            if (!utils.isEmpty(unset)) {
 	                // Should unset
+	                debug("%s: Unset attributes: %j", this.uid, Object.keys(unset));
 	                _get(Object.getPrototypeOf(State.prototype), "set", this).call(this, unset);
 	            }
 	            return this;
@@ -15171,10 +15184,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function TemplateView(section, template, context, options) {
 	        _classCallCheck(this, TemplateView);
 
-	        //this._onModelChange = bind(this._onModelChange, this);
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TemplateView).call(this, section, template, null, options));
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TemplateView).call(this, section, template, context, options));
-
+	        _this._onModelChange = utilities_1.bind(_this._onModelChange, _this);
+	        _this.context = context;
 	        if (options.delegator) {
 	            _this._delegator = options.delegator;
 	        }
@@ -15245,7 +15258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'update',
 	        value: function update() {
-	            debug("%s: Start updating", this.id);
+	            debug("%s: Update", this.id);
 	            /*nextTick(() => {
 	                super.update();
 	            });*/
@@ -15313,10 +15326,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this._context && this._context instanceof collection_1.Model) {
 	                this._context.off('change', this._onModelChange, this);
 	            }
+	            this._context = context;
 	            if (context != null && context instanceof collection_1.Model) {
 	                context.on('change', this._onModelChange, this);
 	            }
-	            this._context = context;
 	        },
 	        get: function get() {
 	            return this._context;
@@ -15426,13 +15439,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	var controller_factory_1 = __webpack_require__(31);
 	exports.Controller = {
 	    initialize: function initialize($container) {
-	        var _this = this;
-
 	        if (this.attributes['name']) {
 	            this.name = this.attributes['name'];
 	            this.as = this.attributes['as'] || this.name;
 	        }
-	        this.factory = $container.get(this.name);
+	        // this.factory = $container.get(this.name);
+	        // if (!(this.factory instanceof ControllerFactory)) {
+	        // 	throw new Error(this.name + ' is not a controller');
+	        // }
+	        // let template:string|Template = this.childTemplate
+	        // if (this.attributes['template']) {
+	        // 	template = this.attributes['template'];
+	        // }
+	        // this.factory.create({
+	        // 	template: template,
+	        // 	contextName: this.as
+	        // }).then( controller => {
+	        // 	let el = this.factory.container.get('$el');
+	        // 	this.section.appendChild(el);
+	        // });
+	    },
+	    update: function update() {
+	        var _this = this;
+
+	        if (this.factory) {
+	            if (this.factory.container.hasHandler('template')) {
+	                this.factory.container.get('template').update();
+	            }
+	            return;
+	        }
+	        this.factory = this.view.container.get(this.name);
 	        if (!(this.factory instanceof controller_factory_1.ControllerFactory)) {
 	            throw new Error(this.name + ' is not a controller');
 	        }
@@ -15448,14 +15484,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.section.appendChild(el);
 	        });
 	    },
-	    update: function update() {
-	        if (this.factory.container.hasHandler('template')) {
-	            this.factory.container.get('template').update();
-	        }
-	    },
 	    onDestroy: function onDestroy() {
 	        if (this.factory) {
 	            this.factory.destroy();
+	            this.factory = void 0;
 	        }
 	    }
 	};
@@ -15658,7 +15690,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 	    onDestroy: function destroy() {
-	        console.log('on destroy');
 	        if (this._subview) this._subview.$destroy();
 	    }
 	};

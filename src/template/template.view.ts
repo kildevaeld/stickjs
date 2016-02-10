@@ -18,11 +18,11 @@ export class TemplateView extends View {
     private _container: DIContainer;
     private _target: any;
     private _id: string;
-    
+
     get id () {
         return this._id
     }
-     
+
     get container(): DIContainer {
         if (this._container) return this._container;
         return this.parent ? (<any>this.parent).container : undefined;
@@ -34,10 +34,14 @@ export class TemplateView extends View {
             this._context.off('change', this._onModelChange, this);
 
         }
+
+        this._context = context;
+
         if (context != null && context instanceof Model) {
             context.on('change', this._onModelChange, this);
         }
-        this._context = context
+
+
 
     }
 
@@ -65,13 +69,15 @@ export class TemplateView extends View {
         //for (let k in changed) {
         //    this.set(k, changed[k])
         //}
+
         this.update();
+
     }
 
     constructor(section: any, template: any, context: any, options?: TemplateViewOptions) {
-        super(section, template, context, options)
-
-        //this._onModelChange = bind(this._onModelChange, this);
+        super(section, template, null, options)
+        this._onModelChange = bind(this._onModelChange, this);
+        this.context = context;
         if (options.delegator) {
             this._delegator = options.delegator
         }
@@ -112,7 +118,7 @@ export class TemplateView extends View {
                 (<string[]>key).shift()
                 this.root.set(key, val);
             } else {
-                
+
                 this.context.set((<string[]>key).join('.'), val)
 
             }
@@ -121,23 +127,23 @@ export class TemplateView extends View {
 
         this.update()
     }
-    
+
     render (): HTMLElement {
         debug("%s: Render", this.id);
         return <HTMLElement>super.render();
     }
-    
+
     update() {
-        debug("%s: Start updating", this.id);
+        debug("%s: Update", this.id);
         /*nextTick(() => {
             super.update();
         });*/
         super.update();
-        
+
     }
 
     get(key: string | string[]): any {
-	    debug("%s: Get value for key: %j", this.id, key); 
+	    debug("%s: Get value for key: %j", this.id, key);
         if (!Array.isArray(key)) key = (<string>key).split(/[,.]/);
 
         let value, context = this.context;

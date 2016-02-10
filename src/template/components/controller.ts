@@ -14,7 +14,36 @@ export const Controller: ComponentDefinition = {
 			this.as = this.attributes['as'] || this.name
 		}
 
-		this.factory = $container.get(this.name);
+		// this.factory = $container.get(this.name);
+
+		// if (!(this.factory instanceof ControllerFactory)) {
+		// 	throw new Error(this.name + ' is not a controller');
+		// }
+
+		// let template:string|Template = this.childTemplate
+		// if (this.attributes['template']) {
+		// 	template = this.attributes['template'];
+		// }
+
+		// this.factory.create({
+		// 	template: template,
+		// 	contextName: this.as
+		// }).then( controller => {
+		// 	let el = this.factory.container.get('$el');
+
+		// 	this.section.appendChild(el);
+		// });
+	},
+
+	update() {
+		if (this.factory) {
+			if (this.factory.container.hasHandler('template')) {
+				this.factory.container.get('template').update();
+			}
+			return;
+		}
+
+		this.factory = this.view.container.get(this.name);
 
 		if (!(this.factory instanceof ControllerFactory)) {
 			throw new Error(this.name + ' is not a controller');
@@ -30,14 +59,10 @@ export const Controller: ComponentDefinition = {
 			contextName: this.as
 		}).then( controller => {
 			let el = this.factory.container.get('$el');
+
 			this.section.appendChild(el);
 		});
-	},
 
-	update() {
-		if (this.factory.container.hasHandler('template')) {
-			this.factory.container.get('template').update();
-		}
 
 	},
 
@@ -45,6 +70,7 @@ export const Controller: ComponentDefinition = {
 
 		if (this.factory) {
 			this.factory.destroy()
+			this.factory = void 0;
 		}
 	}
 }

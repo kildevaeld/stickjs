@@ -37,7 +37,7 @@ export const Show: ComponentDefinition = {
   },
 
   onDestroy: function destroy() {
-    console.log('on destroy')
+
     if (this._subview)
       this._subview.$destroy();
   }

@@ -10,35 +10,36 @@ export function controller (controllerName?:string): ClassDecorator {
 	return function (target:Function) {
 		let name = controllerName||camelcase(target.name);
 		Repository.add(DependencyType.Controller, name, target);
-		
-	}	
+
+	}
 }
 
 export function module (moduleName?:string): ClassDecorator {
 	return function (target:Function) {
-		
-		let name = moduleName||camelcase(target.name);	
+
+		let name = moduleName||camelcase(target.name);
 		Repository.add(DependencyType.Module, name, target);
-			
+
 	}
 }
 
 export function service (serviceName?:string, moduleName?:string): ClassDecorator {
 	return function (target:Function) {
-		
-		let name = serviceName||camelcase(target.name);		
+
+		let name = serviceName||camelcase(target.name);
 		Repository.add(DependencyType.Service, name, target);
-			
+
 	}
 }
 
-export function factory(factoryName:string): ClassDecorator {
+
+/*export function factory(factoryName:string): ClassDecorator {
 	return function (target:Function) {
-		
+
 		Repository.add(DependencyType.Factory, factoryName, target);
-		
+
 	}
-}
+}*/
 
 export function config (config:any): ClassDecorator {
 	return function (target:Function) {
@@ -48,6 +49,6 @@ export function config (config:any): ClassDecorator {
 
 export function template (name:string): ClassDecorator {
 	return function (target:Function) {
-		Metadata.define(Metakey[Metakey.Template], name, target, undefined)	
+		Metadata.define(Metakey[Metakey.Template], name, target, undefined)
 	}
 }
