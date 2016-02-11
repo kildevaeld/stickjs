@@ -18,14 +18,23 @@ export class TemplateView extends View {
     private _container: DIContainer;
     private _target: any;
     private _id: string;
-
+    private _parent: TemplateView
+    
     get id () {
         return this._id
+    }
+    
+    get parent(): TemplateView {
+        return this._parent;
+    }
+    
+    set parent(parent:TemplateView) {
+        this._parent = parent;
     }
 
     get container(): DIContainer {
         if (this._container) return this._container;
-        return this.parent ? (<any>this.parent).container : undefined;
+        return this.parent ? this.parent.container : undefined;
     }
 
     set context(context: any) {
@@ -50,8 +59,8 @@ export class TemplateView extends View {
     }
 
     get target(): any {
-        if (this._target) return this._target;
-        return this.parent ? (<any>this.parent).target : undefined;
+        if (!!this._target) return this._target;
+        return this.parent ? this.parent.target : undefined;
 
     }
 

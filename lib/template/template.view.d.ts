@@ -11,7 +11,9 @@ export declare class TemplateView extends View {
     private _container;
     private _target;
     private _id;
+    private _parent;
     id: string;
+    parent: TemplateView;
     container: DIContainer;
     context: any;
     target: any;

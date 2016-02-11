@@ -1,5 +1,4 @@
 import {Router, RouteHandler, IRouterOptions} from './router';
-import {IContext} from '../../context';
 import * as utils from 'utilities';
 import {Container} from '../../container';
 import {service, inject, config} from '../../decorators';
@@ -46,7 +45,7 @@ export class RouterOptions implements IRouterOptions {
 /** Router */
 export class RouterService {
     router: Router
-    //context: IContext
+   
     container: Container
     _currentController: ControllerFactory
     swap: any

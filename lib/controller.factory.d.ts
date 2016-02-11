@@ -7,6 +7,7 @@ export interface ControllerCreateOptions {
     el?: HTMLElement;
     template?: string | Template;
     contextName: string;
+    parentView?: TemplateView;
 }
 export declare class ControllerFactory extends EventEmitter {
     controller: FunctionConstructor;

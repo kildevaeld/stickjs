@@ -15,8 +15,8 @@ gulp.task('typescript', function () {
 	let result = project.src(Path.join(process.cwd(),'src','**','*.ts'))
 	.pipe(typescript(project));
 
-    let js = result.js.
-    pipe(babel({
+    let js = result.js
+    .pipe(babel({
         compact: false,
         "plugins": ["transform-decorators"],
         presets: ["es2015", 'stage-0'],

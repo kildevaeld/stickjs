@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	__webpack_require__(1);
-	__webpack_require__(101);
+	__webpack_require__(102);
 	var u = __webpack_require__(6);
 	exports.utils = u;
 	__export(__webpack_require__(78));
@@ -143,6 +143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(97));
 	__export(__webpack_require__(98));
 	__export(__webpack_require__(100));
+	__export(__webpack_require__(101));
 
 /***/ },
 /* 2 */
@@ -4140,7 +4141,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                }
 
 	                                view = options.template.view(state, {
-	                                    container: this.container
+	                                    container: this.container,
+	                                    parentView: options.parentView
 	                                });
 	                                return _context2.abrupt("return", view);
 
@@ -16013,6 +16015,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this._id;
 	        }
 	    }, {
+	        key: 'parent',
+	        get: function get() {
+	            return this._parent;
+	        },
+	        set: function set(parent) {
+	            this._parent = parent;
+	        }
+	    }, {
 	        key: 'container',
 	        get: function get() {
 	            if (this._container) return this._container;
@@ -16035,7 +16045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'target',
 	        get: function get() {
-	            if (this._target) return this._target;
+	            if (!!this._target) return this._target;
 	            return this.parent ? this.parent.target : undefined;
 	        }
 	    }]);
@@ -16137,6 +16147,165 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
+	    return new Promise(function (resolve, reject) {
+	        generator = generator.call(thisArg, _arguments);
+	        function cast(value) {
+	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
+	                resolve(value);
+	            });
+	        }
+	        function onfulfill(value) {
+	            try {
+	                step("next", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function onreject(value) {
+	            try {
+	                step("throw", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(verb, value) {
+	            var result = generator[verb](value);
+	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        }
+	        step("next", void 0);
+	    });
+	};
+	var utils = __webpack_require__(6);
+	var stick = __webpack_require__(78);
+
+	var Html = function () {
+	    function Html(el) {
+	        _classCallCheck(this, Html);
+
+	        this._elements = el || [];
+	    }
+
+	    _createClass(Html, [{
+	        key: "get",
+	        value: function get(n) {
+	            n = n === undefined ? 0 : n;
+	            return n >= this.length ? undefined : this._elements[n];
+	        }
+	    }, {
+	        key: "addClass",
+	        value: function addClass(str) {
+	            return this.forEach(function (e) {
+	                utils.addClass(e, str);
+	            });
+	        }
+	    }, {
+	        key: "removeClass",
+	        value: function removeClass(str) {
+	            return this.forEach(function (e) {
+	                utils.removeClass(e, str);
+	            });
+	        }
+	    }, {
+	        key: "hasClass",
+	        value: function hasClass(str) {
+	            return this._elements.reduce(function (p, c) {
+	                return utils.hasClass(c, str);
+	            }, false);
+	        }
+	    }, {
+	        key: "attr",
+	        value: function attr(key, value) {
+	            var attr = undefined;
+	            if (typeof key === 'string' && value) {
+	                attr = _defineProperty({}, key, value);
+	            } else if (typeof key == 'string') {
+	                if (this.length) return this.get(0).getAttribute(key);
+	            } else if (utils.isObject(key)) {
+	                attr = key;
+	            }
+	            return this.forEach(function (e) {
+	                for (var k in attr) {
+	                    e.setAttribute(k, attr[k]);
+	                }
+	            });
+	        }
+	    }, {
+	        key: "parent",
+	        value: function parent() {
+	            var out = [];
+	            this.forEach(function (e) {
+	                if (e.parentElement) {
+	                    out.push(e.parentElement);
+	                }
+	            });
+	            return new Html(out);
+	        }
+	    }, {
+	        key: "find",
+	        value: function find(str) {
+	            var out = [];
+	            this.forEach(function (e) {
+	                out = out.concat(utils.slice(e.querySelectorAll(str)));
+	            });
+	            return new Html(out);
+	        }
+	    }, {
+	        key: "forEach",
+	        value: function forEach(fn) {
+	            this._elements.forEach(fn);
+	            return this;
+	        }
+	    }, {
+	        key: "length",
+	        get: function get() {
+	            return this._elements.length;
+	        }
+	    }]);
+
+	    return Html;
+	}();
+
+	exports.Html = Html;
+	stick.factory("$html", function () {
+	    return function (query, context) {
+	        if (typeof context === 'string') {
+	            context = document.querySelectorAll(context);
+	        }
+	        var html = undefined;
+	        var els = undefined;
+	        if (typeof query === 'string') {
+	            if (context) {
+	                if (context instanceof HTMLElement) {
+	                    els = utils.slice(context.querySelectorAll(query));
+	                } else {
+	                    html = new Html(utils.slice(context));
+	                    return html.find(query);
+	                }
+	            } else {
+	                els = utils.slice(document.querySelectorAll(query));
+	            }
+	        } else if (query && query instanceof Element) {
+	            els = [query];
+	        } else if (query && query instanceof NodeList) {
+	            els = utils.slice(query);
+	        }
+	        return new Html(els);
+	    };
+	});
+
+/***/ },
+/* 102 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
 	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
 	    return new Promise(function (resolve, reject) {
 	        generator = generator.call(thisArg, _arguments);
@@ -16173,11 +16342,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	var stick_1 = __webpack_require__(78);
 	__export(__webpack_require__(99));
-	var controller_1 = __webpack_require__(102);
-	var repeat_1 = __webpack_require__(103);
-	var show_1 = __webpack_require__(104);
-	var unsafe_1 = __webpack_require__(105);
-	var delegate_1 = __webpack_require__(106);
+	var controller_1 = __webpack_require__(103);
+	var repeat_1 = __webpack_require__(104);
+	var show_1 = __webpack_require__(105);
+	var unsafe_1 = __webpack_require__(106);
+	var delegate_1 = __webpack_require__(107);
 	stick_1.component('controller', controller_1.Controller);
 	stick_1.component('repeat', repeat_1.Repeat);
 	stick_1.component('hide', show_1.Hide);
@@ -16187,7 +16356,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(80));
 
 /***/ },
-/* 102 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -16282,7 +16451,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            _context.next = 12;
 	                            return this.factory.create({
 	                                template: template,
-	                                contextName: this.as
+	                                contextName: this.as,
+	                                parentView: this.view
 	                            });
 
 	                        case 12:
@@ -16363,7 +16533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}*/
 
 /***/ },
-/* 103 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -16448,9 +16618,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // TODO - provide SAME context here for speed and stability
 	            if (n >= this._children.length) {
 	                child = this.childTemplate.view(properties, {
-	                    parent: parent,
-	                    container: parent.container,
-	                    target: parent.target
+	                    parent: parent /*,
+	                                   container: parent.container,
+	                                   target: parent.target*/
 	                });
 	                this._children.push(child);
 	                this.section.appendChild(child.render(properties));
@@ -16513,7 +16683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 104 */
+/* 105 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -16561,9 +16731,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (show) {
 	            if (!this._subview) {
 	                this._subview = this.childTemplate.view(this.view.context, {
-	                    parent: this.view,
-	                    container: this.view.container,
-	                    target: this.view.target
+	                    parent: this.view /*,
+	                                      container: this.view.container,
+	                                      target: this.view.target*/
 	                });
 	                this.section.appendChild(this._subview.render());
 	            }
@@ -16592,9 +16762,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!hide) {
 	            if (!this._subview) {
 	                this._subview = this.childTemplate.view(this.view.context, {
-	                    parent: this.view,
-	                    container: this.view.container,
-	                    target: this.view.target
+	                    parent: this.view /*,
+	                                      container: this.view.container,
+	                                      target: this.view.target*/
 	                });
 	                this.section.appendChild(this._subview.render());
 	            }
@@ -16611,7 +16781,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 105 */
+/* 106 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -16705,7 +16875,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 106 */
+/* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16739,46 +16909,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        step("next", void 0);
 	    });
 	};
+	var templ = __webpack_require__(86);
 	var utilities_1 = __webpack_require__(6);
 	exports.Delegate = {
 	    initialize: function initialize($container) {
 	        this._onEvent = utilities_1.bind(this._onEvent, this);
-	        //stick.utils.delegate(this.ref, this.attributes.selector, 'click', this._onEvent);
-	        //if (!this.event) this.event = this.key.match(/on(.+)/)[1].toLowerCase();
-	        //debug('added event listener %s: %o', this.event, this.value)
-	        //this.view.addListener(this.ref, this.event, this._onEvent)
 	        var view = this.childTemplate.view(this.view.context, {
-	            parent: this.view,
-	            container: this.view._container
+	            parent: this.view
 	        });
 	        this._subview = view;
 	        this._container = this.document.createElement('div');
 	        this._container.appendChild(view.render());
 	        this.section.appendChild(this._container);
-	        //this.$context = $context;
 	        utilities_1.delegate(this._container, this.attributes.selector, 'click', this._onEvent);
 	    },
 	    update: function update() {},
 	    _onEvent: function _onEvent(e) {
 	        var self = this;
-	        //let fn;
-	        /*if (this.value instanceof templ.Assignment) {
-	            fn = this.value.assign;
-	        } else {
-	            fn = this.value;
-	        }*/
 	        var fn = this.attributes.click;
+	        //let fn;
+	        if (fn instanceof templ.Assignment) {
+	            fn = fn.assign;
+	        }
 	        if (typeof fn !== 'function') {
-	            //return;
 	            throw new Error('[event] value is not a function');
 	        }
-	        //this.$context.call(fn, undefined, e)
 	        fn(e);
 	    },
 	    onDestroy: function destroy() {
-	        //debug('removed event listener %s: %o', this.event, this.value);
 	        utilities_1.undelegate(this._container, this.attributes.selector, 'click', this._onEvent);
-	        //this.view.removeListener(this.ref, this.event, this._onEvent);
 	        this._subview.$destroy();
 	    }
 	};

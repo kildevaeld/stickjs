@@ -16,6 +16,7 @@ export interface ControllerCreateOptions {
     el?: HTMLElement
     template?: string | Template
     contextName: string
+    parentView?: TemplateView
 }
 
 const wrap = (el: Node, name:string, contextName: string) => {
@@ -135,6 +136,7 @@ export class ControllerFactory extends EventEmitter {
             if (options.template instanceof Template) {
                 let view = <TemplateView>(<Template>options.template).view(state, {
                     container: this.container,
+                    parentView: options.parentView
                 });
                 return view;
             }

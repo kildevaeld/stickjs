@@ -14,6 +14,7 @@ export class Html {
     }
     
     get (n:number): HTMLElement {
+        n = n === undefined ? 0 : n; 
         return n >= this.length ? undefined : this._elements[n];
     }
 
@@ -28,10 +29,27 @@ export class Html {
             utils.removeClass(e, str);
         });
     }
+    
+    hasClass(str: string): boolean {
+        return this._elements.reduce<boolean>((p,c) => {
+            return utils.hasClass(c, str);
+        }, false);
+    }
 
-    attr(): Html {
-        
-        return this;
+    attr(key:string|Object, value?:any): Html|string {
+        let attr;
+        if (typeof key === 'string' && value) {
+            attr = {[key]: value};
+        } else if (typeof key == 'string') {
+            if (this.length) return this.get(0).getAttribute(<string>key);
+        } else if (utils.isObject(key)) {
+            attr = key;
+        }
+        return this.forEach( e => {
+            for (let k in attr) {
+                e.setAttribute(k, attr[k]);
+            }
+        });
     }
 
     parent(): Html {

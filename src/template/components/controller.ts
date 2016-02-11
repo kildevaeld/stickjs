@@ -57,8 +57,11 @@ export const Controller: ComponentDefinition = {
 
         let controller = await this.factory.create({
 			template: template,
-			contextName: this.as
-		})
+			contextName: this.as,
+            parentView: this.view
+		});
+        
+        
         
         let el = await this.factory.container.get('$el');
         this.section.appendChild(el);

@@ -21,9 +21,9 @@ export const Show: ComponentDefinition = {
     if (show) {
       if (!this._subview) {
         this._subview = this.childTemplate.view(this.view.context, {
-          parent: this.view,
+          parent: this.view/*,
           container: this.view.container,
-          target: this.view.target
+          target: this.view.target*/
         });
         
         this.section.appendChild(this._subview.render());
@@ -65,9 +65,9 @@ export const Hide: ComponentDefinition = {
     if (!hide) {
       if (!this._subview) {
         this._subview = this.childTemplate.view(this.view.context, {
-          parent: this.view,
+          parent: this.view/*,
           container: this.view.container,
-          target: this.view.target
+          target: this.view.target*/
         });
         this.section.appendChild(this._subview.render());
       }

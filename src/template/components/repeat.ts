@@ -67,9 +67,9 @@ export const Repeat: ComponentDefinition = {
             if (n >= this._children.length) {
 
                 child = this.childTemplate.view(properties, {
-                    parent: parent,
+                    parent: parent/*,
                     container: parent.container,
-                    target: parent.target
+                    target: parent.target*/
                 });
 
 

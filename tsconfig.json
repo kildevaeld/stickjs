@@ -13,8 +13,8 @@
     "node_modules"
   ],
   "files": [
-    "src/collection.ts",
     "src/container.ts",
+    "src/collection.ts",
     "src/controller.factory.ts",
     "src/decorators.ts",
     "src/errors.ts",
@@ -25,10 +25,6 @@
     "src/repository.ts",
     "src/state.ts",
     "src/stick.ts",
-    "src/context/context.ts",
-    "src/context/dirty-object-context.ts",
-    "src/context/index.ts",
-    "src/context/object-observer-context.ts",
     "src/lib/index.ts",
     "src/services/html.ts",
     "src/services/http.ts",
