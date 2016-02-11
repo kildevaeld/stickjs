@@ -1,6 +1,5 @@
 import { Container } from './container';
 import { EventEmitter } from 'eventsjs';
-import * as utils from 'utilities';
 import { Template } from 'templ/lib/vnode';
 export declare type ControllerDefinition = FunctionConstructor | Object | any[];
 export interface ModuleCreateOptions {
@@ -32,8 +31,8 @@ export declare class ModuleFactory extends EventEmitter {
      * emits before:template:render, template:render, before:element:attached, element:attached
      *
     */
-    create(options?: ModuleCreateOptions): utils.IPromise<any>;
-    configure<T>(name: string): utils.IPromise<T>;
+    create(options?: ModuleCreateOptions): Promise<any>;
+    configure<T>(name: string): Promise<T>;
     private resolveTemplate(state, options);
     destroy(): void;
 }

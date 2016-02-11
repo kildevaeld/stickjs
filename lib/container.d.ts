@@ -7,7 +7,7 @@ export declare class Container extends DIContainer {
     constructor(info?: Map<Function, ConstructionInfo>);
     hasInstance(key: any): boolean;
     hasHandler(name: string, parent?: boolean, repository?: boolean): boolean;
-    get(key: any, targetKey?: string): any;
+    get(key: any, targetKey?: string): Promise<any>;
     registerSingleton(key: any, fn: Function, targetKey?: any): void;
     registerService(key: any, fn: Function, targetKey?: any): void;
     registerInstance(key: any, instance: any, track?: boolean): void;

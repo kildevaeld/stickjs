@@ -1,5 +1,4 @@
 import { Container } from './container';
-import * as utils from 'utilities';
 import { EventEmitter } from 'eventsjs';
 import { State } from './state';
 import { TemplateView } from './template/template.view';
@@ -23,7 +22,7 @@ export declare class ControllerFactory extends EventEmitter {
      * Call onTemplateRender (), onElementAttached
      * emits before:template:render, template:render, before:element:attached, element:attached
      */
-    create(options: ControllerCreateOptions): utils.IPromise<any>;
-    resolveTemplate(state: State, options: ControllerCreateOptions): utils.IPromise<TemplateView>;
-    destroy(): void;
+    create(options: ControllerCreateOptions): Promise<any>;
+    resolveTemplate(state: State, options: ControllerCreateOptions): Promise<TemplateView>;
+    destroy(): Promise<void>;
 }

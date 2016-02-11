@@ -155,7 +155,7 @@ export class RouterService {
             throw new Error('[router] controller');
         }
 
-        return (...args: any[]) => {
+        return async (...args: any[]) => {
 
             let target: HTMLElement;
             if (typeof options.target === 'string') {
@@ -174,28 +174,24 @@ export class RouterService {
                 throw new Error('[router] target not defined')
             }
 
-            let factory = this.container.get(options.controller);
+            let factory = await this.container.get(options.controller);
 
             if (factory == null || (!(factory instanceof ControllerFactory) && !(factory instanceof ModuleFactory))) {
                 throw new Error(`${options.controller} not a controller`);
             }
 
-            factory.create({
+            let controller = await factory.create({
                 template: options.template,
-                parent: this.container/*,
-                el: target*/
-            }).then(controller => {
-
-                if (this._currentController != null) {
-                    this._currentController.destroy();
-                }
-                this._currentController = factory;
-                let template = factory.container.get('template');
-                this.swapElements(target, template.render())
-            }).catch( e => {
-               console.error(e)
+                parent: this.container
             });
-
+            
+            if (this._currentController != null) {
+                this._currentController.destroy();
+            }
+            this._currentController = factory;
+            let template = await factory.container.get('template');
+            this.swapElements(target, template.render())
+            
         }
     }
 

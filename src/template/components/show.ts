@@ -25,14 +25,17 @@ export const Show: ComponentDefinition = {
           container: this.view.container,
           target: this.view.target
         });
+        
+        this.section.appendChild(this._subview.render());
       }
 
-      this.section.appendChild(this._subview.render());
+      
 
     } else {
       if (this._subview) {
-        this._subview.remove();
+        this._subview.$destroy();
       }
+      this._subview = void 0;
     }
   },
 
@@ -66,15 +69,17 @@ export const Hide: ComponentDefinition = {
           container: this.view.container,
           target: this.view.target
         });
+        this.section.appendChild(this._subview.render());
       }
 
-      this.section.appendChild(this._subview.render());
+      
 
     } else {
 
       if (this._subview) {
-        this._subview.remove();
+        this._subview.$destroy();
       }
+      this._subview = void 0;
 
     }
   },

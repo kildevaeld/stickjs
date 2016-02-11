@@ -39,7 +39,7 @@ export class Container extends DIContainer {
         return (!has && repository) ? Repository.hasAny(name) : has;
     }
 
-    get(key: any, targetKey?: string): any {
+    async get(key: any, targetKey?: string): Promise<any> {
         var entry;
 
         if (key === null || key === undefined) {
@@ -160,13 +160,13 @@ export class Container extends DIContainer {
                 args = args.concat(deps);
             }
             
-            /*return utils.arrayToPromise(args)
+            return utils.arrayToPromise(args)
             .then((args) => {
                 return (<any>info.activator).invoke(fn, args, targetKey, keys);
-            })*/
+            })
 
             //debug("%s: invoking '%s', with dependencies:", this.id, fn.name, args);
-            return (<any>info.activator).invoke(fn, args, targetKey, keys);
+            //return (<any>info.activator).invoke(fn, args, targetKey, keys);
 
         } catch (e) {
 

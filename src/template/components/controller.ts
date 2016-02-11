@@ -35,15 +35,16 @@ export const Controller: ComponentDefinition = {
 		// });
 	},
 
-	update() {
+	async update() {
 		if (this.factory) {
 			if (this.factory.container.hasHandler('template')) {
-				this.factory.container.get('template').update();
+                
+				//this.factory.container.get('template').update();
 			}
 			return;
 		}
 
-		this.factory = this.view.container.get(this.name);
+		this.factory = await this.view.container.get(this.name);
 
 		if (!(this.factory instanceof ControllerFactory)) {
 			throw new Error(this.name + ' is not a controller');
@@ -54,14 +55,22 @@ export const Controller: ComponentDefinition = {
 			template = this.attributes['template'];
 		}
 
-		this.factory.create({
+        let controller = await this.factory.create({
+			template: template,
+			contextName: this.as
+		})
+        
+        let el = await this.factory.container.get('$el');
+        this.section.appendChild(el);
+        
+		/*this.factory.create({
 			template: template,
 			contextName: this.as
 		}).then( controller => {
 			let el = this.factory.container.get('$el');
 
 			this.section.appendChild(el);
-		});
+		});*/
 
 
 	},

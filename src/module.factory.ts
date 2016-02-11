@@ -10,11 +10,20 @@ import {Template} from 'templ/lib/vnode'
 import {TemplateView} from './template/template.view'
 import {State} from './state';
 
-import {TemplateCreator} from './services/template'
+import {TemplateCreator, TemplateResolver} from './services/template'
 import {ControllerFactory} from './controller.factory'
 //import {Observer} from './observer'
 const debug = require('debug')('stick:factory:module');
 
+const wrap = (el: Node, name: string) => {
+    let div = document.createElement('module');
+    div.setAttribute('name', name);
+
+    //if (contextName != this.name) div.setAttribute('as', contextName);
+
+    div.appendChild(el);
+    return div;
+}
 
 export type ControllerDefinition = FunctionConstructor | Object | any[];
 
@@ -29,11 +38,11 @@ export class ModuleFactory extends EventEmitter {
     module: FunctionConstructor;
     container: Container;
     private _id: string;
-    
-    get id () {
+
+    get id() {
         return this._id;
     }
-    
+
     constructor(name: string, module: FunctionConstructor, container: Container) {
         super();
         if (arguments.length != 3) {
@@ -87,10 +96,10 @@ export class ModuleFactory extends EventEmitter {
                 throw new StickError('controller defition should be a function or an object literal')
             }
             setDependencyType(DependencyType.Controller)(fn);
-	        
+
             let factory = new ControllerFactory(name, fn, this.container.createChild());
             this.container.registerInstance(name, factory, true);
-            debug("%s: Register controller: '%s', %s", this.id, name, factory.id); 
+            debug("%s: Register controller: '%s', %s", this.id, name, factory.id);
 
         } else {
             throw new StickError("controller definition should be a function, function constructor or a object literal");
@@ -146,69 +155,71 @@ export class ModuleFactory extends EventEmitter {
 	 * emits before:template:render, template:render, before:element:attached, element:attached
 	 *
 	*/
-    create(options: ModuleCreateOptions = {}): utils.IPromise<any> {
+    async create(options: ModuleCreateOptions = {}): Promise<any> {
         // There can only be one.
         if (this.container.hasInstance(this.name)) {
-            debug("%s: Resolving module %s", this.id, this.name); 
-            return utils.Promise.resolve(this.container.get(this.name));
+            debug("%s: Resolving module %s", this.id, this.name);
+            //return utils.Promise.resolve(this.container.get(this.name));
+            return this.container.get(this.name);
         }
 
         this.container.registerSingleton('$state', State);
 
-        let state: State = this.container.get('$state');
-	    debug("%s: Creating module %s", this.id, this.name); 
+        let state: State = await this.container.get('$state');
+
+        debug("%s: Creating module %s", this.id, this.name);
+
         if (options.template || options.el) {
-           
-            return this.resolveTemplate(state, options)
-                .then((template) => {
 
-                    this.container.registerInstance("template", template, true);
+            let template = await this.resolveTemplate(state, options);
 
-                    let m = this.container.get(this.name);
-                    template.setTarget(m);
-                    //(<any>template)._target = m;
+            debug("%s: Created template: %s", this.id, template.id);
+            this.container.registerInstance('template', template, true);
+            debug("%s: Instantiating module '%s'", this.id, this.name);
+            let mod = await this.container.get(this.name);
+            template.setTarget(mod)
 
-                    this.trigger('before:template:render');
+            //$state.set(contextName, controller);
 
-                    let el = this.container.get('template').render()
+            this.trigger('before:template:render');
 
-                    if (el instanceof DocumentFragment) {
-                        // FIXME:
-                        if (el.children.length === 1) {
-                            //el = el.firstChild;
-                        } else {
-                            let div = document.createElement('module');
-                            div.appendChild(el);
-                            el = div;
-                        }
-                    }
+            let el = template.render();
 
-                    this.container.registerInstance('$el', el, true);
+            if (el.nodeType === 11 || el.nodeType === 3) {
+                if ((<any>el).children.length === 1) {
+                    el = el.firstChild.nodeType === 3 ? wrap(el, this.name) : <HTMLElement>el.firstChild;
+                } else {
+                    el = wrap(el, this.name);
+                }
+            }
 
-                    if (typeof m.onTemplateRender === 'function') {
-                        m.onTemplateRender.call(m, el, template);
-                    }
+            this.container.registerInstance('$el', el, true)
 
-                    this.trigger('template:render');
+            if (typeof mod.onTemplateRender === 'function') {
+                mod.onTemplateRender.call(mod, el, template);
+            }
 
-                    if (options.el) {
-                        this.trigger('before:element:attached', options.el);
-                        options.el.innerHTML = '';
-                        options.el.appendChild(el);
-                        if (typeof m.onElementAttached === 'function') {
-                            m.onElementAttached.call(m, el, options.el);
-                        }
-                        this.trigger('element:attached', el, options.el)
-                    }
+            this.trigger('template:render');
 
-                    return m;
-                });
+
+            if (options.el) {
+
+                this.trigger('before:element:attached', options.el);
+                options.el.innerHTML = '';
+                options.el.appendChild(el);
+                if (typeof mod.onElementAttached === 'function') {
+                    mod.onElementAttached.call(mod, el, options.el);
+                }
+                this.trigger('element:attached', el, options.el)
+            }
+
+            return mod;
         }
 
-        return utils.Promise.resolve(this.container.get(this.name))
+        return this.container.get(this.name);
     }
 
-    public configure<T>(name: string): utils.IPromise<T> {
+    public async configure<T>(name: string): Promise<T> {
         let configName = name;
         if (!/Provider$/.test(name)) {
             configName = name + 'Provider';
@@ -219,46 +230,45 @@ export class ModuleFactory extends EventEmitter {
         let provider;
         // Check if provider is registered
         if (this.container.hasHandler(configName, false, false)) {
-            return Promise.resolve(this.container.get(name));
+            return this.container.get(name);
             // Register module, if exists, at try loading the provider again
         } else if (Repository.has(DependencyType.Service, name)) {
             let serv = Repository.get(DependencyType.Service, name);
             this.container.register(serv);
             if (this.container.hasHandler(configName, false, false)) {
-                return Promise.resolve(this.container.get(configName));
+                return this.container.get(configName);
             }
         }
 
-        return utils.Promise.reject(new Error('No provider for ' + name.replace('Provider', '')));
+        throw new Error('No provider for ' + name.replace('Provider', ''));
     }
 
-    private resolveTemplate(state: State, options: ModuleCreateOptions): utils.IPromise<TemplateView> {
-        let $template: TemplateCreator = this.container.get('$templateCreator');
+    private async resolveTemplate(state: State, options: ModuleCreateOptions): Promise<TemplateView> {
+        let $template: TemplateCreator = await this.container.get('$templateCreator');
+        let $resolver: TemplateResolver = await this.container.get('$templateResolver');
         let promise: utils.IPromise<string>
-        if (options.el) {
-            if (options.template == null) {
-                promise = utils.Promise.resolve(options.el.innerHTML)
-            }
-        }
 
-        if (!promise && options.template) {
+        if (options.el && !options.template) {
+            let templateString = options.el.innerHTML;
+            promise = utils.Promise.resolve(templateString)
+
+        } else if (options.template) {
             if (options.template instanceof Template) {
-                let view = (<Template>options.template).view(state, {
-                    container: this.container
+                let view = <TemplateView>(<Template>options.template).view(state, {
+                    container: this.container,
                 });
-                return utils.Promise.resolve(view);
+                return view;
             }
 
+            promise = $resolver(<string>options.template);
 
-            promise = this.container.get('$templateResolver')(options.template);
-
-        } else if (!options.el) {
+        } else {
             return utils.Promise.reject(new StickError("no element or template"));
         }
 
-        return promise.then((templateString) => {
-            return $template(templateString, state);
-        })
+        let templateString = await promise;
+
+        return $template(templateString, state);
     }
 
 
