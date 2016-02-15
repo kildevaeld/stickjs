@@ -4,7 +4,7 @@ import {getDependencies, setActivator, DependencyType, setDependencyType} from '
 import {EventEmitter} from 'eventsjs';
 import {Repository} from './repository';
 import {StickError} from './errors'
-import {FactoryActivator} from 'di'
+import {FactoryActivator} from 'stick.di'
 import * as utils from 'utilities'
 import {Template} from 'templ/lib/vnode'
 import {TemplateView} from './template/template.view'

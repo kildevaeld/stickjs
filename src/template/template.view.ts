@@ -1,7 +1,7 @@
 declare var require:any;
 import {View, IDelegator} from 'templ/lib/view'
 import {Model, NestedModel} from 'collection'
-import {DIContainer} from 'di'
+import {DIContainer} from 'stick.di'
 import {bind, uniqueId, nextTick} from 'utilities';
 
 const debug = require('debug')('stick:template:view');
@@ -19,15 +19,15 @@ export class TemplateView extends View {
     private _target: any;
     private _id: string;
     private _parent: TemplateView
-    
+
     get id () {
         return this._id
     }
-    
+
     get parent(): TemplateView {
         return this._parent;
     }
-    
+
     set parent(parent:TemplateView) {
         this._parent = parent;
     }

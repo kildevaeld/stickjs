@@ -1,5 +1,5 @@
 import { View, IDelegator } from 'templ/lib/view';
-import { DIContainer } from 'di';
+import { DIContainer } from 'stick.di';
 export interface TemplateViewOptions {
     parent?: TemplateView;
     container: DIContainer;
