@@ -98,20 +98,22 @@ export function module(name: string, definition: Function | Object | any[] = nul
 
 export function component(name: string, handler: ComponentDefinition|Function) {
 
-	let component: ComponentDefinition
-	
+	//let component: ComponentDefinition
+	let Component: any
 
 	if (typeof handler === 'function') {
-		component = {
+		/*component = {
 			initialize: <any>handler,
-		}
+		}*/
+		Component = handler;
 	} else if (utils.isObject(handler) && typeof (<any>handler).initialize === 'function') {
-		component = <ComponentDefinition>handler;
+		Component = utils.inherits(<any>BaseComponent, handler);
+		//component = <ComponentDefinition>handler;
 	} else {
 		throw new StickError("component should be a function or an object");
 	}
 
-	let Component = utils.inherits(<any>BaseComponent, component)
+	//let Component = utils.inherits(<any>BaseComponent, component)
 
 	templ.component(name, Component);
 }
