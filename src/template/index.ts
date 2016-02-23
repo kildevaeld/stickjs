@@ -7,6 +7,7 @@ import {Repeat} from './components/repeat';
 import {Show, Hide} from './components/show';
 import {Unsafe} from './components/unsafe';
 import {Delegate} from './components/delegate';
+import {View} from './components/view';
 
 import * as templ from 'templ'
 
@@ -16,6 +17,7 @@ component('hide', Hide);
 component('show', Show);
 component('unsafe', Unsafe);
 component('delegate', Delegate);
+component('view', View);
 
 export * from './components/base-component'
 

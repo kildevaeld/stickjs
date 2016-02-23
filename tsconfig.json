@@ -13,8 +13,8 @@
     "node_modules"
   ],
   "files": [
-    "src/container.ts",
     "src/collection.ts",
+    "src/container.ts",
     "src/controller.factory.ts",
     "src/decorators.ts",
     "src/errors.ts",
@@ -41,6 +41,7 @@
     "src/template/components/delegate.ts",
     "src/template/components/repeat.ts",
     "src/template/components/show.ts",
-    "src/template/components/unsafe.ts"
+    "src/template/components/unsafe.ts",
+    "src/template/components/view.ts"
   ]
 }

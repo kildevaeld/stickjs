@@ -5,124 +5,124 @@ import {ComponentDefinition} from '../index'
 
 export const Repeat: ComponentDefinition = {
 
-    initialize() {
-        this._children = []
-        this._collection = [];
-        
-    },
+  initialize() {
+    this._children = []
+    this._collection = [];
 
-    update() {
-        
-        var as = this['as'];
-        var each = this['each'];
-        var key = this['key'] || "key";
+  },
 
-        var n = 0;
-        var self = this;
-        var parent = this.view;
+  update() {
 
-        if (each === this._collection || !each) {
-            return
-        }
+    var as = this['as'];
+    var each = this['each'];
+    var key = this['key'] || "key";
 
-        if (this._collection && this._collection instanceof Collection) {
-            this.__removeEventListeners(this._collection)
+    var n = 0;
+    var self = this;
+    var parent = this.view;
 
-        }
+    if (each === this._collection || !each) {
+      return
+    }
 
-        this._collection = each
+    if (this._collection && this._collection instanceof Collection) {
+      this.__removeEventListeners(this._collection)
 
-        this._update()
+    }
 
-        if (each instanceof Collection) {
-            this.__addEventListeners(each)
-        }
+    this._collection = each
 
-    },
+    this._update()
 
-    _update() {
-	   
-        var properties;
-        var as = this['as'];
-        var parent = this.view
-        var n = 0
+    if (each instanceof Collection) {
+      this.__addEventListeners(each)
+    }
 
-        var self = this
+  },
 
-        var filter = this['filter'] || function(a) { return true }
+  _update() {
 
-        this._collection.forEach(function(m: IModel) {
+    var properties;
+    var as = this['as'];
+    var parent = this.view
+    var n = 0
 
-            if (!filter(m)) { return; }
+    var self = this
 
-            var child;
+    var filter = this['filter'] || function(a) { return true }
 
-            if (as) {
-                properties = new NestedModel({ [as]: m, self: this.view.context });
-            } else {
-                properties = m;
-            }
+    this._collection.forEach(function(m: IModel) {
 
-            // TODO - provide SAME context here for speed and stability
-            if (n >= this._children.length) {
+      if (!filter(m)) { return; }
 
-                child = this.childTemplate.view(properties, {
-                    parent: parent/*,
-                    container: parent.container,
-                    target: parent.target*/
-                });
+      var child;
 
+      if (as) {
+        properties = new NestedModel({ [as]: m, self: this.view.context });
+      } else {
+        properties = m;
+      }
 
-                this._children.push(child);
+      // TODO - provide SAME context here for speed and stability
+      if (n >= this._children.length) {
 
-                this.section.appendChild(child.render(properties));
-
-            } else {
-                child = this._children[n];
-                child.context = properties;
-                child.update();
-            }
-
-            n++;
-
-        }, this);
-
-        this._children.splice(n).forEach(function(child) {
-            (<any>child).$destroy();
+        child = this.childTemplate.view(properties, {
+          parent: parent
         });
 
 
-    },
+        this._children.push(child);
 
-    __addEventListeners<T extends IModel>(collection: Collection<T>) {
+        this.section.appendChild(child.render(properties));
 
-        collection.on('add', this._update, this);
-        collection.on('remove', this._update, this);
-        collection.on('reset', this._update, this);
-    },
+      } else {
+        child = this._children[n];
+        child.context = properties;
+        child.update();
+      }
 
-    __removeEventListeners<T extends IModel>(collection: Collection<T>) {
-        collection.off('remove', this._update)
-        collection.off('add', this._update)
-        collection.off('reset', this._update)
-    },
+      n++;
 
-    setAttribute(key: string, value: any) {
-        this[key] = value
+    }, this);
 
-    },
+    this._children.splice(n).forEach(function(child) {
+      (<any>child).$destroy();
+    });
 
-    setProperty() {
-        console.log(arguments)
-    },
 
-    onDestroy() {
-        if (this._collection && typeof this._collection.destroy === 'function') {
-            this._collection.destroy();
-        }
+  },
 
-        for (let child of this._children) {
-            child.$destroy();
-        }
+  __addEventListeners<T extends IModel>(collection: Collection<T>) {
+
+    collection.on('add', this._update, this);
+    collection.on('remove', this._update, this);
+    collection.on('reset', this._update, this);
+    collection.on('filter', this._update, this);
+  },
+
+  __removeEventListeners<T extends IModel>(collection: Collection<T>) {
+    collection.off('remove', this._update);
+    collection.off('add', this._update);
+    collection.off('reset', this._update);
+    collection.off('filter', this._update);
+  },
+
+  setAttribute(key: string, value: any) {
+    this[key] = value
+
+  },
+
+  setProperty() {
+    console.log(arguments)
+  },
+
+  onDestroy() {
+    if (this._collection && typeof this._collection.destroy === 'function') {
+      this._collection.destroy();
     }
+
+    for (let child of this._children) {
+      child.$destroy();
+    }
+  }
 }

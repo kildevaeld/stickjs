@@ -48,8 +48,8 @@ export class State extends NestedModel {
         return this._container;
     }
 
-    constructor(container:DIContainer) {
-        super();
+    constructor(container:DIContainer, values?:any) {
+        super(values);
         this._container = container;
         debug('%s: State created', this.uid);
     }
@@ -100,10 +100,9 @@ export class State extends NestedModel {
         return this;
     }
 
-    public createChild(container?:DIContainer): State {
-
+    public createChild(container?:DIContainer, values?:any): State {
         if (!container) container = this.container.createChild();
-        let state = new State(container);
+        let state = new State(container, values);
         state._parent = state;
         debug("%s: Create child %s", this.uid, state.uid);
         return state;

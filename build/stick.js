@@ -91,11 +91,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	__webpack_require__(1);
-	__webpack_require__(82);
+	__webpack_require__(88);
 	var u = __webpack_require__(6);
 	exports.utils = u;
-	__export(__webpack_require__(58));
-	__export(__webpack_require__(48));
+	__export(__webpack_require__(80));
+	__export(__webpack_require__(64));
 	//export * from './decorators';
 	exports.ready = u.domReady();
 
@@ -140,10 +140,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	__export(__webpack_require__(2));
-	__export(__webpack_require__(77));
-	__export(__webpack_require__(78));
-	__export(__webpack_require__(80));
-	__export(__webpack_require__(81));
+	__export(__webpack_require__(83));
+	__export(__webpack_require__(84));
+	__export(__webpack_require__(86));
+	__export(__webpack_require__(87));
 
 /***/ },
 /* 2 */
@@ -197,9 +197,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var router_1 = __webpack_require__(3);
 	var utils = __webpack_require__(6);
 	var decorators_1 = __webpack_require__(15);
-	var controller_factory_1 = __webpack_require__(31);
-	var module_factory_1 = __webpack_require__(46);
-	var stick_1 = __webpack_require__(58);
+	var controller_factory_1 = __webpack_require__(60);
+	var module_factory_1 = __webpack_require__(62);
+	var stick_1 = __webpack_require__(80);
 	var internal_1 = __webpack_require__(16);
 	stick_1.decorator("route", function () {
 	    return function (target) {
@@ -1482,6 +1482,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 10 */
 /***/ function(module, exports) {
 
+	function isString(a) {
+	    return typeof a === 'string';
+	}
+	exports.isString = isString;
 	function camelcase(input) {
 	    return input.toLowerCase().replace(/-(.)/g, function (match, group1) {
 	        return group1.toUpperCase();
@@ -1853,8 +1857,29 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var utils_1 = __webpack_require__(8);
+	var strings_1 = __webpack_require__(10);
+	var objects_1 = __webpack_require__(9);
 	var promises_1 = __webpack_require__(11);
 	var xmlRe = /^(?:application|text)\/xml/, jsonRe = /^application\/json/, fileProto = /^file:/;
+	function queryStringToParams(qs) {
+	    var kvp, k, v, ls, params = {}, decode = decodeURIComponent;
+	    var kvps = qs.split('&');
+	    for (var i = 0, l = kvps.length; i < l; i++) {
+	        var param = kvps[i];
+	        kvp = param.split('='), k = kvp[0], v = kvp[1];
+	        if (v == null)
+	            v = true;
+	        k = decode(k), v = decode(v), ls = params[k];
+	        if (Array.isArray(ls))
+	            ls.push(v);
+	        else if (ls)
+	            params[k] = [ls, v];
+	        else
+	            params[k] = v;
+	    }
+	    return params;
+	}
+	exports.queryStringToParams = queryStringToParams;
 	function queryParam(obj) {
 	    return '?' + Object.keys(obj).reduce(function (a, k) { a.push(k + '=' + encodeURIComponent(obj[k])); return a; }, []).join('&');
 	}
@@ -1869,6 +1894,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Request(_method, _url) {
 	        this._method = _method;
 	        this._url = _url;
+	        this._headers = {};
+	        this._params = {};
 	        this._xhr = utils_1.ajax();
 	    }
 	    Request.prototype.send = function (data) {
@@ -1893,16 +1920,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        data = this._data;
 	        var url = this._url;
-	        if (data && data === Object(data)) {
+	        if (data && data === Object(data) && this._method == 'GET') {
 	            var d = queryParam(data);
 	            url += d;
 	        }
+	        url = this._apply_params(url);
 	        this._xhr.open(this._method, url, true);
+	        for (var key in this._headers) {
+	            this._xhr.setRequestHeader(key, this._headers[key]);
+	        }
 	        this._xhr.send(data);
 	        return defer.promise;
 	    };
 	    Request.prototype.json = function (data) {
 	        var _this = this;
+	        this.header('content-type', 'application/json; charset=utf-8');
+	        if (!strings_1.isString(data)) {
+	            data = JSON.stringify(data);
+	        }
 	        return this.end(data)
 	            .then(function (str) {
 	            var accepts = _this._xhr.getResponseHeader('content-type');
@@ -1920,8 +1955,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this;
 	    };
 	    Request.prototype.header = function (field, value) {
-	        this._xhr.setRequestHeader(field, value);
+	        if (strings_1.isString(field) && strings_1.isString(value)) {
+	            this._headers[field] = value;
+	        }
+	        else if (objects_1.isObject(field)) {
+	            objects_1.extend(this._headers, field);
+	        }
 	        return this;
+	    };
+	    Request.prototype.params = function (value) {
+	        objects_1.extend(this._params, value);
+	        return this;
+	    };
+	    Request.prototype._apply_params = function (url) {
+	        var params = {};
+	        var idx = url.indexOf('?');
+	        if (idx > -1) {
+	            params = objects_1.extend(params, queryStringToParams(url.substr(idx + 1)));
+	            url = url.substr(0, idx);
+	        }
+	        objects_1.extend(params, this._params);
+	        if (!objects_1.isEmpty(params)) {
+	            var sep = (url.indexOf('?') === -1) ? '?' : '&';
+	            url += sep + queryParam(params);
+	        }
+	        return url;
 	    };
 	    return Request;
 	})();
@@ -2043,6 +2101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utilities_1 = __webpack_require__(6);
 	var stick_di_1 = __webpack_require__(17);
 	var repository_1 = __webpack_require__(30);
+	var templ = __webpack_require__(31);
 	__export(__webpack_require__(29));
 	function controller(controllerName) {
 	    return function (target) {
@@ -2084,6 +2143,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	exports.template = template;
+	function component(name) {
+	    return function (target) {
+	        templ.component(name, target);
+	    };
+	}
+	exports.component = component;
+	function attribute(name) {
+	    return function (target) {
+	        templ.attribute(name, target);
+	    };
+	}
+	exports.attribute = attribute;
 
 /***/ },
 /* 16 */
@@ -3947,330 +4018,89 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
-	var utils = __webpack_require__(6);
-	var eventsjs_1 = __webpack_require__(5);
-	var errors_1 = __webpack_require__(32);
-	var vnode_1 = __webpack_require__(33);
-	var debug = __webpack_require__(23)('stick:factory:controller');
-	var wrap = function wrap(el, name, contextName) {
-	    var div = document.createElement('controller');
-	    div.setAttribute('name', name);
-	    if (contextName != name) div.setAttribute('as', contextName);
-	    div.appendChild(el);
-	    return div;
-	};
-
-	var ControllerFactory = function (_eventsjs_1$EventEmit) {
-	    _inherits(ControllerFactory, _eventsjs_1$EventEmit);
-
-	    function ControllerFactory(name, controller, container) {
-	        _classCallCheck(this, ControllerFactory);
-
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ControllerFactory).call(this));
-
-	        _this.container = container;
-	        _this.controller = controller;
-	        _this.name = name;
-	        _this._id = utils.uniqueId("ctrl");
-	        if (typeof controller === 'function' && controller.name == "") {
-	            Object.defineProperty(controller, 'name', {
-	                value: name
-	            });
-	        }
-	        debug("%s: Controller factory created: '%s', container %s", _this.id, name, _this.container.id);
-	        return _this;
+	var repository_1 = __webpack_require__(32);
+	var vnode = __webpack_require__(33);
+	var components = __webpack_require__(46);
+	var attributes = __webpack_require__(50);
+	var modifiers = __webpack_require__(56);
+	var utils = __webpack_require__(38);
+	var view_1 = __webpack_require__(49);
+	var compiler = __webpack_require__(57);
+	var binding_1 = __webpack_require__(59);
+	exports.version = "$$version$$";
+	function attribute(name, attr) {
+	    if (typeof attr !== 'function') {
+	        attr = utils.extendClass(attributes.BaseAttribute, attr);
 	    }
-
-	    _createClass(ControllerFactory, [{
-	        key: "create",
-
-	        /**
-	         * Create an instance of a controller
-	         * @param  {ControllerCreateOptions} options
-	         * @return {utils.IPromise<any>}
-	         * Call onTemplateRender (), onElementAttached
-	         * emits before:template:render, template:render, before:element:attached, element:attached
-	         */
-	        value: function create(options) {
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
-	                var contextName, $state, template, controller, el;
-	                return regeneratorRuntime.wrap(function _callee$(_context) {
-	                    while (1) {
-	                        switch (_context.prev = _context.next) {
-	                            case 0:
-	                                if (!this.container.hasInstance(this.name)) {
-	                                    _context.next = 2;
-	                                    break;
-	                                }
-
-	                                return _context.abrupt("return", utils.Promise.resolve(this.container.get(this.name)));
-
-	                            case 2:
-	                                this.container.registerSingleton(this.name, this.controller);
-	                                contextName = options.contextName || this.name;
-	                                // State
-
-	                                _context.next = 6;
-	                                return this.container.get('$state');
-
-	                            case 6:
-	                                $state = _context.sent;
-
-	                                $state = $state.createChild(this.container);
-	                                this.container.registerInstance('$state', $state, true);
-	                                // Template       
-	                                _context.next = 11;
-	                                return this.resolveTemplate($state, options);
-
-	                            case 11:
-	                                template = _context.sent;
-
-	                                debug("%s: Created template: %s", this.id, template.id);
-	                                this.container.registerInstance('template', template, true);
-	                                debug("%s: Instantiating controller '%s' as '%s'", this.id, this.name, contextName);
-	                                _context.next = 17;
-	                                return this.container.get(this.name);
-
-	                            case 17:
-	                                controller = _context.sent;
-
-	                                $state.set(contextName, controller);
-	                                template.setTarget(controller);
-	                                this.trigger('before:template:render');
-	                                el = template.render();
-	                                // Wrap element if its a DocumentFragment
-
-	                                if (el.nodeType === 11 || el.nodeType === 3) {
-	                                    if (el.children.length === 1) {
-	                                        el = el.firstChild.nodeType === 3 ? wrap(el, this.name, contextName) : el.firstChild;
-	                                    } else {
-	                                        el = wrap(el, this.name, contextName);
-	                                    }
-	                                }
-	                                this.container.registerInstance('$el', el, true);
-	                                if (typeof controller.onTemplateRender === 'function') {
-	                                    controller.onTemplateRender.call(controller, el, template);
-	                                }
-	                                this.trigger('template:render');
-	                                if (options.el) {
-	                                    this.trigger('before:element:attached', options.el);
-	                                    options.el.innerHTML = '';
-	                                    options.el.appendChild(el);
-	                                    if (typeof controller.onElementAttached === 'function') {
-	                                        controller.onElementAttached.call(controller, el, options.el);
-	                                    }
-	                                    this.trigger('element:attached', el, options.el);
-	                                }
-	                                return _context.abrupt("return", controller);
-
-	                            case 28:
-	                            case "end":
-	                                return _context.stop();
-	                        }
-	                    }
-	                }, _callee, this);
-	            }));
-	        }
-	    }, {
-	        key: "resolveTemplate",
-	        value: function resolveTemplate(state, options) {
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee2() {
-	                var $template, $resolver, promise, _templateString, view, templateString;
-
-	                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-	                    while (1) {
-	                        switch (_context2.prev = _context2.next) {
-	                            case 0:
-	                                _context2.next = 2;
-	                                return this.container.get('$templateCreator');
-
-	                            case 2:
-	                                $template = _context2.sent;
-	                                _context2.next = 5;
-	                                return this.container.get('$templateResolver');
-
-	                            case 5:
-	                                $resolver = _context2.sent;
-	                                promise = undefined;
-
-	                                if (!(options.el && !options.template)) {
-	                                    _context2.next = 12;
-	                                    break;
-	                                }
-
-	                                _templateString = options.el.innerHTML;
-
-	                                promise = utils.Promise.resolve(_templateString);
-	                                _context2.next = 20;
-	                                break;
-
-	                            case 12:
-	                                if (!options.template) {
-	                                    _context2.next = 19;
-	                                    break;
-	                                }
-
-	                                if (!(options.template instanceof vnode_1.Template)) {
-	                                    _context2.next = 16;
-	                                    break;
-	                                }
-
-	                                view = options.template.view(state, {
-	                                    container: this.container,
-	                                    parentView: options.parentView
-	                                });
-	                                return _context2.abrupt("return", view);
-
-	                            case 16:
-	                                promise = $resolver(options.template);
-	                                _context2.next = 20;
-	                                break;
-
-	                            case 19:
-	                                return _context2.abrupt("return", utils.Promise.reject(new errors_1.StickError("no element or template")));
-
-	                            case 20:
-	                                _context2.next = 22;
-	                                return promise;
-
-	                            case 22:
-	                                templateString = _context2.sent;
-	                                return _context2.abrupt("return", $template(templateString, state));
-
-	                            case 24:
-	                            case "end":
-	                                return _context2.stop();
-	                        }
-	                    }
-	                }, _callee2, this);
-	            }));
-	        }
-	    }, {
-	        key: "destroy",
-	        value: function destroy() {
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee3() {
-	                var controller;
-	                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-	                    while (1) {
-	                        switch (_context3.prev = _context3.next) {
-	                            case 0:
-	                                debug("%s: Destroying controller '%s'", this.id, this.name);
-	                                _context3.next = 3;
-	                                return this.container.get(this.name);
-
-	                            case 3:
-	                                controller = _context3.sent;
-
-	                                if (typeof controller.onDestroy === 'function') {
-	                                    controller.onDestroy.call(controller);
-	                                }
-	                                this.container.clear();
-	                                this.container.entries.clear();
-
-	                            case 7:
-	                            case "end":
-	                                return _context3.stop();
-	                        }
-	                    }
-	                }, _callee3, this);
-	            }));
-	        }
-	    }, {
-	        key: "id",
-	        get: function get() {
-	            return this._id;
-	        }
-	    }]);
-
-	    return ControllerFactory;
-	}(eventsjs_1.EventEmitter);
-
-	exports.ControllerFactory = ControllerFactory;
+	    attributes[name] = attr;
+	}
+	exports.attribute = attribute;
+	function component(name, cmp) {
+	    if (typeof cmp !== 'function') {
+	        cmp = utils.extendClass(components.BaseComponent, cmp);
+	    }
+	    components[name] = cmp;
+	}
+	exports.component = component;
+	function modifier(name, func) {
+	    modifiers[name] = func;
+	}
+	exports.modifier = modifier;
+	function debugging(enabled) {
+	    utils.Debug.enable(enabled);
+	}
+	exports.debugging = debugging;
+	function compile(str, options) {
+	    var vn = vnode,
+	        fn = compiler.compile(str);
+	    var n = fn(vn.fragment, vn.element, vn.text, vn.comment, vn.dynamic, binding_1.binding);
+	    return vn.template(n, utils.extend({
+	        document: document,
+	        viewClass: view_1.View,
+	        attributes: new repository_1.Repository(attributes),
+	        components: new repository_1.Repository(components),
+	        modifiers: modifiers
+	    }, options || {}));
+	}
+	exports.compile = compile;
 
 /***/ },
 /* 32 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	var Repository = function () {
+	    function Repository(values) {
+	        _classCallCheck(this, Repository);
 
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var StickError = function (_Error) {
-	    _inherits(StickError, _Error);
-
-	    function StickError(message) {
-	        _classCallCheck(this, StickError);
-
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StickError).call(this, message));
-
-	        _this.message = message;
-	        return _this;
+	        this.values = values || {};
 	    }
 
-	    return StickError;
-	}(Error);
+	    Repository.prototype.set = function set(key, value) {
+	        this.values[key] = value;
+	    };
 
-	exports.StickError = StickError;
+	    Repository.prototype.get = function get(key) {
+	        return this.values[key];
+	    };
 
-	var StickDependencyError = function (_StickError) {
-	    _inherits(StickDependencyError, _StickError);
+	    Repository.prototype.has = function has(key) {
+	        return !!this.get(key);
+	    };
 
-	    function StickDependencyError(message, errors) {
-	        _classCallCheck(this, StickDependencyError);
+	    Repository.prototype.delete = function _delete(key) {
+	        delete this.values[key];
+	    };
 
-	        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(StickDependencyError).call(this, message));
+	    return Repository;
+	}();
 
-	        _this2.errors = errors;
-	        return _this2;
-	    }
-
-	    return StickDependencyError;
-	}(StickError);
-
-	exports.StickDependencyError = StickDependencyError;
+	exports.Repository = Repository;
 
 /***/ },
 /* 33 */
@@ -5186,2740 +5016,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
-	var internal_1 = __webpack_require__(16);
-	var eventsjs_1 = __webpack_require__(5);
-	var repository_1 = __webpack_require__(30);
-	var errors_1 = __webpack_require__(32);
-	var stick_di_1 = __webpack_require__(17);
-	var utils = __webpack_require__(6);
-	var vnode_1 = __webpack_require__(33);
-	var state_1 = __webpack_require__(47);
-	var controller_factory_1 = __webpack_require__(31);
-	//import {Observer} from './observer'
-	var debug = __webpack_require__(23)('stick:factory:module');
-	var wrap = function wrap(el, name) {
-	    var div = document.createElement('module');
-	    div.setAttribute('name', name);
-	    //if (contextName != this.name) div.setAttribute('as', contextName);
-	    div.appendChild(el);
-	    return div;
-	};
-
-	var ModuleFactory = function (_eventsjs_1$EventEmit) {
-	    _inherits(ModuleFactory, _eventsjs_1$EventEmit);
-
-	    function ModuleFactory(name, module, container) {
-	        _classCallCheck(this, ModuleFactory);
-
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ModuleFactory).call(this));
-
-	        if (arguments.length != 3) {
-	            throw new Error();
-	        }
-	        _this.name = name;
-	        _this.module = module;
-	        _this.container = container;
-	        if (typeof module === 'function' && module.name == "") {
-	            Object.defineProperty(module, 'name', {
-	                value: name
-	            });
-	        }
-	        _this._id = utils.uniqueId("mod");
-	        debug("%s: Module factory created: '%s', container: %s", _this.id, name, _this.container.id);
-	        _this.container.registerSingleton(name, module);
-	        _this.container.registerInstance('$container', _this.container);
-	        return _this;
+	function __export(m) {
+	    for (var p in m) {
+	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	    }
-
-	    _createClass(ModuleFactory, [{
-	        key: "controller",
-	        value: function controller(name, definition) {
-	            var _internal_1$getDepend = internal_1.getDependencies(definition);
-
-	            var _internal_1$getDepend2 = _slicedToArray(_internal_1$getDepend, 2);
-
-	            var def = _internal_1$getDepend2[0];
-	            var deps = _internal_1$getDepend2[1];
-
-	            if (def) {
-	                var fn = undefined;
-	                if (typeof def !== 'function' && utils.isObject(def)) {
-	                    var copy = utils.extend({}, def);
-	                    if (typeof def.initialize === 'function') {
-	                        fn = def.initialize;
-	                        delete copy.initialize;
-	                    } else if (typeof def.constructor === 'function') {
-	                        fn = def.constructor;
-	                        delete copy.constructor;
-	                    }
-	                    if (!deps || deps.length == 0) {
-	                        internal_1.getDependencies(fn);
-	                    }
-	                    utils.assign(fn.prototype, copy);
-	                } else if (typeof def === 'function') {
-	                    fn = def;
-	                }
-	                if (typeof fn !== 'function') {
-	                    throw new errors_1.StickError('controller defition should be a function or an object literal');
-	                }
-	                internal_1.setDependencyType(internal_1.DependencyType.Controller)(fn);
-	                var factory = new controller_factory_1.ControllerFactory(name, fn, this.container.createChild());
-	                this.container.registerInstance(name, factory, true);
-	                debug("%s: Register controller: '%s', %s", this.id, name, factory.id);
-	            } else {
-	                throw new errors_1.StickError("controller definition should be a function, function constructor or a object literal");
-	            }
-	            return this;
-	        }
-	    }, {
-	        key: "service",
-	        value: function service(name, definition) {
-	            var _internal_1$getDepend3 = internal_1.getDependencies(definition);
-
-	            var _internal_1$getDepend4 = _slicedToArray(_internal_1$getDepend3, 1);
-
-	            var fn = _internal_1$getDepend4[0];
-
-	            if (fn && typeof fn === 'function') {
-	                internal_1.setDependencyType(internal_1.DependencyType.Service)(fn);
-	                this.container.registerService(name, fn);
-	                debug("%s Register service %s", this.id, name);
-	            } else {
-	                throw new errors_1.StickError('service should be a function');
-	            }
-	            return this;
-	        }
-	        /**
-	         * Create a factory function
-	         * @param {String} name
-	         */
-
-	    }, {
-	        key: "factory",
-	        value: function factory(name, _factory) {
-	            var _internal_1$getDepend5 = internal_1.getDependencies(_factory);
-
-	            var _internal_1$getDepend6 = _slicedToArray(_internal_1$getDepend5, 1);
-
-	            var fn = _internal_1$getDepend6[0];
-
-	            if (!fn) throw new errors_1.StickError('factory');
-	            debug("%s Register factory %s", this.id, name);
-	            if (typeof fn === 'function') {
-	                internal_1.setDependencyType(internal_1.DependencyType.Factory)(fn);
-	                internal_1.setActivator(fn, stick_di_1.FactoryActivator.instance);
-	                this.container.registerSingleton(name, fn);
-	            } else {
-	                this.container.registerInstance(name, fn);
-	            }
-	            return this;
-	        }
-	        /**
-	         * Create a new instance of the module
-	         * @method create
-	         * @params {Object} options
-	         * @return {Promise}
-	         *
-	         * Call onTemplateRender (), onElementAttached
-	         * emits before:template:render, template:render, before:element:attached, element:attached
-	         *
-	        */
-
-	    }, {
-	        key: "create",
-	        value: function create() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
-	                var state, template, mod, el;
-	                return regeneratorRuntime.wrap(function _callee$(_context) {
-	                    while (1) {
-	                        switch (_context.prev = _context.next) {
-	                            case 0:
-	                                if (!this.container.hasInstance(this.name)) {
-	                                    _context.next = 3;
-	                                    break;
-	                                }
-
-	                                debug("%s: Resolving module %s", this.id, this.name);
-	                                //return utils.Promise.resolve(this.container.get(this.name));
-	                                return _context.abrupt("return", this.container.get(this.name));
-
-	                            case 3:
-	                                this.container.registerSingleton('$state', state_1.State);
-	                                _context.next = 6;
-	                                return this.container.get('$state');
-
-	                            case 6:
-	                                state = _context.sent;
-
-	                                debug("%s: Creating module %s", this.id, this.name);
-
-	                                if (!(options.template || options.el)) {
-	                                    _context.next = 27;
-	                                    break;
-	                                }
-
-	                                _context.next = 11;
-	                                return this.resolveTemplate(state, options);
-
-	                            case 11:
-	                                template = _context.sent;
-
-	                                debug("%s: Created template: %s", this.id, template.id);
-	                                this.container.registerInstance('template', template, true);
-	                                debug("%s: Instantiating module '%s'", this.id, this.name);
-	                                _context.next = 17;
-	                                return this.container.get(this.name);
-
-	                            case 17:
-	                                mod = _context.sent;
-
-	                                template.setTarget(mod);
-	                                //$state.set(contextName, controller);
-	                                this.trigger('before:template:render');
-	                                el = template.render();
-
-	                                if (el.nodeType === 11 || el.nodeType === 3) {
-	                                    if (el.children.length === 1) {
-	                                        el = el.firstChild.nodeType === 3 ? wrap(el, this.name) : el.firstChild;
-	                                    } else {
-	                                        el = wrap(el, this.name);
-	                                    }
-	                                }
-	                                this.container.registerInstance('$el', el, true);
-	                                if (typeof mod.onTemplateRender === 'function') {
-	                                    mod.onTemplateRender.call(mod, el, template);
-	                                }
-	                                this.trigger('template:render');
-	                                if (options.el) {
-	                                    this.trigger('before:element:attached', options.el);
-	                                    options.el.innerHTML = '';
-	                                    options.el.appendChild(el);
-	                                    if (typeof mod.onElementAttached === 'function') {
-	                                        mod.onElementAttached.call(mod, el, options.el);
-	                                    }
-	                                    this.trigger('element:attached', el, options.el);
-	                                }
-	                                return _context.abrupt("return", mod);
-
-	                            case 27:
-	                                return _context.abrupt("return", this.container.get(this.name));
-
-	                            case 28:
-	                            case "end":
-	                                return _context.stop();
-	                        }
-	                    }
-	                }, _callee, this);
-	            }));
-	        }
-	    }, {
-	        key: "configure",
-	        value: function configure(name) {
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee2() {
-	                var configName, provider, serv;
-	                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-	                    while (1) {
-	                        switch (_context2.prev = _context2.next) {
-	                            case 0:
-	                                configName = name;
-
-	                                if (!/Provider$/.test(name)) {
-	                                    configName = name + 'Provider';
-	                                } else {
-	                                    name = name.replace('Provider', '');
-	                                }
-	                                provider = undefined;
-	                                // Check if provider is registered
-
-	                                if (!this.container.hasHandler(configName, false, false)) {
-	                                    _context2.next = 7;
-	                                    break;
-	                                }
-
-	                                return _context2.abrupt("return", this.container.get(name));
-
-	                            case 7:
-	                                if (!repository_1.Repository.has(internal_1.DependencyType.Service, name)) {
-	                                    _context2.next = 12;
-	                                    break;
-	                                }
-
-	                                serv = repository_1.Repository.get(internal_1.DependencyType.Service, name);
-
-	                                this.container.register(serv);
-
-	                                if (!this.container.hasHandler(configName, false, false)) {
-	                                    _context2.next = 12;
-	                                    break;
-	                                }
-
-	                                return _context2.abrupt("return", this.container.get(configName));
-
-	                            case 12:
-	                                throw new Error('No provider for ' + name.replace('Provider', ''));
-
-	                            case 13:
-	                            case "end":
-	                                return _context2.stop();
-	                        }
-	                    }
-	                }, _callee2, this);
-	            }));
-	        }
-	    }, {
-	        key: "resolveTemplate",
-	        value: function resolveTemplate(state, options) {
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee3() {
-	                var $template, $resolver, promise, _templateString, view, templateString;
-
-	                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-	                    while (1) {
-	                        switch (_context3.prev = _context3.next) {
-	                            case 0:
-	                                _context3.next = 2;
-	                                return this.container.get('$templateCreator');
-
-	                            case 2:
-	                                $template = _context3.sent;
-	                                _context3.next = 5;
-	                                return this.container.get('$templateResolver');
-
-	                            case 5:
-	                                $resolver = _context3.sent;
-	                                promise = undefined;
-
-	                                if (!(options.el && !options.template)) {
-	                                    _context3.next = 12;
-	                                    break;
-	                                }
-
-	                                _templateString = options.el.innerHTML;
-
-	                                promise = utils.Promise.resolve(_templateString);
-	                                _context3.next = 20;
-	                                break;
-
-	                            case 12:
-	                                if (!options.template) {
-	                                    _context3.next = 19;
-	                                    break;
-	                                }
-
-	                                if (!(options.template instanceof vnode_1.Template)) {
-	                                    _context3.next = 16;
-	                                    break;
-	                                }
-
-	                                view = options.template.view(state, {
-	                                    container: this.container
-	                                });
-	                                return _context3.abrupt("return", view);
-
-	                            case 16:
-	                                promise = $resolver(options.template);
-	                                _context3.next = 20;
-	                                break;
-
-	                            case 19:
-	                                return _context3.abrupt("return", utils.Promise.reject(new errors_1.StickError("no element or template")));
-
-	                            case 20:
-	                                _context3.next = 22;
-	                                return promise;
-
-	                            case 22:
-	                                templateString = _context3.sent;
-	                                return _context3.abrupt("return", $template(templateString, state));
-
-	                            case 24:
-	                            case "end":
-	                                return _context3.stop();
-	                        }
-	                    }
-	                }, _callee3, this);
-	            }));
-	        }
-	    }, {
-	        key: "destroy",
-	        value: function destroy() {
-	            //this.container.destroy();
-	        }
-	    }, {
-	        key: "id",
-	        get: function get() {
-	            return this._id;
-	        }
-	    }]);
-
-	    return ModuleFactory;
-	}(eventsjs_1.EventEmitter);
-
-	exports.ModuleFactory = ModuleFactory;
+	}
+	__export(__webpack_require__(47));
+	__export(__webpack_require__(48));
 
 /***/ },
 /* 47 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
-	    var c = arguments.length,
-	        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
-	        d;
-	    if ((typeof Reflect === "undefined" ? "undefined" : _typeof(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
-	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var collection_1 = __webpack_require__(48);
-	var utils = __webpack_require__(6);
-	var decorators_1 = __webpack_require__(15);
-	var debug = __webpack_require__(23)('stick:state');
-	function isObject(a) {
-	    return a === Object(a);
-	}
-	exports.get_atributes = function (attributes) {
-	    var keys = Object.keys(attributes),
-	        deferred = {},
-	        attr = {};
-	    keys.map(function (key) {
-	        return { key: key, value: attributes[key] };
-	    }).filter(function (pair) {
-	        if (!utils.has(attributes, pair.key)) return false;
-	        if (pair.value && utils.isPromise(pair.value)) {
-	            deferred[pair.key] = pair.value;
-	            delete attributes[pair.key];
-	            return false;
-	        }
-	        return true;
-	    }).forEach(function (a) {
-	        attr[a.key] = a.value;
-	    });
-	    return { attr: attr, deferred: deferred };
-	};
-	var _State = function (_collection_1$NestedM) {
-	    _inherits(State, _collection_1$NestedM);
-
-	    function State(container) {
-	        _classCallCheck(this, State);
-
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(State).call(this));
-
-	        _this._container = container;
-	        debug('%s: State created', _this.uid);
-	        return _this;
-	    }
-
-	    _createClass(State, [{
-	        key: "get",
-	        value: function get(key) {
-	            debug("%s: Get attribute: %s", this.uid, key);
-	            return _get(Object.getPrototypeOf(State.prototype), "get", this).call(this, key);
-	        }
-	    }, {
-	        key: "set",
-	        value: function set(key, val) {
-	            var _this2 = this;
-
-	            var opts = {},
-	                value = {},
-	                unset = {};
-	            if (typeof key === 'string') {
-	                if (val == null) {
-	                    unset[key] = val;
-	                } else {
-	                    value[key] = val;
-	                }
-	            } else if (isObject(key)) {
-	                value = key;
-	            }
-
-	            var _exports$get_atribute = exports.get_atributes(value);
-
-	            var attr = _exports$get_atribute.attr;
-	            var deferred = _exports$get_atribute.deferred;
-
-	            if (!utils.isEmpty(deferred)) {
-	                debug("%s: Resolve deferred values: %j", this.uid, Object.keys(deferred));
-	                utils.objectToPromise(deferred).then(function (obj) {
-	                    _this2.set(obj);
-	                });
-	            }
-	            if (!utils.isEmpty(attr)) {
-	                debug("%s: Set attributes: %j", this.uid, Object.keys(attr));
-	                _get(Object.getPrototypeOf(State.prototype), "set", this).call(this, attr, opts);
-	            }
-	            if (!utils.isEmpty(unset)) {
-	                // Should unset
-	                debug("%s: Unset attributes: %j", this.uid, Object.keys(unset));
-	                _get(Object.getPrototypeOf(State.prototype), "set", this).call(this, unset);
-	            }
-	            return this;
-	        }
-	    }, {
-	        key: "createChild",
-	        value: function createChild(container) {
-	            if (!container) container = this.container.createChild();
-	            var state = new _State(container);
-	            state._parent = state;
-	            debug("%s: Create child %s", this.uid, state.uid);
-	            return state;
-	        }
-	    }, {
-	        key: "$destroy",
-	        value: function $destroy() {
-	            _get(Object.getPrototypeOf(State.prototype), "destroy", this).call(this);
-	            debug("%s: State destroyed", this.uid);
-	        }
-	    }, {
-	        key: "parent",
-	        get: function get() {
-	            return this._parent;
-	        }
-	    }, {
-	        key: "container",
-	        get: function get() {
-	            return this._container;
-	        }
-	    }]);
-
-	    return State;
-	}(collection_1.NestedModel);
-	_State = __decorate([decorators_1.inject('$container')], _State);
-	exports.State = _State;
-
-/***/ },
-/* 48 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	function __export(m) {
-	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	}
-	__export(__webpack_require__(49));
-	__export(__webpack_require__(52));
-	__export(__webpack_require__(53));
-	__export(__webpack_require__(54));
-	__export(__webpack_require__(55));
-	__export(__webpack_require__(57));
-
-
-/***/ },
-/* 49 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var object_1 = __webpack_require__(50);
-	var model_1 = __webpack_require__(52);
-	var objects_1 = __webpack_require__(9);
-	var arrays_1 = __webpack_require__(7);
-	var utils_1 = __webpack_require__(8);
-	var setOptions = { add: true, remove: true, merge: true };
-	var addOptions = { add: true, remove: false };
-	var Collection = (function (_super) {
-	    __extends(Collection, _super);
-	    function Collection(models, options) {
-	        if (options === void 0) { options = {}; }
-	        this.options = options;
-	        if (this.options.model) {
-	            this.Model = this.options.model;
-	        }
-	        if (models) {
-	            this.add(models);
-	        }
-	        _super.call(this);
-	    }
-	    Object.defineProperty(Collection.prototype, "length", {
-	        get: function () {
-	            return this.models.length;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Collection.prototype, "Model", {
-	        get: function () {
-	            if (!this._model) {
-	                this._model = model_1.Model;
-	            }
-	            return this._model;
-	        },
-	        set: function (con) {
-	            this._model = con;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Collection.prototype, "models", {
-	        get: function () {
-	            return this._models || (this._models = []);
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Collection.prototype.add = function (models, options) {
-	        var _this = this;
-	        if (options === void 0) { options = {}; }
-	        if (!Array.isArray(models)) {
-	            if (!(models instanceof this.Model)) {
-	                models = this._prepareModel(models);
-	            }
-	        }
-	        else {
-	            models = models.map(function (item) {
-	                return (item instanceof _this.Model) ? item : (_this._prepareModel(item));
-	            });
-	        }
-	        this.set(models, objects_1.extend({ merge: false }, options, addOptions));
-	    };
-	    Collection.prototype.set = function (items, options) {
-	        if (options === void 0) { options = {}; }
-	        options = objects_1.extend({}, setOptions, options);
-	        if (options.parse)
-	            items = this.parse(items, options);
-	        var singular = !Array.isArray(items);
-	        var models = (singular ? (items ? [items] : []) : items.slice());
-	        var i, l, id, model, attrs, existing, sort;
-	        var at = options.at;
-	        var sortable = this.comparator && (at == null) && options.sort !== false;
-	        var sortAttr = typeof this.comparator === 'string' ? this.comparator : null;
-	        var toAdd = [], toRemove = [], modelMap = {};
-	        var add = options.add, merge = options.merge, remove = options.remove;
-	        var order = !sortable && add && remove ? [] : null;
-	        for (i = 0, l = models.length; i < l; i++) {
-	            model = models[i];
-	            model = this._prepareModel(model);
-	            id = model.get(model.idAttribute) || model.uid;
-	            if (existing = this.get(id)) {
-	                if (remove)
-	                    modelMap[existing.uid] = true;
-	                if (merge) {
-	                    attrs = model.toJSON();
-	                    existing.set(attrs, options);
-	                    if (sortable && !sort && existing.hasChanged(sortAttr))
-	                        sort = true;
-	                }
-	                models[i] = existing;
-	            }
-	            else if (add) {
-	                models[i] = model;
-	                if (!model)
-	                    continue;
-	                toAdd.push(model);
-	                this._addReference(model, options);
-	            }
-	            model = existing || model;
-	            if (order && !modelMap[model.id])
-	                order.push(model);
-	            modelMap[model.uid] = true;
-	        }
-	        if (remove) {
-	            for (i = 0, l = this.length; i < l; ++i) {
-	                if (!modelMap[(model = this.models[i]).uid])
-	                    toRemove.push(model);
-	            }
-	            if (toRemove.length)
-	                this.remove(toRemove, options);
-	        }
-	        if (toAdd.length || (order && order.length)) {
-	            if (sortable)
-	                sort = true;
-	            if (at != null) {
-	                for (i = 0, l = toAdd.length; i < l; i++) {
-	                    this.models.splice(at + i, 0, toAdd[i]);
-	                }
-	            }
-	            else {
-	                if (order)
-	                    this.models.length = 0;
-	                var orderedModels = order || toAdd;
-	                for (i = 0, l = orderedModels.length; i < l; i++) {
-	                    this.models.push(orderedModels[i]);
-	                }
-	            }
-	        }
-	        if (sort)
-	            this.sort({ silent: true });
-	        if (!options.silent) {
-	            for (i = 0, l = toAdd.length; i < l; i++) {
-	                (model = toAdd[i]).trigger('add', model, this, options);
-	            }
-	            if (sort || (order && order.length))
-	                this.trigger('sort', this, options);
-	            if (toAdd.length || toRemove.length)
-	                this.trigger('update', this, options);
-	        }
-	        return singular ? models[0] : models;
-	    };
-	    Collection.prototype.remove = function (models, options) {
-	        if (options === void 0) { options = {}; }
-	        var singular = !Array.isArray(models);
-	        models = (singular ? [models] : models.slice());
-	        var i, l, index, model;
-	        for (i = 0, l = models.length; i < l; i++) {
-	            model = models[i] = this.get(models[i]);
-	            if (!model)
-	                continue;
-	            index = this.indexOf(model);
-	            this.models.splice(index, 1);
-	            if (!options.silent) {
-	                options.index = index;
-	                model.trigger('remove', model, this, options);
-	            }
-	            this._removeReference(model, options);
-	        }
-	        return singular ? models[0] : models;
-	    };
-	    Collection.prototype.get = function (id) {
-	        return this.find(id);
-	    };
-	    Collection.prototype.at = function (index) {
-	        return this.models[index];
-	    };
-	    Collection.prototype.clone = function (options) {
-	        options = options || this.options;
-	        return new this.constructor(this.models, options);
-	    };
-	    Collection.prototype.sort = function (options) {
-	        if (options === void 0) { options = {}; }
-	        if (!this.comparator)
-	            throw new Error('Cannot sort a set without a comparator');
-	        if (typeof this.comparator === 'string' || this.comparator.length === 1) {
-	            this._models = this.sortBy(this.comparator, this);
-	        }
-	        else {
-	            this.models.sort(this.comparator.bind(this));
-	        }
-	        if (!options.silent)
-	            this.trigger('sort', this, options);
-	        return this;
-	    };
-	    Collection.prototype.sortBy = function (key, context) {
-	        return arrays_1.sortBy(this._models, key, context);
-	    };
-	    Collection.prototype.push = function (model, options) {
-	        if (options === void 0) { options = {}; }
-	        return this.add(model, objects_1.extend({ at: this.length }, options));
-	    };
-	    Collection.prototype.reset = function (models, options) {
-	        var _this = this;
-	        if (options === void 0) { options = {}; }
-	        this.forEach(function (model) {
-	            _this._removeReference(model, options);
-	        });
-	        options.previousModels = this.models;
-	        this._reset();
-	        models = this.add(models, options);
-	        if (!options.silent)
-	            this.trigger('reset', this, options);
-	        return models;
-	    };
-	    Collection.prototype.create = function (values, options) {
-	        if (options === void 0) { options = { add: true }; }
-	        var model = new this.Model(values, options);
-	        if (options.add)
-	            this.add(model);
-	        return model;
-	    };
-	    Collection.prototype.parse = function (models, options) {
-	        if (options === void 0) { options = {}; }
-	        return models;
-	    };
-	    Collection.prototype.find = function (nidOrFn) {
-	        var model;
-	        if (typeof nidOrFn === 'function') {
-	            model = arrays_1.find(this.models, nidOrFn);
-	        }
-	        else {
-	            model = arrays_1.find(this.models, function (model) {
-	                return model.id == nidOrFn || model.uid == nidOrFn || nidOrFn === model;
-	            });
-	        }
-	        return model;
-	    };
-	    Collection.prototype.forEach = function (iterator, ctx) {
-	        for (var i = 0, l = this.models.length; i < l; i++) {
-	            iterator.call(ctx || this, this.models[i], i);
-	        }
-	        return this;
-	    };
-	    Collection.prototype.indexOf = function (model) {
-	        return this.models.indexOf(model);
-	    };
-	    Collection.prototype.toJSON = function () {
-	        return this.models.map(function (m) { return m.toJSON(); });
-	    };
-	    Collection.prototype._prepareModel = function (value) {
-	        if (value instanceof model_1.Model)
-	            return value;
-	        if (objects_1.isObject(value))
-	            return new this.Model(value, { parse: true });
-	        throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
-	    };
-	    Collection.prototype._removeReference = function (model, options) {
-	        if (this === model.collection)
-	            delete model.collection;
-	        this.stopListening(model);
-	    };
-	    Collection.prototype._addReference = function (model, options) {
-	        if (!model.collection)
-	            model.collection = this;
-	        this.listenTo(model, 'all', this._onModelEvent);
-	    };
-	    Collection.prototype._reset = function () {
-	        this._models = [];
-	    };
-	    Collection.prototype._onModelEvent = function (event, model, collection, options) {
-	        if ((event === 'add' || event === 'remove') && collection !== this)
-	            return;
-	        if (event === 'destroy')
-	            this.remove(model, options);
-	        utils_1.callFunc(this.trigger, this, arrays_1.slice(arguments));
-	    };
-	    Collection.prototype.destroy = function () {
-	        var _this = this;
-	        this.models.forEach(function (m) {
-	            if (typeof m.destroy === 'function' &&
-	                m.collection == _this)
-	                m.destroy();
-	        });
-	        _super.prototype.destroy.call(this);
-	    };
-	    return Collection;
-	}(object_1.BaseObject));
-	exports.Collection = Collection;
-
-
-/***/ },
-/* 50 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var eventsjs_1 = __webpack_require__(51);
-	var utils_1 = __webpack_require__(8);
-	var BaseObject = (function (_super) {
-	    __extends(BaseObject, _super);
-	    function BaseObject() {
-	        _super.apply(this, arguments);
-	    }
-	    BaseObject.extend = function (proto, stat) {
-	        return utils_1.inherits(this, proto, stat);
-	    };
-	    return BaseObject;
-	}(eventsjs_1.EventEmitter));
-	exports.BaseObject = BaseObject;
-
-
-/***/ },
-/* 51 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var idCounter = 0;
-	function getID() {
-	    return "" + (++idCounter);
-	}
-	function callFunc(fn, args) {
-	    if (args === void 0) { args = []; }
-	    var l = fn.length, i = -1, a1 = args[0], a2 = args[1], a3 = args[2], a4 = args[3];
-	    switch (args.length) {
-	        case 0:
-	            while (++i < l)
-	                fn[i].handler.call(fn[i].ctx);
-	            return;
-	        case 1:
-	            while (++i < l)
-	                fn[i].handler.call(fn[i].ctx, a1);
-	            return;
-	        case 2:
-	            while (++i < l)
-	                fn[i].handler.call(fn[i].ctx, a1, a2);
-	            return;
-	        case 3:
-	            while (++i < l)
-	                fn[i].handler.call(fn[i].ctx, a1, a2, a3);
-	            return;
-	        case 4:
-	            while (++i < l)
-	                fn[i].handler.call(fn[i].ctx, a1, a2, a3, a4);
-	            return;
-	        default:
-	            while (++i < l)
-	                fn[i].handler.apply(fn[i].ctx, args);
-	            return;
-	    }
-	}
-	exports.callFunc = callFunc;
-	var EventEmitter = (function () {
-	    function EventEmitter() {
-	    }
-	    Object.defineProperty(EventEmitter.prototype, "listeners", {
-	        get: function () {
-	            return this._listeners;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    EventEmitter.prototype.on = function (event, fn, ctx, once) {
-	        if (once === void 0) { once = false; }
-	        var events = (this._listeners || (this._listeners = {}))[event] || (this._listeners[event] = []);
-	        events.push({
-	            name: event,
-	            once: once,
-	            handler: fn,
-	            ctx: ctx || this
-	        });
-	        return this;
-	    };
-	    EventEmitter.prototype.once = function (event, fn, ctx) {
-	        return this.on(event, fn, ctx, true);
-	    };
-	    EventEmitter.prototype.off = function (eventName, fn) {
-	        this._listeners = this._listeners || {};
-	        if (eventName == null) {
-	            this._listeners = {};
-	        }
-	        else if (this._listeners[eventName]) {
-	            var events = this._listeners[eventName];
-	            if (fn == null) {
-	                this._listeners[eventName] = [];
-	            }
-	            else {
-	                for (var i = 0; i < events.length; i++) {
-	                    var event_1 = events[i];
-	                    if (events[i].handler == fn) {
-	                        this._listeners[eventName].splice(i, 1);
-	                    }
-	                }
-	            }
-	        }
-	    };
-	    EventEmitter.prototype.trigger = function (eventName) {
-	        var args = [];
-	        for (var _i = 1; _i < arguments.length; _i++) {
-	            args[_i - 1] = arguments[_i];
-	        }
-	        var events = (this._listeners || (this._listeners = {}))[eventName] || (this._listeners[eventName] = [])
-	            .concat(this._listeners['all'] || []);
-	        if (EventEmitter.debugCallback)
-	            EventEmitter.debugCallback(this.constructor.name, this.name, eventName, args);
-	        var event, a, len = events.length, index;
-	        var calls = [];
-	        for (var i = 0, ii = events.length; i < ii; i++) {
-	            event = events[i];
-	            a = args;
-	            if (event.name == 'all') {
-	                a = [eventName].concat(args);
-	                callFunc([event], a);
-	            }
-	            else {
-	                calls.push(event);
-	            }
-	            if (event.once === true) {
-	                index = this._listeners[event.name].indexOf(event);
-	                this._listeners[event.name].splice(index, 1);
-	            }
-	        }
-	        if (calls.length)
-	            this._executeListener(calls, args);
-	        return this;
-	    };
-	    EventEmitter.prototype._executeListener = function (func, args) {
-	        var executor = callFunc;
-	        if (this.constructor.executeListenerFunction) {
-	            executor = this.constructor.executeListenerFunction;
-	        }
-	        executor(func, args);
-	    };
-	    EventEmitter.prototype.listenTo = function (obj, event, fn, ctx, once) {
-	        if (once === void 0) { once = false; }
-	        var listeningTo, id, meth;
-	        listeningTo = this._listeningTo || (this._listeningTo = {});
-	        id = obj.listenId || (obj.listenId = getID());
-	        listeningTo[id] = obj;
-	        meth = once ? 'once' : 'on';
-	        obj[meth](event, fn, this);
-	        return this;
-	    };
-	    EventEmitter.prototype.listenToOnce = function (obj, event, fn, ctx) {
-	        return this.listenTo(obj, event, fn, ctx, true);
-	    };
-	    EventEmitter.prototype.stopListening = function (obj, event, callback) {
-	        var listeningTo = this._listeningTo;
-	        if (!listeningTo)
-	            return this;
-	        var remove = !event && !callback;
-	        if (!callback && typeof event === 'object')
-	            callback = this;
-	        if (obj)
-	            (listeningTo = {})[obj.listenId] = obj;
-	        for (var id in listeningTo) {
-	            obj = listeningTo[id];
-	            obj.off(event, callback, this);
-	            if (remove || !Object.keys(obj.listeners).length)
-	                delete this._listeningTo[id];
-	        }
-	        return this;
-	    };
-	    EventEmitter.prototype.destroy = function () {
-	        this.stopListening();
-	        this.off();
-	    };
-	    return EventEmitter;
-	}());
-	exports.EventEmitter = EventEmitter;
-
-
-/***/ },
-/* 52 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var object_1 = __webpack_require__(50);
-	var utils_1 = __webpack_require__(8);
-	var objects_1 = __webpack_require__(9);
-	var Model = (function (_super) {
-	    __extends(Model, _super);
-	    function Model(attributes, options) {
-	        if (attributes === void 0) { attributes = {}; }
-	        if (options === void 0) { options = {}; }
-	        options = options || {};
-	        this._attributes = {};
-	        this.options = options;
-	        if (options.parse)
-	            attributes = this.parse(attributes);
-	        this.set(attributes, null, { silent: true });
-	        this.uid = utils_1.uniqueId('uid');
-	        this._changed = {};
-	        this.collection = options.collection;
-	        this.idAttribute = options.idAttribute || this.idAttribute || 'id';
-	        _super.call(this);
-	    }
-	    Object.defineProperty(Model.prototype, "id", {
-	        get: function () {
-	            if (this.idAttribute in this._attributes)
-	                return this._attributes[this.idAttribute];
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Model.prototype, "isNew", {
-	        get: function () {
-	            return this.id == null;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Model.prototype, "isDirty", {
-	        get: function () {
-	            return this.hasChanged();
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Model.prototype.set = function (key, val, options) {
-	        if (options === void 0) { options = {}; }
-	        var attr, attrs = {}, unset, changes, silent, changing, prev, current;
-	        if (key == null)
-	            return this;
-	        if (typeof key === 'object') {
-	            attrs = key;
-	            options = val;
-	        }
-	        else {
-	            attrs[key] = val;
-	        }
-	        options || (options = {});
-	        unset = options.unset;
-	        silent = options.silent;
-	        changes = [];
-	        changing = this._changing;
-	        this._changing = true;
-	        if (!changing) {
-	            this._previousAttributes = objects_1.extend(Object.create(null), this._attributes);
-	            this._changed = {};
-	        }
-	        current = this._attributes, prev = this._previousAttributes;
-	        for (attr in attrs) {
-	            val = attrs[attr];
-	            if (!utils_1.equal(current[attr], val))
-	                changes.push(attr);
-	            if (!utils_1.equal(prev[attr], val)) {
-	                this._changed[attr] = val;
-	            }
-	            else {
-	                delete this._changed[attr];
-	            }
-	            unset ? delete current[attr] : current[attr] = val;
-	        }
-	        if (!silent) {
-	            if (changes.length)
-	                this._pending = !!options;
-	            for (var i = 0, l = changes.length; i < l; i++) {
-	                this.trigger('change:' + changes[i], this, current[changes[i]], options);
-	            }
-	        }
-	        if (changing)
-	            return this;
-	        if (!silent) {
-	            while (this._pending) {
-	                options = this._pending;
-	                this._pending = false;
-	                this.trigger('change', this, options);
-	            }
-	        }
-	        this._pending = false;
-	        this._changing = false;
-	        return this;
-	    };
-	    Model.prototype.get = function (key) {
-	        return this._attributes[key];
-	    };
-	    Model.prototype.unset = function (key, options) {
-	        this.set(key, void 0, objects_1.extend({}, options, { unset: true }));
-	    };
-	    Model.prototype.has = function (attr) {
-	        return this.get(attr) != null;
-	    };
-	    Model.prototype.hasChanged = function (attr) {
-	        if (attr == null)
-	            return !!Object.keys(this.changed).length;
-	        return objects_1.has(this.changed, attr);
-	    };
-	    Model.prototype.clear = function (options) {
-	        var attrs = {};
-	        for (var key in this._attributes)
-	            attrs[key] = void 0;
-	        return this.set(attrs, objects_1.extend({}, options, { unset: true }));
-	    };
-	    Object.defineProperty(Model.prototype, "changed", {
-	        get: function () {
-	            return objects_1.extend({}, this._changed);
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Model.prototype.changedAttributes = function (diff) {
-	        if (!diff)
-	            return this.hasChanged() ? objects_1.extend(Object.create(null), this.changed) : false;
-	        var val, changed = {};
-	        var old = this._changing ? this._previousAttributes : this._attributes;
-	        for (var attr in diff) {
-	            if (utils_1.equal(old[attr], (val = diff[attr])))
-	                continue;
-	            (changed || (changed = {}))[attr] = val;
-	        }
-	        return changed;
-	    };
-	    Model.prototype.previous = function (attr) {
-	        if (attr == null || !this._previousAttributes)
-	            return null;
-	        return this._previousAttributes[attr];
-	    };
-	    Model.prototype.previousAttributes = function () {
-	        return objects_1.extend(Object.create(null), this._previousAttributes);
-	    };
-	    Model.prototype.toJSON = function () {
-	        return JSON.parse(JSON.stringify(this._attributes));
-	    };
-	    Model.prototype.clone = function () {
-	        return new (this.constructor)(this._attributes, this.options);
-	    };
-	    Model.prototype.parse = function (attr, options) {
-	        return attr;
-	    };
-	    Model.prototype.remove = function (options) {
-	        this.trigger('remove', this, this.collection, options);
-	    };
-	    return Model;
-	}(object_1.BaseObject));
-	exports.Model = Model;
-
-
-/***/ },
-/* 53 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var utils_1 = __webpack_require__(8);
-	var objects_1 = __webpack_require__(9);
-	var model_1 = __webpack_require__(52);
-	function objToPaths(obj, separator) {
-	    if (separator === void 0) { separator = "."; }
-	    var ret = {};
-	    if (!obj)
-	        return obj;
-	    for (var key in obj) {
-	        var val = obj[key];
-	        if (val && (val.constructor === Object || val.constructor === Array) && !objects_1.isEmpty(val)) {
-	            var obj2 = objToPaths(val);
-	            for (var key2 in obj2) {
-	                var val2 = obj2[key2];
-	                ret[key + separator + key2] = val2;
-	            }
-	        }
-	        else {
-	            ret[key] = val;
-	        }
-	    }
-	    return ret;
-	}
-	function isOnNestedModel(obj, path, separator) {
-	    if (separator === void 0) { separator = "."; }
-	    var fields = path ? path.split(separator) : [];
-	    if (!obj)
-	        return false;
-	    var result = obj;
-	    for (var i = 0, n = fields.length; i < n; i++) {
-	        if (result instanceof model_1.Model)
-	            return true;
-	        if (!result)
-	            return false;
-	        result = result[fields[i]];
-	    }
-	    return false;
-	}
-	function getNested(obj, path, return_exists, separator) {
-	    if (separator === void 0) { separator = "."; }
-	    if (!obj)
-	        return null;
-	    var fields = path ? path.split(separator) : [];
-	    var result = obj;
-	    return_exists || (return_exists === false);
-	    for (var i = 0, n = fields.length; i < n; i++) {
-	        if (return_exists && !objects_1.has(result, fields[i])) {
-	            return false;
-	        }
-	        result = result instanceof model_1.Model ? result.get(fields[i]) : result[fields[i]];
-	        if (result == null && i < n - 1) {
-	            result = {};
-	        }
-	        if (typeof result === 'undefined') {
-	            if (return_exists) {
-	                return true;
-	            }
-	            return result;
-	        }
-	    }
-	    if (return_exists) {
-	        return true;
-	    }
-	    return result;
-	}
-	function setNested(obj, path, val, options) {
-	    options = options || {};
-	    if (!obj)
-	        return null;
-	    var separator = options.separator || ".";
-	    var fields = path ? path.split(separator) : [];
-	    var result = obj;
-	    for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
-	        var field = fields[i];
-	        if (i === n - 1) {
-	            options.unset ? delete result[field] : result[field] = val;
-	        }
-	        else {
-	            if (typeof result[field] === 'undefined' || !objects_1.isObject(result[field])) {
-	                if (options.unset) {
-	                    delete result[field];
-	                    return;
-	                }
-	                var nextField = fields[i + 1];
-	                result[field] = /^\d+$/.test(nextField) ? [] : {};
-	            }
-	            result = result[field];
-	            if (result instanceof model_1.Model) {
-	                var rest = fields.slice(i + 1);
-	                return result.set(rest.join('.'), val, options);
-	            }
-	        }
-	    }
-	}
-	function deleteNested(obj, path) {
-	    setNested(obj, path, null, {
-	        unset: true
-	    });
-	}
-	var NestedModel = (function (_super) {
-	    __extends(NestedModel, _super);
-	    function NestedModel() {
-	        _super.apply(this, arguments);
-	    }
-	    NestedModel.prototype.get = function (attr) {
-	        return getNested(this._attributes, attr);
-	    };
-	    NestedModel.prototype.set = function (key, val, options) {
-	        var _this = this;
-	        var attr, attrs, unset, changes, silent, changing, prev, current;
-	        if (key == null)
-	            return this;
-	        if (typeof key === 'object') {
-	            attrs = key;
-	            options = val || {};
-	        }
-	        else {
-	            (attrs = {})[key] = val;
-	        }
-	        options || (options = {});
-	        unset = options.unset;
-	        silent = options.silent;
-	        changes = [];
-	        changing = this._changing;
-	        this._changing = true;
-	        if (!changing) {
-	            this._previousAttributes = objects_1.extend({}, this._attributes);
-	            this._changed = {};
-	        }
-	        current = this._attributes, prev = this._previousAttributes;
-	        attrs = objToPaths(attrs);
-	        var alreadyTriggered = {};
-	        var separator = NestedModel.keyPathSeparator;
-	        if (!this._nestedListener)
-	            this._nestedListener = {};
-	        for (attr in attrs) {
-	            val = attrs[attr];
-	            var curVal = getNested(current, attr);
-	            if (!utils_1.equal(curVal, val)) {
-	                changes.push(attr);
-	                this._changed[attr] = val;
-	            }
-	            if (!utils_1.equal(getNested(prev, attr), val)) {
-	                setNested(this.changed, attr, val);
-	            }
-	            else {
-	                deleteNested(this.changed, attr);
-	            }
-	            if (curVal instanceof model_1.Model) {
-	                var fn = this._nestedListener[attr];
-	                if (fn) {
-	                    curVal.off('change', fn);
-	                    delete this._nestedListener[attr];
-	                }
-	            }
-	            if (unset) {
-	                deleteNested(current, attr);
-	            }
-	            else {
-	                if (!isOnNestedModel(current, attr, separator)) {
-	                    if (val instanceof model_1.Model) {
-	                        var fn = function (model) {
-	                            if (model.changed == undefined || objects_1.isEmpty(model.changed))
-	                                return;
-	                            for (var key_1 in model.changed) {
-	                                _this._changed[attr + separator + key_1] = model.changed[key_1];
-	                                _this.trigger('change:' + attr + separator + key_1, model.changed[key_1]);
-	                            }
-	                            _this.trigger('change', _this, options);
-	                        };
-	                        this._nestedListener[attr] = fn;
-	                        val.on('change', fn);
-	                    }
-	                }
-	                else {
-	                    alreadyTriggered[attr] = true;
-	                }
-	                setNested(current, attr, val);
-	            }
-	        }
-	        if (!silent) {
-	            if (changes.length)
-	                this._pending = true;
-	            for (var i = 0, l = changes.length; i < l; i++) {
-	                var key_2 = changes[i];
-	                if (!alreadyTriggered.hasOwnProperty(key_2) || !alreadyTriggered[key_2]) {
-	                    alreadyTriggered[key_2] = true;
-	                    this.trigger('change:' + key_2, this, getNested(current, key_2), options);
-	                }
-	                var fields = key_2.split(separator);
-	                for (var n = fields.length - 1; n > 0; n--) {
-	                    var parentKey = fields.slice(0, n).join(separator), wildcardKey = parentKey + separator + '*';
-	                    if (!alreadyTriggered.hasOwnProperty(wildcardKey) || !alreadyTriggered[wildcardKey]) {
-	                        alreadyTriggered[wildcardKey] = true;
-	                        this.trigger('change:' + wildcardKey, this, getNested(current, parentKey), options);
-	                    }
-	                    if (!alreadyTriggered.hasOwnProperty(parentKey) || !alreadyTriggered[parentKey]) {
-	                        alreadyTriggered[parentKey] = true;
-	                        this.trigger('change:' + parentKey, this, getNested(current, parentKey), options);
-	                    }
-	                }
-	            }
-	        }
-	        if (changing)
-	            return this;
-	        if (!silent) {
-	            while (this._pending) {
-	                this._pending = false;
-	                this.trigger('change', this, options);
-	            }
-	        }
-	        this._pending = false;
-	        this._changing = false;
-	        return this;
-	    };
-	    NestedModel.prototype.clear = function (options) {
-	        var attrs = {};
-	        var shallowAttributes = objToPaths(this._attributes);
-	        for (var key in shallowAttributes)
-	            attrs[key] = void 0;
-	        return this.set(attrs, objects_1.extend({}, options, {
-	            unset: true
-	        }));
-	    };
-	    NestedModel.prototype.hasChanged = function (attr) {
-	        if (attr == null) {
-	            return !Object.keys(this.changed).length;
-	        }
-	        return getNested(this.changed, attr) !== undefined;
-	    };
-	    NestedModel.prototype.changedAttributes = function (diff) {
-	        if (!diff)
-	            return this.hasChanged() ? objToPaths(this.changed) : false;
-	        var old = this._changing ? this._previousAttributes : this._attributes;
-	        diff = objToPaths(diff);
-	        old = objToPaths(old);
-	        var val, changed = false;
-	        for (var attr in diff) {
-	            if (utils_1.equal(old[attr], (val = diff[attr])))
-	                continue;
-	            (changed || (changed = {}))[attr] = val;
-	        }
-	        return changed;
-	    };
-	    NestedModel.prototype.previous = function (attr) {
-	        if (attr == null || !this._previousAttributes) {
-	            return null;
-	        }
-	        return getNested(this._previousAttributes, attr);
-	    };
-	    NestedModel.prototype.previousAttributes = function () {
-	        return objects_1.extend({}, this._previousAttributes);
-	    };
-	    NestedModel.prototype.destroy = function () {
-	        for (var key in this._nestedListener) {
-	            var fn = this._nestedListener[key];
-	            if (fn) {
-	                var m = this.get(key);
-	                if (m)
-	                    m.off(key, fn);
-	            }
-	        }
-	        _super.prototype.destroy.call(this);
-	    };
-	    NestedModel.keyPathSeparator = '.';
-	    return NestedModel;
-	}(model_1.Model));
-	exports.NestedModel = NestedModel;
-
-
-/***/ },
-/* 54 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var objects_1 = __webpack_require__(9);
-	var collection_1 = __webpack_require__(49);
-	var rest_model_1 = __webpack_require__(55);
-	var promises_1 = __webpack_require__(11);
-	var persistence_1 = __webpack_require__(56);
-	var RestCollection = (function (_super) {
-	    __extends(RestCollection, _super);
-	    function RestCollection(models, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, models, options);
-	        if (options.url)
-	            this.url = options.url;
-	    }
-	    RestCollection.prototype.getURL = function () {
-	        return typeof this.url === 'function' ? this.url() : this.url;
-	    };
-	    RestCollection.prototype.fetch = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        var url = this.getURL();
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        this.trigger('before:fetch');
-	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (results) {
-	            _this[options.reset ? 'reset' : 'set'](results.content, options);
-	            _this.trigger('fetch');
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
-	            throw e;
-	        });
-	    };
-	    RestCollection.prototype.create = function (value, options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        var model;
-	        var url = this.getURL();
-	        if (url == null)
-	            throw new Error('Url or rootURL no specified');
-	        options.url = url;
-	        if (value instanceof rest_model_1.RestModel) {
-	            model = value;
-	        }
-	        else {
-	            model = new this.Model(value, { parse: true });
-	        }
-	        if (options.wait === void 0)
-	            options.wait = true;
-	        if (!options.wait)
-	            this.add(model, options);
-	        this.trigger('before:create', this, model, value, options);
-	        model.save().then(function () {
-	            if (!options.wait)
-	                _this.add(model, options);
-	            _this.trigger('create', _this, model, value, options);
-	            if (options.complete)
-	                options.complete(null, model);
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
-	            if (options.complete)
-	                options.complete(e, null);
-	        });
-	        return model;
-	    };
-	    RestCollection.prototype.sync = function (method, model, options) {
-	        return persistence_1.sync(method, model, options);
-	    };
-	    return RestCollection;
-	}(collection_1.Collection));
-	exports.RestCollection = RestCollection;
-
-
-/***/ },
-/* 55 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var objects_1 = __webpack_require__(9);
-	var promises_1 = __webpack_require__(11);
-	var nested_model_1 = __webpack_require__(53);
-	var persistence_1 = __webpack_require__(56);
-	function normalize_path(url, id) {
-	    var i, p = "";
-	    if ((i = url.indexOf('?')) >= 0) {
-	        p = url.substr(i);
-	        url = url.substr(0, i);
-	    }
-	    if (url[url.length - 1] !== '/')
-	        url += '/';
-	    return url + id + p;
-	}
-	exports.normalize_path = normalize_path;
-	var RestModel = (function (_super) {
-	    __extends(RestModel, _super);
-	    function RestModel(attr, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, attr, options);
-	        this.idAttribute = 'id';
-	        if (options.url) {
-	            this.rootURL = options.url;
-	        }
-	    }
-	    RestModel.prototype.getURL = function (id) {
-	        var url = this.rootURL;
-	        if (this.collection && this.collection.getURL()) {
-	            url = this.collection.getURL();
-	        }
-	        if (id && url) {
-	            url = normalize_path(url, this.id);
-	        }
-	        return url;
-	    };
-	    RestModel.prototype.fetch = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        var url = this.getURL();
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        this.trigger('before:fetch', this, options);
-	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (result) {
-	            if (result)
-	                _this.set(_this.parse(result.content, options), options);
-	            _this.trigger('fetch', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            if (e) {
-	                throw e;
-	            }
-	            return _this;
-	        });
-	    };
-	    RestModel.prototype.save = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        this.trigger('before:save', this, options);
-	        var method = persistence_1.RestMethod[this.isNew ? 'Create' : options.changed ? 'Patch' : "Update"];
-	        var url = this.getURL(this.id);
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        options.url = url;
-	        return this.sync(method, this, options)
-	            .then(function (result) {
-	            _this.set(result.content, options);
-	            _this.trigger('save', _this, result, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            throw e;
-	        });
-	    };
-	    RestModel.prototype.remove = function (options) {
-	        var _this = this;
-	        options = options ? objects_1.extend({}, options) : {};
-	        if (this.isNew) {
-	            _super.prototype.remove.call(this, options);
-	            return promises_1.Promise.resolve(this);
-	        }
-	        var url = this.getURL(this.id);
-	        if (url == null)
-	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
-	        this.trigger('before:remove', this, options);
-	        if (!options.wait)
-	            _super.prototype.remove.call(this, options);
-	        options.url = url;
-	        return this.sync(persistence_1.RestMethod.Delete, this, options)
-	            .then(function (result) {
-	            if (!options.wait)
-	                _super.prototype.remove.call(_this, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', _this, e);
-	            throw e;
-	        });
-	    };
-	    RestModel.prototype.sync = function (method, model, options) {
-	        return persistence_1.sync(method, model, options);
-	    };
-	    return RestModel;
-	}(nested_model_1.NestedModel));
-	exports.RestModel = RestModel;
-
-
-/***/ },
-/* 56 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var promises_1 = __webpack_require__(11);
-	var utils_1 = __webpack_require__(8);
-	var request_1 = __webpack_require__(13);
-	(function (RestMethod) {
-	    RestMethod[RestMethod["Create"] = 0] = "Create";
-	    RestMethod[RestMethod["Update"] = 1] = "Update";
-	    RestMethod[RestMethod["Read"] = 2] = "Read";
-	    RestMethod[RestMethod["Patch"] = 3] = "Patch";
-	    RestMethod[RestMethod["Delete"] = 4] = "Delete";
-	})(exports.RestMethod || (exports.RestMethod = {}));
-	var RestMethod = exports.RestMethod;
-	;
-	var xmlRe = /^(?:application|text)\/xml/;
-	var jsonRe = /^application\/json/;
-	var getData = function (accepts, xhr) {
-	    if (accepts == null)
-	        accepts = xhr.getResponseHeader('content-type');
-	    if (xmlRe.test(accepts)) {
-	        return xhr.responseXML;
-	    }
-	    else if (jsonRe.test(accepts) && xhr.responseText !== '') {
-	        return JSON.parse(xhr.responseText);
-	    }
-	    else {
-	        return xhr.responseText;
-	    }
-	};
-	var isValid = function (xhr) {
-	    return (xhr.status >= 200 && xhr.status < 300) ||
-	        (xhr.status === 304) ||
-	        (xhr.status === 0 && window.location.protocol === 'file:');
-	};
-	function sync(method, model, options) {
-	    var http;
-	    switch (method) {
-	        case RestMethod.Create:
-	            http = 'POST';
-	            break;
-	        case RestMethod.Update:
-	            http = "PUT";
-	            break;
-	        case RestMethod.Patch:
-	            http = "PATCH";
-	            break;
-	        case RestMethod.Delete:
-	            http = "DELETE";
-	            break;
-	        case RestMethod.Read:
-	            http = "GET";
-	            break;
-	        default:
-	            return promises_1.Promise.reject(new Error("Sync: does not recognise method: " + method));
-	    }
-	    var xhr = utils_1.ajax();
-	    var query, url = options.url;
-	    if (options.params)
-	        query = request_1.queryParam(options.params);
-	    if (query) {
-	        var sep = (options.url.indexOf('?') === -1) ? '?' : '&';
-	        url += sep + query.substring(1);
-	    }
-	    return new promises_1.Promise(function (resolve, reject) {
-	        xhr.onreadystatechange = function () {
-	            if (xhr.readyState !== 4)
-	                return;
-	            var response = {
-	                method: method,
-	                status: xhr.status,
-	                content: getData(options.headers['Accept'], xhr)
-	            };
-	            utils_1.proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
-	            if (isValid(xhr)) {
-	                return resolve(response);
-	            }
-	            else {
-	                var error = new Error('Server responded with status of ' + xhr.statusText);
-	                return reject(error);
-	            }
-	        };
-	        xhr.open(http, url, true);
-	        if (!(options.headers && options.headers['Accept'])) {
-	            options.headers = {
-	                Accept: "application/json"
-	            };
-	        }
-	        if (options.headers)
-	            for (var key in options.headers) {
-	                xhr.setRequestHeader(key, options.headers[key]);
-	            }
-	        if (options.beforeSend)
-	            options.beforeSend(xhr);
-	        xhr.send(model.toJSON());
-	    });
-	}
-	exports.sync = sync;
-
-
-/***/ },
-/* 57 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var collection_1 = __webpack_require__(49);
-	var rest_collection_1 = __webpack_require__(54);
-	var promises_1 = __webpack_require__(11);
-	var persistence_1 = __webpack_require__(56);
-	var objects_1 = __webpack_require__(9);
-	var request_1 = __webpack_require__(13);
-	var PARAM_TRIM_RE = /[\s'"]/g;
-	var URL_TRIM_RE = /[<>\s'"]/g;
-	function queryStringToParams(qs) {
-	    var kvp, k, v, ls, params = {}, decode = decodeURIComponent;
-	    var kvps = qs.split('&');
-	    for (var i = 0, l = kvps.length; i < l; i++) {
-	        var param = kvps[i];
-	        kvp = param.split('='), k = kvp[0], v = kvp[1];
-	        if (v == null)
-	            v = true;
-	        k = decode(k), v = decode(v), ls = params[k];
-	        if (Array.isArray(ls))
-	            ls.push(v);
-	        else if (ls)
-	            params[k] = [ls, v];
-	        else
-	            params[k] = v;
-	    }
-	    return params;
-	}
-	var PaginatedCollection = (function (_super) {
-	    __extends(PaginatedCollection, _super);
-	    function PaginatedCollection(models, options) {
-	        if (options === void 0) { options = {}; }
-	        _super.call(this, models, options);
-	        this._state = { first: 1, last: -1, current: 1, size: 10 };
-	        this._link = {};
-	        this.queryParams = {
-	            page: 'page',
-	            size: 'pageSize'
-	        };
-	        if (options.queryParams) {
-	            objects_1.extend(this.queryParams, options.queryParams);
-	        }
-	        if (options.firstPage)
-	            this._state.first = options.firstPage;
-	        if (options.pageSize)
-	            this._state.size = options.pageSize;
-	        this._state.current = this._state.first;
-	        this._page = new collection_1.Collection();
-	        this._page.Model = this.Model;
-	    }
-	    Object.defineProperty(PaginatedCollection.prototype, "page", {
-	        get: function () {
-	            return this._page;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    PaginatedCollection.prototype.hasNext = function () {
-	        return this.hasPage(this._state.current + 1);
-	    };
-	    PaginatedCollection.prototype.hasPrevious = function () {
-	        return this.hasPage(this._state.current - 1);
-	    };
-	    PaginatedCollection.prototype.hasPage = function (page) {
-	        if (this._state.last > -1) {
-	            return page <= this._state.last;
-	        }
-	        return false;
-	    };
-	    PaginatedCollection.prototype.getPreviousPage = function (options) {
-	        options = options ? objects_1.extend({}, options) : {};
-	        options.page = this._state.current - 1;
-	        return this.getPage(options);
-	    };
-	    PaginatedCollection.prototype.getNextPage = function (options) {
-	        options = options ? objects_1.extend({}, options) : {};
-	        options.page = this._state.current + 1;
-	        return this.getPage(options);
-	    };
-	    PaginatedCollection.prototype.getPage = function (options) {
-	        options = options ? objects_1.extend({}, options) : {};
-	        if (options.page === void 0)
-	            return promises_1.Promise.reject(new Error("No page"));
-	        if (this._state.last < options.page && this._state.last != -1) {
-	            options.page = this._state.last;
-	        }
-	        else if (options.page < this._state.first) {
-	            options.page = this._state.first;
-	        }
-	        return this.fetch(options);
-	    };
-	    PaginatedCollection.prototype.fetch = function (options) {
-	        var _this = this;
-	        if (options === void 0) { options = {}; }
-	        options = options ? objects_1.extend({}, options) : {};
-	        var url;
-	        if (!objects_1.has(options, 'page')) {
-	            options.page = this._state.current;
-	        }
-	        var params = options.params ? objects_1.extend({}, options.params) : {};
-	        if (objects_1.has(params, this.queryParams.page))
-	            delete params[this.queryParams.page];
-	        url = this._link[options.page];
-	        if (!url) {
-	            url = this.getURL();
-	        }
-	        if (!url)
-	            return promises_1.Promise.reject(new Error("no url specified"));
-	        var idx = url.indexOf('?');
-	        if (idx > -1) {
-	            params = objects_1.extend(params, queryStringToParams(url.substr(idx + 1)));
-	            url = url.substr(0, idx);
-	        }
-	        if (!objects_1.has(params, this.queryParams.page)) {
-	            params[this.queryParams.page] = options.page;
-	        }
-	        options.params = params;
-	        options.url = url;
-	        this.trigger('before:fetch', this, options);
-	        params[this.queryParams.size] = this._state.size;
-	        if (!this._link[options.page + '']) {
-	            this._link[options.page] = url + request_1.queryParam({ page: options.page });
-	        }
-	        return this.sync(persistence_1.RestMethod.Read, this, options)
-	            .then(function (resp) {
-	            _this._processResponse(resp, options);
-	            _this.trigger('fetch', _this, resp, options);
-	            return _this;
-	        }).catch(function (e) {
-	            _this.trigger('error', e);
-	            throw e;
-	        });
-	    };
-	    PaginatedCollection.prototype._processResponse = function (resp, options) {
-	        var currentPage = options.page;
-	        var links = this._parseLinkHeaders(resp);
-	        if (links.first)
-	            this._link[this._state.first] = links.first;
-	        if (links.prev)
-	            this._link[currentPage - 1] = links.prev;
-	        if (links.next)
-	            this._link[currentPage + 1] = links.next;
-	        if (links.last) {
-	            var last = links.last;
-	            var idx = last.indexOf('?');
-	            if (idx > -1) {
-	                var params = queryStringToParams(last.substr(idx + 1));
-	                if (objects_1.has(params, this.queryParams.page)) {
-	                    this._link[params[this.queryParams.page]] = last;
-	                    this._state.last = parseInt(params[this.queryParams.page]);
-	                }
-	            }
-	        }
-	        this._state.current = currentPage;
-	        var data = resp.content;
-	        if (data && !Array.isArray(data))
-	            data = [data];
-	        if (!data)
-	            return this;
-	        data = this.parse(data);
-	        for (var i = 0, ii = data.length; i < ii; i++) {
-	            data[i] = this._prepareModel(data[i]);
-	        }
-	        this[options.reset ? 'reset' : 'set'](data, options);
-	        this.page.reset(data);
-	        return this;
-	    };
-	    PaginatedCollection.prototype._parseLinkHeaders = function (resp) {
-	        var link = {};
-	        if (typeof resp['getResponseHeader'] !== 'function') {
-	            return link;
-	        }
-	        var linkHeader = resp['getResponseHeader']('Link');
-	        if (!linkHeader)
-	            return link;
-	        linkHeader = linkHeader.split(',');
-	        var relations = ['first', 'prev', 'next', 'last'];
-	        for (var i = 0, ii = linkHeader.length; i < ii; i++) {
-	            var linkParts = linkHeader[i].split(';'), url = linkParts[0].replace(URL_TRIM_RE, ''), params = linkParts.slice(1);
-	            for (var x = 0, xx = params.length; x < xx; x++) {
-	                var paramParts = params[x].split('='), key = paramParts[0].replace(PARAM_TRIM_RE, ''), value = paramParts[1].replace(PARAM_TRIM_RE, '');
-	                if (key == 'rel' && !!~relations.indexOf(value))
-	                    link[value] = url;
-	            }
-	        }
-	        return link;
-	    };
-	    return PaginatedCollection;
-	}(rest_collection_1.RestCollection));
-	exports.PaginatedCollection = PaginatedCollection;
-
-
-/***/ },
-/* 58 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
-	var internal_1 = __webpack_require__(16);
-	var errors_1 = __webpack_require__(32);
-	var repository_1 = __webpack_require__(30);
-	var utils = __webpack_require__(6);
-	var module_factory_1 = __webpack_require__(46);
-	var container_1 = __webpack_require__(59);
-	var base_component_1 = __webpack_require__(60);
-	var templ = __webpack_require__(61);
-	var annotations = __webpack_require__(15);
-	exports.decorators = annotations;
-	function service(name, definition) {
-	    var _internal_1$getDepend = internal_1.getDependencies(definition);
-
-	    var _internal_1$getDepend2 = _slicedToArray(_internal_1$getDepend, 1);
-
-	    var fn = _internal_1$getDepend2[0];
-
-	    if (fn && typeof fn === 'function') {
-	        repository_1.Repository.add(internal_1.DependencyType.Service, name, fn);
-	    } else {
-	        throw new errors_1.StickError('service should be a function');
-	    }
-	}
-	exports.service = service;
-	function factory(name, factory) {
-	    var _internal_1$getDepend3 = internal_1.getDependencies(factory);
-
-	    var _internal_1$getDepend4 = _slicedToArray(_internal_1$getDepend3, 1);
-
-	    var fn = _internal_1$getDepend4[0];
-
-	    if (!fn) throw new errors_1.StickError('factory');
-	    repository_1.Repository.add(internal_1.DependencyType.Factory, name, fn);
-	}
-	exports.factory = factory;
-	var container = new container_1.Container();
-	function _module(name) {
-	    var definition = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-	    if (definition == null) {
-	        var _factory = undefined;
-	        // Check if module already is defined
-	        if (container.hasHandler(name)) {
-	            _factory = container.get(name);
-	        } else if (repository_1.Repository.has(internal_1.DependencyType.Module, name)) {
-	            var result = repository_1.Repository.get(internal_1.DependencyType.Module, name);
-	            _factory = new module_factory_1.ModuleFactory(name, result.handler, container.createChild());
-	            container.registerInstance(name, _factory);
-	        } else {
-	            throw new errors_1.StickError("no module named " + name);
-	        }
-	        return _factory;
-	    }
-
-	    var _internal_1$getDepend5 = internal_1.getDependencies(definition);
-
-	    var _internal_1$getDepend6 = _slicedToArray(_internal_1$getDepend5, 2);
-
-	    var def = _internal_1$getDepend6[0];
-	    var deps = _internal_1$getDepend6[1];
-
-	    if (def) {
-	        var fn = undefined;
-	        if (typeof def !== 'function' && utils.isObject(def)) {
-	            var copy = utils.extend({}, def);
-	            if (typeof def.initialize === 'function') {
-	                fn = def.initialize;
-	                delete copy.initialize;
-	            } else if (typeof def.constructor === 'function') {
-	                fn = def.constructor;
-	                delete copy.constructor;
-	            }
-	            if (!deps || deps.length == 0) {
-	                internal_1.getDependencies(fn);
-	            } else {
-	                fn.inject = deps;
-	            }
-	            utils.assign(fn.prototype, copy);
-	        } else if (typeof def === 'function') {
-	            fn = def;
-	        }
-	        if (typeof fn !== 'function') {
-	            throw new errors_1.StickError('controller defition should be a function or an object literal');
-	        }
-	        var _factory2 = new module_factory_1.ModuleFactory(name, fn, container.createChild());
-	        container.registerInstance(name, _factory2, true);
-	        return _factory2;
-	    } else {
-	        throw new errors_1.StickError('controller defition should be a function or an object literal');
-	    }
-	}
-	exports.module = _module;
-	function component(name, handler) {
-	    //let component: ComponentDefinition
-	    var Component = undefined;
-	    if (typeof handler === 'function') {
-	        /*component = {
-	            initialize: <any>handler,
-	        }*/
-	        Component = handler;
-	    } else if (utils.isObject(handler) && typeof handler.initialize === 'function') {
-	        Component = utils.inherits(base_component_1.BaseComponent, handler);
-	    } else {
-	        throw new errors_1.StickError("component should be a function or an object");
-	    }
-	    //let Component = utils.inherits(<any>BaseComponent, component)
-	    templ.component(name, Component);
-	}
-	exports.component = component;
-	function attribute(name, handler) {
-	    templ.attribute(name, handler);
-	}
-	exports.attribute = attribute;
-	function decorator(name, decorator) {
-	    if (utils.has(exports.decorators, name)) {
-	        throw new Error("decorator called " + name + " already defined!");
-	    }
-	    exports.decorators[name] = decorator;
-	}
-	exports.decorator = decorator;
-	function modifier(name, modifier) {
-	    templ.modifier(name, modifier);
-	}
-	exports.modifier = modifier;
-
-/***/ },
-/* 59 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
-	function __export(m) {
-	    for (var p in m) {
-	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	    }
-	}
-	var stick_di_1 = __webpack_require__(17);
-	var errors_1 = __webpack_require__(32);
-	var repository_1 = __webpack_require__(30);
-	var internal_1 = __webpack_require__(16);
-	var utils = __webpack_require__(6);
-	var controller_factory_1 = __webpack_require__(31);
-	__export(__webpack_require__(17));
-	function tryCatch(fn, ctx, args) {
-	    var result = undefined,
-	        error = undefined;
-	    try {
-	        result = utils.callFunc(fn, ctx, args);
-	    } catch (e) {
-	        error = e;
-	    }
-	    return [result, error];
-	}
-	exports.tryCatch = tryCatch;
-	// TODO: Handle instances in unregister
-
-	var Container = function (_stick_di_1$DIContain) {
-	    _inherits(Container, _stick_di_1$DIContain);
-
-	    function Container(info) {
-	        _classCallCheck(this, Container);
-
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Container).call(this, info));
-
-	        _this.__instances = new Map();
-	        return _this;
-	    }
-
-	    _createClass(Container, [{
-	        key: "hasInstance",
-	        value: function hasInstance(key) {
-	            return this.__instances.has(key);
-	        }
-	    }, {
-	        key: "hasHandler",
-	        value: function hasHandler(name, parent, repository) {
-	            var has = _get(Object.getPrototypeOf(Container.prototype), "hasHandler", this).call(this, name, parent);
-	            return !has && repository ? repository_1.Repository.hasAny(name) : has;
-	        }
-	    }, {
-	        key: "get",
-	        value: function get(key, targetKey) {
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
-	                var entry;
-	                return regeneratorRuntime.wrap(function _callee$(_context) {
-	                    while (1) {
-	                        switch (_context.prev = _context.next) {
-	                            case 0:
-	                                if (!(key === null || key === undefined)) {
-	                                    _context.next = 2;
-	                                    break;
-	                                }
-
-	                                throw new stick_di_1.DIBadKeyError();
-
-	                            case 2:
-	                                if (!(key === stick_di_1.DIContainer)) {
-	                                    _context.next = 4;
-	                                    break;
-	                                }
-
-	                                return _context.abrupt("return", this);
-
-	                            case 4:
-	                                if (!(key instanceof stick_di_1.Resolver)) {
-	                                    _context.next = 6;
-	                                    break;
-	                                }
-
-	                                return _context.abrupt("return", key.get(this));
-
-	                            case 6:
-	                                entry = this.entries.get(key);
-
-	                                if (!(entry !== undefined)) {
-	                                    _context.next = 9;
-	                                    break;
-	                                }
-
-	                                return _context.abrupt("return", entry[0](this));
-
-	                            case 9:
-	                                if (!(this.parent && this.parent.hasHandler(key))) {
-	                                    _context.next = 11;
-	                                    break;
-	                                }
-
-	                                return _context.abrupt("return", this.parent.get(key, targetKey));
-
-	                            case 11:
-	                                entry = repository_1.Repository.any(key);
-
-	                                if (!(entry != null)) {
-	                                    _context.next = 15;
-	                                    break;
-	                                }
-
-	                                this.register(entry);
-	                                return _context.abrupt("return", this.entries.get(key)[0](this));
-
-	                            case 15:
-	                                if (!(typeof key === 'string')) {
-	                                    _context.next = 17;
-	                                    break;
-	                                }
-
-	                                throw new errors_1.StickDependencyError('no component registered for key: ' + key);
-
-	                            case 17:
-	                                this.autoRegister(key, targetKey);
-	                                entry = this.entries.get(key);
-	                                return _context.abrupt("return", entry[0](this));
-
-	                            case 20:
-	                            case "end":
-	                                return _context.stop();
-	                        }
-	                    }
-	                }, _callee, this);
-	            }));
-	        }
-	    }, {
-	        key: "registerSingleton",
-	        value: function registerSingleton(key, fn) {
-	            var _this2 = this;
-
-	            var targetKey = arguments.length <= 2 || arguments[2] === undefined ? undefined : arguments[2];
-
-	            return this.registerHandler(key, function (x) {
-	                if (_this2.__instances.has(key)) {
-	                    return _this2.__instances.get(key);
-	                } else {
-	                    var singleton = _this2.invoke(fn, null, targetKey);
-	                    if (utils.isPromise(singleton)) {}
-	                    _this2.__instances.set(key, singleton);
-	                    return singleton;
-	                }
-	            });
-	        }
-	    }, {
-	        key: "registerService",
-	        value: function registerService(key, fn) {
-	            var _this3 = this;
-
-	            var targetKey = arguments.length <= 2 || arguments[2] === undefined ? undefined : arguments[2];
-
-	            var name = undefined;
-	            if (typeof key === 'string') {
-	                name = key;
-	            } else {
-	                name = key.name;
-	            }
-	            var configKey = name + 'Provider';
-	            var Config = stick_di_1.Metadata.getOwn(internal_1.DIServiceConfig, fn, targetKey);
-	            if (Config != null) {
-	                if (this.hasHandler(configKey, false, false)) {
-	                    throw new Error("Provider for '" + name + "' already defined");
-	                }
-	                var config = new Config();
-	                this.registerInstance(configKey, config);
-	            }
-	            return this.registerHandler(key, function (x) {
-	                if (_this3.__instances.has(key)) {
-	                    return _this3.__instances.get(key);
-	                } else {
-	                    var singleton = _this3.invoke(fn, null, targetKey);
-	                    _this3.__instances.set(key, singleton);
-	                    _this3.unregister(configKey);
-	                    return singleton;
-	                }
-	            });
-	        }
-	    }, {
-	        key: "registerInstance",
-	        value: function registerInstance(key, instance) {
-	            var track = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-
-	            _get(Object.getPrototypeOf(Container.prototype), "registerInstance", this).call(this, key, instance);
-	            if (track) {
-	                this.__instances.set(key, instance);
-	            }
-	        }
-	    }, {
-	        key: "invoke",
-	        value: function invoke(fn, deps, targetKey) {
-	            var info = this._getOrCreateConstructionSet(fn, targetKey);
-	            try {
-	                var keys, args;
-	                if (info.dependencyResolver) {
-	                    args = info.dependencyResolver.resolveDependencies(fn);
-	                } else {
-	                    args = this.resolveDependencies(fn, targetKey);
-	                }
-	                if (deps !== undefined && Array.isArray(deps)) {
-	                    args = args.concat(deps);
-	                }
-	                return utils.arrayToPromise(args).then(function (args) {
-	                    return info.activator.invoke(fn, args, targetKey, keys);
-	                });
-	            } catch (e) {
-	                var activatingText = info.activator instanceof stick_di_1.ClassActivator ? 'instantiating' : 'invoking';
-	                var message = "Error " + activatingText + " " + fn.name + ".";
-	                message += ' Check the inner error for details.';
-	                throw new errors_1.StickDependencyError(message, [e]);
-	            }
-	        }
-	    }, {
-	        key: "clear",
-	        value: function clear() {
-	            var keys = this.__instances.keys();
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
-
-	            try {
-	                for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                    var key = _step.value;
-
-	                    this.destroy(key);
-	                }
-	            } catch (err) {
-	                _didIteratorError = true;
-	                _iteratorError = err;
-	            } finally {
-	                try {
-	                    if (!_iteratorNormalCompletion && _iterator.return) {
-	                        _iterator.return();
-	                    }
-	                } finally {
-	                    if (_didIteratorError) {
-	                        throw _iteratorError;
-	                    }
-	                }
-	            }
-	        }
-	    }, {
-	        key: "destroy",
-	        value: function destroy() {
-	            var key = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-	            var fn = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-	            if (key == null) {
-	                var _iteratorNormalCompletion2 = true;
-	                var _didIteratorError2 = false;
-	                var _iteratorError2 = undefined;
-
-	                try {
-	                    for (var _iterator2 = this.__instances.keys()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	                        var _key = _step2.value;
-
-	                        this.destroy(_key, fn);
-	                    }
-	                } catch (err) {
-	                    _didIteratorError2 = true;
-	                    _iteratorError2 = err;
-	                } finally {
-	                    try {
-	                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	                            _iterator2.return();
-	                        }
-	                    } finally {
-	                        if (_didIteratorError2) {
-	                            throw _iteratorError2;
-	                        }
-	                    }
-	                }
-
-	                delete this.constructionInfo;
-	                this.constructionInfo = new Map();
-	                //this.entries
-	                return;
-	            }
-	            var instance = this.__instances.get(key);
-	            if (instance) {
-	                if (fn) {
-	                    fn(instance);
-	                } else if (typeof instance.$destroy === 'function') {
-	                    instance.$destroy();
-	                }
-	                this.__instances.delete(key);
-	                instance = void 0;
-	            } else {
-	                console.log('could not find key ', key);
-	            }
-	        }
-	    }, {
-	        key: "register",
-	        value: function register(item) {
-	            switch (item.type) {
-	                case internal_1.DependencyType.Controller:
-	                    var factory = new controller_factory_1.ControllerFactory(item.name, item.handler, this.createChild());
-	                    this.registerInstance(item.name, factory, true);
-	                    break;
-	                case internal_1.DependencyType.Service:
-	                    this.registerService(item.name, item.handler);
-	                    break;
-	                case internal_1.DependencyType.Factory:
-	                    if (typeof item.handler === 'function') {
-	                        internal_1.setActivator(item.handler, stick_di_1.FactoryActivator.instance);
-	                        this.registerSingleton(item.name, item.handler);
-	                    } else {
-	                        this.registerInstance(item.name, item.handler);
-	                    }
-	                    break;
-	            }
-	        }
-	    }, {
-	        key: "createChild",
-	        value: function createChild() {
-	            var child = new Container();
-	            child.parent = this;
-	            return child;
-	        }
-	    }]);
-
-	    return Container;
-	}(stick_di_1.DIContainer);
-
-	exports.Container = Container;
-
-/***/ },
-/* 60 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
-	var utilities_1 = __webpack_require__(6);
-	var vnode_1 = __webpack_require__(33);
-
-	var BaseComponent = function () {
-	    function BaseComponent(section, vvnode, attributes, view) {
-	        _classCallCheck(this, BaseComponent);
-
-	        if (this.update) {
-	            this.update = utilities_1.bind(this.update, this);
-	        }
-	        this.section = section;
-	        this.vnode = vvnode;
-	        this.attributes = attributes;
-	        this.view = view;
-	        this.document = view.template.options.document;
-	        if (vvnode.childNodes) this.childTemplate = vnode_1.template(vnode_1.fragment(vvnode.childNodes), view.template.options);
-	        for (var key in attributes) {
-	            this.setAttribute(key, attributes[key]);
-	        }var container = this.view.container;
-	        this.initialize.call(this, container);
-	    }
-
-	    _createClass(BaseComponent, [{
-	        key: "initialize",
-	        value: function initialize() {}
-	    }, {
-	        key: "setAttribute",
-	        value: function setAttribute(key, value) {
-	            this.attributes[key] = value;
-	        }
-	    }, {
-	        key: "removeAttribute",
-	        value: function removeAttribute(key) {
-	            this.attributes[key] = void 0;
-	        }
-	    }, {
-	        key: "getAttribute",
-	        value: function getAttribute(key) {
-	            return this.attributes[key];
-	        }
-	    }, {
-	        key: "destroy",
-	        value: function destroy() {
-	            var a = this;
-	            if (typeof a.onDestroy === 'function') {
-	                a.onDestroy();
-	            }
-	        }
-	    }]);
-
-	    return BaseComponent;
-	}();
-
-	exports.BaseComponent = BaseComponent;
-
-/***/ },
-/* 61 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var repository_1 = __webpack_require__(62);
-	var vnode = __webpack_require__(33);
-	var components = __webpack_require__(63);
-	var attributes = __webpack_require__(67);
-	var modifiers = __webpack_require__(73);
-	var utils = __webpack_require__(38);
-	var view_1 = __webpack_require__(66);
-	var compiler = __webpack_require__(74);
-	var binding_1 = __webpack_require__(76);
-	exports.version = "$$version$$";
-	function attribute(name, attr) {
-	    if (typeof attr !== 'function') {
-	        attr = utils.extendClass(attributes.BaseAttribute, attr);
-	    }
-	    attributes[name] = attr;
-	}
-	exports.attribute = attribute;
-	function component(name, cmp) {
-	    if (typeof cmp !== 'function') {
-	        cmp = utils.extendClass(components.BaseComponent, cmp);
-	    }
-	    components[name] = cmp;
-	}
-	exports.component = component;
-	function modifier(name, func) {
-	    modifiers[name] = func;
-	}
-	exports.modifier = modifier;
-	function debugging(enabled) {
-	    utils.Debug.enable(enabled);
-	}
-	exports.debugging = debugging;
-	function compile(str, options) {
-	    var vn = vnode,
-	        fn = compiler.compile(str);
-	    var n = fn(vn.fragment, vn.element, vn.text, vn.comment, vn.dynamic, binding_1.binding);
-	    return vn.template(n, utils.extend({
-	        document: document,
-	        viewClass: view_1.View,
-	        attributes: new repository_1.Repository(attributes),
-	        components: new repository_1.Repository(components),
-	        modifiers: modifiers
-	    }, options || {}));
-	}
-	exports.compile = compile;
-
-/***/ },
-/* 62 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Repository = function () {
-	    function Repository(values) {
-	        _classCallCheck(this, Repository);
-
-	        this.values = values || {};
-	    }
-
-	    Repository.prototype.set = function set(key, value) {
-	        this.values[key] = value;
-	    };
-
-	    Repository.prototype.get = function get(key) {
-	        return this.values[key];
-	    };
-
-	    Repository.prototype.has = function has(key) {
-	        return !!this.get(key);
-	    };
-
-	    Repository.prototype.delete = function _delete(key) {
-	        delete this.values[key];
-	    };
-
-	    return Repository;
-	}();
-
-	exports.Repository = Repository;
-
-/***/ },
-/* 63 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	function __export(m) {
-	    for (var p in m) {
-	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	    }
-	}
-	__export(__webpack_require__(64));
-	__export(__webpack_require__(65));
-
-/***/ },
-/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7962,7 +5068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.BaseComponent = BaseComponent;
 
 /***/ },
-/* 65 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7973,8 +5079,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var component_1 = __webpack_require__(64);
-	var view_1 = __webpack_require__(66);
+	var component_1 = __webpack_require__(47);
+	var view_1 = __webpack_require__(49);
 	function _each(target, iterate) {
 	    if (!target) return;
 	    if (target.forEach) {
@@ -8054,7 +5160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.repeat = Repeat;
 
 /***/ },
-/* 66 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -8299,7 +5405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.View = View;
 
 /***/ },
-/* 67 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8309,11 +5415,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	    }
 	}
-	var value_1 = __webpack_require__(68);
-	var event_1 = __webpack_require__(70);
-	var style_1 = __webpack_require__(71);
-	var focus_1 = __webpack_require__(72);
-	__export(__webpack_require__(69));
+	var value_1 = __webpack_require__(51);
+	var event_1 = __webpack_require__(53);
+	var style_1 = __webpack_require__(54);
+	var focus_1 = __webpack_require__(55);
+	__export(__webpack_require__(52));
 	exports.value = value_1.ValueAttribute;
 	exports.onclick = event_1.ClickAttribute;
 	exports.onenter = event_1.OnEnterAttribute;
@@ -8327,7 +5433,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.focus = focus_1.FocusAttribute;
 
 /***/ },
-/* 68 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8338,8 +5444,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var base_1 = __webpack_require__(69);
-	var view_1 = __webpack_require__(66);
+	var base_1 = __webpack_require__(52);
+	var view_1 = __webpack_require__(49);
 	var utils = __webpack_require__(38);
 	var _events = ['change', 'keyup', 'input'];
 
@@ -8367,7 +5473,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            var e = _ref;
-
+	            
 	            this.ref.addEventListener(e, this._onInput);
 	        }
 	    };
@@ -8445,7 +5551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.ValueAttribute = ValueAttribute;
 
 /***/ },
-/* 69 */
+/* 52 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -8477,7 +5583,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.BaseAttribute = BaseAttribute;
 
 /***/ },
-/* 70 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8490,8 +5596,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var base_1 = __webpack_require__(69);
-	var view_1 = __webpack_require__(66);
+	var base_1 = __webpack_require__(52);
+	var view_1 = __webpack_require__(49);
 	var utils = __webpack_require__(38);
 	var debug = utils.debug('attributes:event');
 
@@ -8732,7 +5838,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.OnEscapeAttribute = OnEscapeAttribute;
 
 /***/ },
-/* 71 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8743,7 +5849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var base_1 = __webpack_require__(69);
+	var base_1 = __webpack_require__(52);
 
 	var StyleAttribute = function (_base_1$BaseAttribute) {
 	    _inherits(StyleAttribute, _base_1$BaseAttribute);
@@ -8782,7 +5888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.StyleAttribute = StyleAttribute;
 
 /***/ },
-/* 72 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8793,7 +5899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var base_1 = __webpack_require__(69);
+	var base_1 = __webpack_require__(52);
 
 	var FocusAttribute = function (_base_1$BaseAttribute) {
 	    _inherits(FocusAttribute, _base_1$BaseAttribute);
@@ -8825,7 +5931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.FocusAttribute = FocusAttribute;
 
 /***/ },
-/* 73 */
+/* 56 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -8855,7 +5961,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.round = Math.round;
 
 /***/ },
-/* 74 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8864,7 +5970,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var parser_1 = __webpack_require__(75);
+	var parser_1 = __webpack_require__(58);
 	function compile(src, options) {
 	    var str = transpile(src);
 	    return new Function("return " + str)();
@@ -9220,7 +6326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 
 /***/ },
-/* 75 */
+/* 58 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -13363,7 +10469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 /***/ },
-/* 76 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13442,7 +10548,3683 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.binding = binding;
 
 /***/ },
+/* 60 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
+	    return new Promise(function (resolve, reject) {
+	        generator = generator.call(thisArg, _arguments);
+	        function cast(value) {
+	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
+	                resolve(value);
+	            });
+	        }
+	        function onfulfill(value) {
+	            try {
+	                step("next", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function onreject(value) {
+	            try {
+	                step("throw", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(verb, value) {
+	            var result = generator[verb](value);
+	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        }
+	        step("next", void 0);
+	    });
+	};
+	var utils = __webpack_require__(6);
+	var eventsjs_1 = __webpack_require__(5);
+	var errors_1 = __webpack_require__(61);
+	var vnode_1 = __webpack_require__(33);
+	var debug = __webpack_require__(23)('stick:factory:controller');
+	var wrap = function wrap(el, name, contextName) {
+	    var div = document.createElement('controller');
+	    div.setAttribute('name', name);
+	    if (contextName != name) div.setAttribute('as', contextName);
+	    div.appendChild(el);
+	    return div;
+	};
+
+	var ControllerFactory = function (_eventsjs_1$EventEmit) {
+	    _inherits(ControllerFactory, _eventsjs_1$EventEmit);
+
+	    function ControllerFactory(name, controller, container) {
+	        _classCallCheck(this, ControllerFactory);
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ControllerFactory).call(this));
+
+	        _this.container = container;
+	        _this.controller = controller;
+	        _this.name = name;
+	        _this._id = utils.uniqueId("ctrl");
+	        if (typeof controller === 'function' && controller.name == "") {
+	            Object.defineProperty(controller, 'name', {
+	                value: name
+	            });
+	        }
+	        debug("%s: Controller factory created: '%s', container %s", _this.id, name, _this.container.id);
+	        return _this;
+	    }
+
+	    _createClass(ControllerFactory, [{
+	        key: "create",
+
+	        /**
+	         * Create an instance of a controller
+	         * @param  {ControllerCreateOptions} options
+	         * @return {utils.IPromise<any>}
+	         * Call onTemplateRender (), onElementAttached
+	         * emits before:template:render, template:render, before:element:attached, element:attached
+	         */
+	        value: function create(options) {
+	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	                var contextName, $state, template, controller, el;
+	                return regeneratorRuntime.wrap(function _callee$(_context) {
+	                    while (1) {
+	                        switch (_context.prev = _context.next) {
+	                            case 0:
+	                                if (!this.container.hasInstance(this.name)) {
+	                                    _context.next = 2;
+	                                    break;
+	                                }
+
+	                                return _context.abrupt("return", utils.Promise.resolve(this.container.get(this.name)));
+
+	                            case 2:
+	                                this.container.registerSingleton(this.name, this.controller);
+	                                contextName = options.contextName || this.name;
+	                                // State
+
+	                                _context.next = 6;
+	                                return this.container.get('$state');
+
+	                            case 6:
+	                                $state = _context.sent;
+
+	                                $state = $state.createChild(this.container, options.state);
+	                                this.container.registerInstance('$state', $state, true);
+	                                // Template       
+	                                _context.next = 11;
+	                                return this.resolveTemplate($state, options);
+
+	                            case 11:
+	                                template = _context.sent;
+
+	                                debug("%s: Created template: %s", this.id, template.id);
+	                                this.container.registerInstance('template', template, true);
+	                                debug("%s: Instantiating controller '%s' as '%s'", this.id, this.name, contextName);
+	                                _context.next = 17;
+	                                return this.container.get(this.name);
+
+	                            case 17:
+	                                controller = _context.sent;
+
+	                                $state.set(contextName, controller);
+	                                template.setTarget(controller);
+	                                this.trigger('before:template:render');
+	                                el = template.render();
+	                                // Wrap element if its a DocumentFragment
+
+	                                if (el.nodeType === 11 || el.nodeType === 3) {
+	                                    if (el.children.length === 1) {
+	                                        el = el.firstChild.nodeType === 3 ? wrap(el, this.name, contextName) : el.firstChild;
+	                                    } else {
+	                                        el = wrap(el, this.name, contextName);
+	                                    }
+	                                }
+	                                this.container.registerInstance('$el', el, true);
+	                                if (typeof controller.onTemplateRender === 'function') {
+	                                    controller.onTemplateRender.call(controller, el, template);
+	                                }
+	                                this.trigger('template:render');
+	                                if (options.el) {
+	                                    this.trigger('before:element:attached', options.el);
+	                                    options.el.innerHTML = '';
+	                                    options.el.appendChild(el);
+	                                    if (typeof controller.onElementAttached === 'function') {
+	                                        controller.onElementAttached.call(controller, el, options.el);
+	                                    }
+	                                    this.trigger('element:attached', el, options.el);
+	                                }
+	                                return _context.abrupt("return", controller);
+
+	                            case 28:
+	                            case "end":
+	                                return _context.stop();
+	                        }
+	                    }
+	                }, _callee, this);
+	            }));
+	        }
+	    }, {
+	        key: "resolveTemplate",
+	        value: function resolveTemplate(state, options) {
+	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee2() {
+	                var $template, $resolver, promise, _templateString, view, templateString;
+
+	                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+	                    while (1) {
+	                        switch (_context2.prev = _context2.next) {
+	                            case 0:
+	                                _context2.next = 2;
+	                                return this.container.get('$templateCreator');
+
+	                            case 2:
+	                                $template = _context2.sent;
+	                                _context2.next = 5;
+	                                return this.container.get('$templateResolver');
+
+	                            case 5:
+	                                $resolver = _context2.sent;
+	                                promise = undefined;
+
+	                                if (!(options.el && !options.template)) {
+	                                    _context2.next = 12;
+	                                    break;
+	                                }
+
+	                                _templateString = options.el.innerHTML;
+
+	                                promise = utils.Promise.resolve(_templateString);
+	                                _context2.next = 20;
+	                                break;
+
+	                            case 12:
+	                                if (!options.template) {
+	                                    _context2.next = 19;
+	                                    break;
+	                                }
+
+	                                if (!(options.template instanceof vnode_1.Template)) {
+	                                    _context2.next = 16;
+	                                    break;
+	                                }
+
+	                                view = options.template.view(state, {
+	                                    container: this.container,
+	                                    parentView: options.parentView
+	                                });
+	                                return _context2.abrupt("return", view);
+
+	                            case 16:
+	                                promise = $resolver(options.template);
+	                                _context2.next = 20;
+	                                break;
+
+	                            case 19:
+	                                return _context2.abrupt("return", utils.Promise.reject(new errors_1.StickError("no element or template")));
+
+	                            case 20:
+	                                _context2.next = 22;
+	                                return promise;
+
+	                            case 22:
+	                                templateString = _context2.sent;
+	                                return _context2.abrupt("return", $template(templateString, state));
+
+	                            case 24:
+	                            case "end":
+	                                return _context2.stop();
+	                        }
+	                    }
+	                }, _callee2, this);
+	            }));
+	        }
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee3() {
+	                var controller;
+	                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+	                    while (1) {
+	                        switch (_context3.prev = _context3.next) {
+	                            case 0:
+	                                debug("%s: Destroying controller '%s'", this.id, this.name);
+	                                _context3.next = 3;
+	                                return this.container.get(this.name);
+
+	                            case 3:
+	                                controller = _context3.sent;
+
+	                                if (typeof controller.onDestroy === 'function') {
+	                                    controller.onDestroy.call(controller);
+	                                }
+	                                this.container.clear();
+	                                this.container.entries.clear();
+
+	                            case 7:
+	                            case "end":
+	                                return _context3.stop();
+	                        }
+	                    }
+	                }, _callee3, this);
+	            }));
+	        }
+	    }, {
+	        key: "id",
+	        get: function get() {
+	            return this._id;
+	        }
+	    }]);
+
+	    return ControllerFactory;
+	}(eventsjs_1.EventEmitter);
+
+	exports.ControllerFactory = ControllerFactory;
+
+/***/ },
+/* 61 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var StickError = function (_Error) {
+	    _inherits(StickError, _Error);
+
+	    function StickError(message) {
+	        _classCallCheck(this, StickError);
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StickError).call(this, message));
+
+	        _this.message = message;
+	        return _this;
+	    }
+
+	    return StickError;
+	}(Error);
+
+	exports.StickError = StickError;
+
+	var StickDependencyError = function (_StickError) {
+	    _inherits(StickDependencyError, _StickError);
+
+	    function StickDependencyError(message, errors) {
+	        _classCallCheck(this, StickDependencyError);
+
+	        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(StickDependencyError).call(this, message));
+
+	        _this2.errors = errors;
+	        return _this2;
+	    }
+
+	    return StickDependencyError;
+	}(StickError);
+
+	exports.StickDependencyError = StickDependencyError;
+
+/***/ },
+/* 62 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
+	    return new Promise(function (resolve, reject) {
+	        generator = generator.call(thisArg, _arguments);
+	        function cast(value) {
+	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
+	                resolve(value);
+	            });
+	        }
+	        function onfulfill(value) {
+	            try {
+	                step("next", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function onreject(value) {
+	            try {
+	                step("throw", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(verb, value) {
+	            var result = generator[verb](value);
+	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        }
+	        step("next", void 0);
+	    });
+	};
+	var internal_1 = __webpack_require__(16);
+	var eventsjs_1 = __webpack_require__(5);
+	var repository_1 = __webpack_require__(30);
+	var errors_1 = __webpack_require__(61);
+	var stick_di_1 = __webpack_require__(17);
+	var utils = __webpack_require__(6);
+	var vnode_1 = __webpack_require__(33);
+	var state_1 = __webpack_require__(63);
+	var controller_factory_1 = __webpack_require__(60);
+	//import {Observer} from './observer'
+	var debug = __webpack_require__(23)('stick:factory:module');
+	var wrap = function wrap(el, name) {
+	    var div = document.createElement('module');
+	    div.setAttribute('name', name);
+	    //if (contextName != this.name) div.setAttribute('as', contextName);
+	    div.appendChild(el);
+	    return div;
+	};
+
+	var ModuleFactory = function (_eventsjs_1$EventEmit) {
+	    _inherits(ModuleFactory, _eventsjs_1$EventEmit);
+
+	    function ModuleFactory(name, module, container) {
+	        _classCallCheck(this, ModuleFactory);
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ModuleFactory).call(this));
+
+	        if (arguments.length != 3) {
+	            throw new Error();
+	        }
+	        _this.name = name;
+	        _this.module = module;
+	        _this.container = container;
+	        if (typeof module === 'function' && module.name == "") {
+	            Object.defineProperty(module, 'name', {
+	                value: name
+	            });
+	        }
+	        _this._id = utils.uniqueId("mod");
+	        debug("%s: Module factory created: '%s', container: %s", _this.id, name, _this.container.id);
+	        _this.container.registerSingleton(name, module);
+	        _this.container.registerInstance('$container', _this.container);
+	        return _this;
+	    }
+
+	    _createClass(ModuleFactory, [{
+	        key: "controller",
+	        value: function controller(name, definition) {
+	            var _internal_1$getDepend = internal_1.getDependencies(definition);
+
+	            var _internal_1$getDepend2 = _slicedToArray(_internal_1$getDepend, 2);
+
+	            var def = _internal_1$getDepend2[0];
+	            var deps = _internal_1$getDepend2[1];
+
+	            if (def) {
+	                var fn = undefined;
+	                if (typeof def !== 'function' && utils.isObject(def)) {
+	                    var copy = utils.extend({}, def);
+	                    if (typeof def.initialize === 'function') {
+	                        fn = def.initialize;
+	                        delete copy.initialize;
+	                    } else if (typeof def.constructor === 'function') {
+	                        fn = def.constructor;
+	                        delete copy.constructor;
+	                    }
+	                    if (!deps || deps.length == 0) {
+	                        internal_1.getDependencies(fn);
+	                    }
+	                    utils.assign(fn.prototype, copy);
+	                } else if (typeof def === 'function') {
+	                    fn = def;
+	                }
+	                if (typeof fn !== 'function') {
+	                    throw new errors_1.StickError('controller defition should be a function or an object literal');
+	                }
+	                internal_1.setDependencyType(internal_1.DependencyType.Controller)(fn);
+	                var factory = new controller_factory_1.ControllerFactory(name, fn, this.container.createChild());
+	                this.container.registerInstance(name, factory, true);
+	                debug("%s: Register controller: '%s', %s", this.id, name, factory.id);
+	            } else {
+	                throw new errors_1.StickError("controller definition should be a function, function constructor or a object literal");
+	            }
+	            return this;
+	        }
+	    }, {
+	        key: "service",
+	        value: function service(name, definition) {
+	            var _internal_1$getDepend3 = internal_1.getDependencies(definition);
+
+	            var _internal_1$getDepend4 = _slicedToArray(_internal_1$getDepend3, 1);
+
+	            var fn = _internal_1$getDepend4[0];
+
+	            if (fn && typeof fn === 'function') {
+	                internal_1.setDependencyType(internal_1.DependencyType.Service)(fn);
+	                this.container.registerService(name, fn);
+	                debug("%s Register service %s", this.id, name);
+	            } else {
+	                throw new errors_1.StickError('service should be a function');
+	            }
+	            return this;
+	        }
+	        /**
+	         * Create a factory function
+	         * @param {String} name
+	         */
+
+	    }, {
+	        key: "factory",
+	        value: function factory(name, _factory) {
+	            var _internal_1$getDepend5 = internal_1.getDependencies(_factory);
+
+	            var _internal_1$getDepend6 = _slicedToArray(_internal_1$getDepend5, 1);
+
+	            var fn = _internal_1$getDepend6[0];
+
+	            if (!fn) throw new errors_1.StickError('factory');
+	            debug("%s Register factory %s", this.id, name);
+	            if (typeof fn === 'function') {
+	                internal_1.setDependencyType(internal_1.DependencyType.Factory)(fn);
+	                internal_1.setActivator(fn, stick_di_1.FactoryActivator.instance);
+	                this.container.registerSingleton(name, fn);
+	            } else {
+	                this.container.registerInstance(name, fn);
+	            }
+	            return this;
+	        }
+	        /**
+	         * Create a new instance of the module
+	         * @method create
+	         * @params {Object} options
+	         * @return {Promise}
+	         *
+	         * Call onTemplateRender (), onElementAttached
+	         * emits before:template:render, template:render, before:element:attached, element:attached
+	         *
+	        */
+
+	    }, {
+	        key: "create",
+	        value: function create() {
+	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	                var state, template, mod, el;
+	                return regeneratorRuntime.wrap(function _callee$(_context) {
+	                    while (1) {
+	                        switch (_context.prev = _context.next) {
+	                            case 0:
+	                                if (!this.container.hasInstance(this.name)) {
+	                                    _context.next = 3;
+	                                    break;
+	                                }
+
+	                                debug("%s: Resolving module %s", this.id, this.name);
+	                                //return utils.Promise.resolve(this.container.get(this.name));
+	                                return _context.abrupt("return", this.container.get(this.name));
+
+	                            case 3:
+	                                this.container.registerSingleton('$state', state_1.State);
+	                                _context.next = 6;
+	                                return this.container.get('$state');
+
+	                            case 6:
+	                                state = _context.sent;
+
+	                                debug("%s: Creating module %s", this.id, this.name);
+
+	                                if (!(options.template || options.el)) {
+	                                    _context.next = 27;
+	                                    break;
+	                                }
+
+	                                _context.next = 11;
+	                                return this.resolveTemplate(state, options);
+
+	                            case 11:
+	                                template = _context.sent;
+
+	                                debug("%s: Created template: %s", this.id, template.id);
+	                                this.container.registerInstance('template', template, true);
+	                                debug("%s: Instantiating module '%s'", this.id, this.name);
+	                                _context.next = 17;
+	                                return this.container.get(this.name);
+
+	                            case 17:
+	                                mod = _context.sent;
+
+	                                template.setTarget(mod);
+	                                //$state.set(contextName, controller);
+	                                this.trigger('before:template:render');
+	                                el = template.render();
+
+	                                if (el.nodeType === 11 || el.nodeType === 3) {
+	                                    if (el.children.length === 1) {
+	                                        el = el.firstChild.nodeType === 3 ? wrap(el, this.name) : el.firstChild;
+	                                    } else {
+	                                        el = wrap(el, this.name);
+	                                    }
+	                                }
+	                                this.container.registerInstance('$el', el, true);
+	                                if (typeof mod.onTemplateRender === 'function') {
+	                                    mod.onTemplateRender.call(mod, el, template);
+	                                }
+	                                this.trigger('template:render');
+	                                if (options.el) {
+	                                    this.trigger('before:element:attached', options.el);
+	                                    options.el.innerHTML = '';
+	                                    options.el.appendChild(el);
+	                                    if (typeof mod.onElementAttached === 'function') {
+	                                        mod.onElementAttached.call(mod, el, options.el);
+	                                    }
+	                                    this.trigger('element:attached', el, options.el);
+	                                }
+	                                return _context.abrupt("return", mod);
+
+	                            case 27:
+	                                return _context.abrupt("return", this.container.get(this.name));
+
+	                            case 28:
+	                            case "end":
+	                                return _context.stop();
+	                        }
+	                    }
+	                }, _callee, this);
+	            }));
+	        }
+	    }, {
+	        key: "configure",
+	        value: function configure(name) {
+	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee2() {
+	                var configName, provider, serv;
+	                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+	                    while (1) {
+	                        switch (_context2.prev = _context2.next) {
+	                            case 0:
+	                                configName = name;
+
+	                                if (!/Provider$/.test(name)) {
+	                                    configName = name + 'Provider';
+	                                } else {
+	                                    name = name.replace('Provider', '');
+	                                }
+	                                provider = undefined;
+	                                // Check if provider is registered
+
+	                                if (!this.container.hasHandler(configName, false, false)) {
+	                                    _context2.next = 7;
+	                                    break;
+	                                }
+
+	                                return _context2.abrupt("return", this.container.get(name));
+
+	                            case 7:
+	                                if (!repository_1.Repository.has(internal_1.DependencyType.Service, name)) {
+	                                    _context2.next = 12;
+	                                    break;
+	                                }
+
+	                                serv = repository_1.Repository.get(internal_1.DependencyType.Service, name);
+
+	                                this.container.register(serv);
+
+	                                if (!this.container.hasHandler(configName, false, false)) {
+	                                    _context2.next = 12;
+	                                    break;
+	                                }
+
+	                                return _context2.abrupt("return", this.container.get(configName));
+
+	                            case 12:
+	                                throw new Error('No provider for ' + name.replace('Provider', ''));
+
+	                            case 13:
+	                            case "end":
+	                                return _context2.stop();
+	                        }
+	                    }
+	                }, _callee2, this);
+	            }));
+	        }
+	    }, {
+	        key: "resolveTemplate",
+	        value: function resolveTemplate(state, options) {
+	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee3() {
+	                var $template, $resolver, promise, _templateString, view, templateString;
+
+	                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+	                    while (1) {
+	                        switch (_context3.prev = _context3.next) {
+	                            case 0:
+	                                _context3.next = 2;
+	                                return this.container.get('$templateCreator');
+
+	                            case 2:
+	                                $template = _context3.sent;
+	                                _context3.next = 5;
+	                                return this.container.get('$templateResolver');
+
+	                            case 5:
+	                                $resolver = _context3.sent;
+	                                promise = undefined;
+
+	                                if (!(options.el && !options.template)) {
+	                                    _context3.next = 12;
+	                                    break;
+	                                }
+
+	                                _templateString = options.el.innerHTML;
+
+	                                promise = utils.Promise.resolve(_templateString);
+	                                _context3.next = 20;
+	                                break;
+
+	                            case 12:
+	                                if (!options.template) {
+	                                    _context3.next = 19;
+	                                    break;
+	                                }
+
+	                                if (!(options.template instanceof vnode_1.Template)) {
+	                                    _context3.next = 16;
+	                                    break;
+	                                }
+
+	                                view = options.template.view(state, {
+	                                    container: this.container
+	                                });
+	                                return _context3.abrupt("return", view);
+
+	                            case 16:
+	                                promise = $resolver(options.template);
+	                                _context3.next = 20;
+	                                break;
+
+	                            case 19:
+	                                return _context3.abrupt("return", utils.Promise.reject(new errors_1.StickError("no element or template")));
+
+	                            case 20:
+	                                _context3.next = 22;
+	                                return promise;
+
+	                            case 22:
+	                                templateString = _context3.sent;
+	                                return _context3.abrupt("return", $template(templateString, state));
+
+	                            case 24:
+	                            case "end":
+	                                return _context3.stop();
+	                        }
+	                    }
+	                }, _callee3, this);
+	            }));
+	        }
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            //this.container.destroy();
+	        }
+	    }, {
+	        key: "id",
+	        get: function get() {
+	            return this._id;
+	        }
+	    }]);
+
+	    return ModuleFactory;
+	}(eventsjs_1.EventEmitter);
+
+	exports.ModuleFactory = ModuleFactory;
+
+/***/ },
+/* 63 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+	    var c = arguments.length,
+	        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+	        d;
+	    if ((typeof Reflect === "undefined" ? "undefined" : _typeof(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var collection_1 = __webpack_require__(64);
+	var utils = __webpack_require__(6);
+	var decorators_1 = __webpack_require__(15);
+	var debug = __webpack_require__(23)('stick:state');
+	function isObject(a) {
+	    return a === Object(a);
+	}
+	exports.get_atributes = function (attributes) {
+	    var keys = Object.keys(attributes),
+	        deferred = {},
+	        attr = {};
+	    keys.map(function (key) {
+	        return { key: key, value: attributes[key] };
+	    }).filter(function (pair) {
+	        if (!utils.has(attributes, pair.key)) return false;
+	        if (pair.value && utils.isPromise(pair.value)) {
+	            deferred[pair.key] = pair.value;
+	            delete attributes[pair.key];
+	            return false;
+	        }
+	        return true;
+	    }).forEach(function (a) {
+	        attr[a.key] = a.value;
+	    });
+	    return { attr: attr, deferred: deferred };
+	};
+	var _State = function (_collection_1$NestedM) {
+	    _inherits(State, _collection_1$NestedM);
+
+	    function State(container, values) {
+	        _classCallCheck(this, State);
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(State).call(this, values));
+
+	        _this._container = container;
+	        debug('%s: State created', _this.uid);
+	        return _this;
+	    }
+
+	    _createClass(State, [{
+	        key: "get",
+	        value: function get(key) {
+	            debug("%s: Get attribute: %s", this.uid, key);
+	            return _get(Object.getPrototypeOf(State.prototype), "get", this).call(this, key);
+	        }
+	    }, {
+	        key: "set",
+	        value: function set(key, val) {
+	            var _this2 = this;
+
+	            var opts = {},
+	                value = {},
+	                unset = {};
+	            if (typeof key === 'string') {
+	                if (val == null) {
+	                    unset[key] = val;
+	                } else {
+	                    value[key] = val;
+	                }
+	            } else if (isObject(key)) {
+	                value = key;
+	            }
+
+	            var _exports$get_atribute = exports.get_atributes(value);
+
+	            var attr = _exports$get_atribute.attr;
+	            var deferred = _exports$get_atribute.deferred;
+
+	            if (!utils.isEmpty(deferred)) {
+	                debug("%s: Resolve deferred values: %j", this.uid, Object.keys(deferred));
+	                utils.objectToPromise(deferred).then(function (obj) {
+	                    _this2.set(obj);
+	                });
+	            }
+	            if (!utils.isEmpty(attr)) {
+	                debug("%s: Set attributes: %j", this.uid, Object.keys(attr));
+	                _get(Object.getPrototypeOf(State.prototype), "set", this).call(this, attr, opts);
+	            }
+	            if (!utils.isEmpty(unset)) {
+	                // Should unset
+	                debug("%s: Unset attributes: %j", this.uid, Object.keys(unset));
+	                _get(Object.getPrototypeOf(State.prototype), "set", this).call(this, unset);
+	            }
+	            return this;
+	        }
+	    }, {
+	        key: "createChild",
+	        value: function createChild(container, values) {
+	            if (!container) container = this.container.createChild();
+	            var state = new _State(container, values);
+	            state._parent = state;
+	            debug("%s: Create child %s", this.uid, state.uid);
+	            return state;
+	        }
+	    }, {
+	        key: "$destroy",
+	        value: function $destroy() {
+	            _get(Object.getPrototypeOf(State.prototype), "destroy", this).call(this);
+	            debug("%s: State destroyed", this.uid);
+	        }
+	    }, {
+	        key: "parent",
+	        get: function get() {
+	            return this._parent;
+	        }
+	    }, {
+	        key: "container",
+	        get: function get() {
+	            return this._container;
+	        }
+	    }]);
+
+	    return State;
+	}(collection_1.NestedModel);
+	_State = __decorate([decorators_1.inject('$container')], _State);
+	exports.State = _State;
+
+/***/ },
+/* 64 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	__export(__webpack_require__(65));
+	__export(__webpack_require__(72));
+	__export(__webpack_require__(73));
+	__export(__webpack_require__(74));
+	__export(__webpack_require__(75));
+	__export(__webpack_require__(79));
+
+
+/***/ },
+/* 65 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var object_1 = __webpack_require__(66);
+	var model_1 = __webpack_require__(72);
+	var objects_1 = __webpack_require__(69);
+	var arrays_1 = __webpack_require__(70);
+	var utils_1 = __webpack_require__(68);
+	var setOptions = { add: true, remove: true, merge: true };
+	var addOptions = { add: true, remove: false };
+	var Collection = (function (_super) {
+	    __extends(Collection, _super);
+	    function Collection(models, options) {
+	        if (options === void 0) { options = {}; }
+	        this.options = options;
+	        if (this.options.model) {
+	            this.Model = this.options.model;
+	        }
+	        if (models) {
+	            this.add(models);
+	        }
+	        _super.call(this);
+	    }
+	    Object.defineProperty(Collection.prototype, "length", {
+	        get: function () {
+	            return this.models.length;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(Collection.prototype, "Model", {
+	        get: function () {
+	            if (!this._model) {
+	                this._model = model_1.Model;
+	            }
+	            return this._model;
+	        },
+	        set: function (con) {
+	            this._model = con;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(Collection.prototype, "models", {
+	        get: function () {
+	            return this._models || (this._models = []);
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Collection.prototype.add = function (models, options) {
+	        var _this = this;
+	        if (options === void 0) { options = {}; }
+	        if (!Array.isArray(models)) {
+	            if (!(models instanceof this.Model)) {
+	                models = this._prepareModel(models);
+	            }
+	        }
+	        else {
+	            models = models.map(function (item) {
+	                return (item instanceof _this.Model) ? item : (_this._prepareModel(item));
+	            });
+	        }
+	        this.set(models, objects_1.extend({ merge: false }, options, addOptions));
+	    };
+	    Collection.prototype.set = function (items, options) {
+	        if (options === void 0) { options = {}; }
+	        options = objects_1.extend({}, setOptions, options);
+	        if (options.parse)
+	            items = this.parse(items, options);
+	        var singular = !Array.isArray(items);
+	        var models = (singular ? (items ? [items] : []) : items.slice());
+	        var i, l, id, model, attrs, existing, sort;
+	        var at = options.at;
+	        var sortable = this.comparator && (at == null) && options.sort !== false;
+	        var sortAttr = typeof this.comparator === 'string' ? this.comparator : null;
+	        var toAdd = [], toRemove = [], modelMap = {};
+	        var add = options.add, merge = options.merge, remove = options.remove;
+	        var order = !sortable && add && remove ? [] : null;
+	        for (i = 0, l = models.length; i < l; i++) {
+	            model = models[i];
+	            model = this._prepareModel(model);
+	            id = model.get(model.idAttribute) || model.uid;
+	            if (existing = this.get(id)) {
+	                if (remove)
+	                    modelMap[existing.uid] = true;
+	                if (merge) {
+	                    attrs = model.toJSON();
+	                    existing.set(attrs, options);
+	                    if (sortable && !sort && existing.hasChanged(sortAttr))
+	                        sort = true;
+	                }
+	                models[i] = existing;
+	            }
+	            else if (add) {
+	                models[i] = model;
+	                if (!model)
+	                    continue;
+	                toAdd.push(model);
+	                this._addReference(model, options);
+	            }
+	            model = existing || model;
+	            if (order && !modelMap[model.id])
+	                order.push(model);
+	            modelMap[model.uid] = true;
+	        }
+	        if (remove) {
+	            for (i = 0, l = this.length; i < l; ++i) {
+	                if (!modelMap[(model = this.models[i]).uid])
+	                    toRemove.push(model);
+	            }
+	            if (toRemove.length)
+	                this.remove(toRemove, options);
+	        }
+	        if (toAdd.length || (order && order.length)) {
+	            if (sortable)
+	                sort = true;
+	            if (at != null) {
+	                for (i = 0, l = toAdd.length; i < l; i++) {
+	                    this.models.splice(at + i, 0, toAdd[i]);
+	                }
+	            }
+	            else {
+	                if (order)
+	                    this.models.length = 0;
+	                var orderedModels = order || toAdd;
+	                for (i = 0, l = orderedModels.length; i < l; i++) {
+	                    this.models.push(orderedModels[i]);
+	                }
+	            }
+	        }
+	        if (sort)
+	            this.sort({ silent: true });
+	        if (!options.silent) {
+	            for (i = 0, l = toAdd.length; i < l; i++) {
+	                (model = toAdd[i]).trigger('add', model, this, options);
+	            }
+	            if (sort || (order && order.length))
+	                this.trigger('sort', this, options);
+	            if (toAdd.length || toRemove.length)
+	                this.trigger('update', this, options);
+	        }
+	        return singular ? models[0] : models;
+	    };
+	    Collection.prototype.remove = function (models, options) {
+	        if (options === void 0) { options = {}; }
+	        var singular = !Array.isArray(models);
+	        models = (singular ? [models] : models.slice());
+	        var i, l, index, model;
+	        for (i = 0, l = models.length; i < l; i++) {
+	            model = models[i] = this.get(models[i]);
+	            if (!model)
+	                continue;
+	            index = this.indexOf(model);
+	            this.models.splice(index, 1);
+	            if (!options.silent) {
+	                options.index = index;
+	                model.trigger('remove', model, this, options);
+	            }
+	            this._removeReference(model, options);
+	        }
+	        return singular ? models[0] : models;
+	    };
+	    Collection.prototype.get = function (id) {
+	        return this.find(id);
+	    };
+	    Collection.prototype.at = function (index) {
+	        return this.models[index];
+	    };
+	    Collection.prototype.clone = function (options) {
+	        options = options || this.options;
+	        return new this.constructor(this.models, options);
+	    };
+	    Collection.prototype.sort = function (options) {
+	        if (options === void 0) { options = {}; }
+	        if (!this.comparator)
+	            throw new Error('Cannot sort a set without a comparator');
+	        if (typeof this.comparator === 'string' || this.comparator.length === 1) {
+	            this._models = this.sortBy(this.comparator, this);
+	        }
+	        else {
+	            this.models.sort(this.comparator.bind(this));
+	        }
+	        if (!options.silent)
+	            this.trigger('sort', this, options);
+	        return this;
+	    };
+	    Collection.prototype.sortBy = function (key, context) {
+	        return arrays_1.sortBy(this._models, key, context);
+	    };
+	    Collection.prototype.push = function (model, options) {
+	        if (options === void 0) { options = {}; }
+	        return this.add(model, objects_1.extend({ at: this.length }, options));
+	    };
+	    Collection.prototype.reset = function (models, options) {
+	        var _this = this;
+	        if (options === void 0) { options = {}; }
+	        this.forEach(function (model) {
+	            _this._removeReference(model, options);
+	        });
+	        options.previousModels = this.models;
+	        this._reset();
+	        models = this.add(models, options);
+	        if (!options.silent)
+	            this.trigger('reset', this, options);
+	        return models;
+	    };
+	    Collection.prototype.create = function (values, options) {
+	        if (options === void 0) { options = { add: true }; }
+	        var model = new this.Model(values, options);
+	        if (options.add)
+	            this.add(model);
+	        return model;
+	    };
+	    Collection.prototype.parse = function (models, options) {
+	        if (options === void 0) { options = {}; }
+	        return models;
+	    };
+	    Collection.prototype.find = function (nidOrFn) {
+	        var model;
+	        if (typeof nidOrFn === 'function') {
+	            model = arrays_1.find(this.models, nidOrFn);
+	        }
+	        else {
+	            model = arrays_1.find(this.models, function (model) {
+	                return model.id == nidOrFn || model.uid == nidOrFn || nidOrFn === model;
+	            });
+	        }
+	        return model;
+	    };
+	    Collection.prototype.forEach = function (iterator, ctx) {
+	        for (var i = 0, l = this.models.length; i < l; i++) {
+	            iterator.call(ctx || this, this.models[i], i);
+	        }
+	        return this;
+	    };
+	    Collection.prototype.indexOf = function (model) {
+	        return this.models.indexOf(model);
+	    };
+	    Collection.prototype.toJSON = function () {
+	        return this.models.map(function (m) { return m.toJSON(); });
+	    };
+	    Collection.prototype._prepareModel = function (value) {
+	        if (value instanceof model_1.Model)
+	            return value;
+	        if (objects_1.isObject(value))
+	            return new this.Model(value, { parse: true });
+	        throw new Error('Value not an Object or an instance of a model, but was: ' + typeof value);
+	    };
+	    Collection.prototype._removeReference = function (model, options) {
+	        if (this === model.collection)
+	            delete model.collection;
+	        this.stopListening(model);
+	    };
+	    Collection.prototype._addReference = function (model, options) {
+	        if (!model.collection)
+	            model.collection = this;
+	        this.listenTo(model, 'all', this._onModelEvent);
+	    };
+	    Collection.prototype._reset = function () {
+	        this._models = [];
+	    };
+	    Collection.prototype._onModelEvent = function (event, model, collection, options) {
+	        if ((event === 'add' || event === 'remove') && collection !== this)
+	            return;
+	        if (event === 'destroy')
+	            this.remove(model, options);
+	        utils_1.callFunc(this.trigger, this, arrays_1.slice(arguments));
+	    };
+	    Collection.prototype.destroy = function () {
+	        var _this = this;
+	        this.models.forEach(function (m) {
+	            if (typeof m.destroy === 'function' &&
+	                m.collection == _this)
+	                m.destroy();
+	        });
+	        _super.prototype.destroy.call(this);
+	    };
+	    return Collection;
+	}(object_1.BaseObject));
+	exports.Collection = Collection;
+
+
+/***/ },
+/* 66 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var eventsjs_1 = __webpack_require__(67);
+	var utils_1 = __webpack_require__(68);
+	var BaseObject = (function (_super) {
+	    __extends(BaseObject, _super);
+	    function BaseObject() {
+	        _super.apply(this, arguments);
+	    }
+	    BaseObject.extend = function (proto, stat) {
+	        return utils_1.inherits(this, proto, stat);
+	    };
+	    return BaseObject;
+	}(eventsjs_1.EventEmitter));
+	exports.BaseObject = BaseObject;
+
+
+/***/ },
+/* 67 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var idCounter = 0;
+	function getID() {
+	    return "" + (++idCounter);
+	}
+	function callFunc(fn, args) {
+	    if (args === void 0) { args = []; }
+	    var l = fn.length, i = -1, a1 = args[0], a2 = args[1], a3 = args[2], a4 = args[3];
+	    switch (args.length) {
+	        case 0:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx);
+	            return;
+	        case 1:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx, a1);
+	            return;
+	        case 2:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx, a1, a2);
+	            return;
+	        case 3:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx, a1, a2, a3);
+	            return;
+	        case 4:
+	            while (++i < l)
+	                fn[i].handler.call(fn[i].ctx, a1, a2, a3, a4);
+	            return;
+	        default:
+	            while (++i < l)
+	                fn[i].handler.apply(fn[i].ctx, args);
+	            return;
+	    }
+	}
+	exports.callFunc = callFunc;
+	var EventEmitter = (function () {
+	    function EventEmitter() {
+	    }
+	    Object.defineProperty(EventEmitter.prototype, "listeners", {
+	        get: function () {
+	            return this._listeners;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    EventEmitter.prototype.on = function (event, fn, ctx, once) {
+	        if (once === void 0) { once = false; }
+	        var events = (this._listeners || (this._listeners = {}))[event] || (this._listeners[event] = []);
+	        events.push({
+	            name: event,
+	            once: once,
+	            handler: fn,
+	            ctx: ctx || this
+	        });
+	        return this;
+	    };
+	    EventEmitter.prototype.once = function (event, fn, ctx) {
+	        return this.on(event, fn, ctx, true);
+	    };
+	    EventEmitter.prototype.off = function (eventName, fn) {
+	        this._listeners = this._listeners || {};
+	        if (eventName == null) {
+	            this._listeners = {};
+	        }
+	        else if (this._listeners[eventName]) {
+	            var events = this._listeners[eventName];
+	            if (fn == null) {
+	                this._listeners[eventName] = [];
+	            }
+	            else {
+	                for (var i = 0; i < events.length; i++) {
+	                    var event_1 = events[i];
+	                    if (events[i].handler == fn) {
+	                        this._listeners[eventName].splice(i, 1);
+	                    }
+	                }
+	            }
+	        }
+	    };
+	    EventEmitter.prototype.trigger = function (eventName) {
+	        var args = [];
+	        for (var _i = 1; _i < arguments.length; _i++) {
+	            args[_i - 1] = arguments[_i];
+	        }
+	        var events = (this._listeners || (this._listeners = {}))[eventName] || (this._listeners[eventName] = [])
+	            .concat(this._listeners['all'] || []);
+	        if (EventEmitter.debugCallback)
+	            EventEmitter.debugCallback(this.constructor.name, this.name, eventName, args);
+	        var event, a, len = events.length, index;
+	        var calls = [];
+	        for (var i = 0, ii = events.length; i < ii; i++) {
+	            event = events[i];
+	            a = args;
+	            if (event.name == 'all') {
+	                a = [eventName].concat(args);
+	                callFunc([event], a);
+	            }
+	            else {
+	                calls.push(event);
+	            }
+	            if (event.once === true) {
+	                index = this._listeners[event.name].indexOf(event);
+	                this._listeners[event.name].splice(index, 1);
+	            }
+	        }
+	        if (calls.length)
+	            this._executeListener(calls, args);
+	        return this;
+	    };
+	    EventEmitter.prototype._executeListener = function (func, args) {
+	        var executor = callFunc;
+	        if (this.constructor.executeListenerFunction) {
+	            executor = this.constructor.executeListenerFunction;
+	        }
+	        executor(func, args);
+	    };
+	    EventEmitter.prototype.listenTo = function (obj, event, fn, ctx, once) {
+	        if (once === void 0) { once = false; }
+	        var listeningTo, id, meth;
+	        listeningTo = this._listeningTo || (this._listeningTo = {});
+	        id = obj.listenId || (obj.listenId = getID());
+	        listeningTo[id] = obj;
+	        meth = once ? 'once' : 'on';
+	        obj[meth](event, fn, this);
+	        return this;
+	    };
+	    EventEmitter.prototype.listenToOnce = function (obj, event, fn, ctx) {
+	        return this.listenTo(obj, event, fn, ctx, true);
+	    };
+	    EventEmitter.prototype.stopListening = function (obj, event, callback) {
+	        var listeningTo = this._listeningTo;
+	        if (!listeningTo)
+	            return this;
+	        var remove = !event && !callback;
+	        if (!callback && typeof event === 'object')
+	            callback = this;
+	        if (obj)
+	            (listeningTo = {})[obj.listenId] = obj;
+	        for (var id in listeningTo) {
+	            obj = listeningTo[id];
+	            obj.off(event, callback, this);
+	            if (remove || !Object.keys(obj.listeners).length)
+	                delete this._listeningTo[id];
+	        }
+	        return this;
+	    };
+	    EventEmitter.prototype.destroy = function () {
+	        this.stopListening();
+	        this.off();
+	    };
+	    return EventEmitter;
+	}());
+	exports.EventEmitter = EventEmitter;
+
+
+/***/ },
+/* 68 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var objects_1 = __webpack_require__(69);
+	var arrays_1 = __webpack_require__(70);
+	var strings_1 = __webpack_require__(71);
+	var idCounter = 0;
+	var nativeBind = Function.prototype.bind;
+	function ajax() {
+	    var e;
+	    if (window.hasOwnProperty('XMLHttpRequest')) {
+	        return new XMLHttpRequest();
+	    }
+	    try {
+	        return new ActiveXObject('msxml2.xmlhttp.6.0');
+	    }
+	    catch (_error) {
+	        e = _error;
+	    }
+	    try {
+	        return new ActiveXObject('msxml2.xmlhttp.3.0');
+	    }
+	    catch (_error) {
+	        e = _error;
+	    }
+	    try {
+	        return new ActiveXObject('msxml2.xmlhttp');
+	    }
+	    catch (_error) {
+	        e = _error;
+	    }
+	    return e;
+	}
+	exports.ajax = ajax;
+	;
+	function uniqueId(prefix) {
+	    if (prefix === void 0) { prefix = ''; }
+	    return prefix + (++idCounter);
+	}
+	exports.uniqueId = uniqueId;
+	function proxy(from, to, fns) {
+	    if (!Array.isArray(fns))
+	        fns = [fns];
+	    fns.forEach(function (fn) {
+	        if (typeof to[fn] === 'function') {
+	            from[fn] = bind(to[fn], to);
+	        }
+	    });
+	}
+	exports.proxy = proxy;
+	function bind(method, context) {
+	    var args = [];
+	    for (var _i = 2; _i < arguments.length; _i++) {
+	        args[_i - 2] = arguments[_i];
+	    }
+	    if (typeof method !== 'function')
+	        throw new Error('method not at function');
+	    if (nativeBind != null)
+	        return nativeBind.call.apply(nativeBind, [method, context].concat(args));
+	    args = args || [];
+	    var fnoop = function () { };
+	    var fBound = function () {
+	        var ctx = this instanceof fnoop ? this : context;
+	        return callFunc(method, ctx, args.concat(arrays_1.slice(arguments)));
+	    };
+	    fnoop.prototype = this.prototype;
+	    fBound.prototype = new fnoop();
+	    return fBound;
+	}
+	exports.bind = bind;
+	function callFunc(fn, ctx, args) {
+	    if (args === void 0) { args = []; }
+	    switch (args.length) {
+	        case 0:
+	            return fn.call(ctx);
+	        case 1:
+	            return fn.call(ctx, args[0]);
+	        case 2:
+	            return fn.call(ctx, args[0], args[1]);
+	        case 3:
+	            return fn.call(ctx, args[0], args[1], args[2]);
+	        case 4:
+	            return fn.call(ctx, args[0], args[1], args[2], args[3]);
+	        case 5:
+	            return fn.call(ctx, args[0], args[1], args[2], args[3], args[4]);
+	        default:
+	            return fn.apply(ctx, args);
+	    }
+	}
+	exports.callFunc = callFunc;
+	function equal(a, b) {
+	    return eq(a, b, [], []);
+	}
+	exports.equal = equal;
+	function triggerMethodOn(obj, eventName, args) {
+	    var ev = strings_1.camelcase("on-" + eventName.replace(':', '-'));
+	    if (obj[ev] && typeof obj[ev] === 'function') {
+	        callFunc(obj[ev], obj, args);
+	    }
+	    if (typeof obj.trigger === 'function') {
+	        args = [eventName].concat(args);
+	        callFunc(obj.trigger, obj, args);
+	    }
+	}
+	exports.triggerMethodOn = triggerMethodOn;
+	function getOption(option, objs) {
+	    for (var _i = 0; _i < objs.length; _i++) {
+	        var o = objs[_i];
+	        if (objects_1.isObject(o) && o[option])
+	            return o[option];
+	    }
+	    return null;
+	}
+	exports.getOption = getOption;
+	function inherits(parent, protoProps, staticProps) {
+	    var child;
+	    if (protoProps && objects_1.has(protoProps, 'constructor')) {
+	        child = protoProps.constructor;
+	    }
+	    else {
+	        child = function () { return parent.apply(this, arguments); };
+	    }
+	    objects_1.extend(child, parent, staticProps);
+	    var Surrogate = function () { this.constructor = child; };
+	    Surrogate.prototype = parent.prototype;
+	    child.prototype = new Surrogate;
+	    if (protoProps)
+	        objects_1.extend(child.prototype, protoProps);
+	    child.__super__ = parent.prototype;
+	    return child;
+	}
+	exports.inherits = inherits;
+	exports.nextTick = (function () {
+	    var canSetImmediate = typeof window !== 'undefined'
+	        && window.setImmediate;
+	    var canPost = typeof window !== 'undefined'
+	        && window.postMessage && window.addEventListener;
+	    if (canSetImmediate) {
+	        return function (f) { return window.setImmediate(f); };
+	    }
+	    if (canPost) {
+	        var queue = [];
+	        window.addEventListener('message', function (ev) {
+	            var source = ev.source;
+	            if ((source === window || source === null) && ev.data === 'process-tick') {
+	                ev.stopPropagation();
+	                if (queue.length > 0) {
+	                    var fn = queue.shift();
+	                    fn();
+	                }
+	            }
+	        }, true);
+	        return function nextTick(fn) {
+	            queue.push(fn);
+	            window.postMessage('process-tick', '*');
+	        };
+	    }
+	    return function nextTick(fn) {
+	        setTimeout(fn, 0);
+	    };
+	})();
+	function eq(a, b, aStack, bStack) {
+	    if (a === b)
+	        return a !== 0 || 1 / a == 1 / b;
+	    if (a == null || b == null)
+	        return a === b;
+	    var className = toString.call(a);
+	    if (className != toString.call(b))
+	        return false;
+	    switch (className) {
+	        case '[object String]':
+	            return a == String(b);
+	        case '[object Number]':
+	            return a !== +a ? b !== +b : (a === 0 ? 1 / a === 1 / b : a === +b);
+	        case '[object Date]':
+	        case '[object Boolean]':
+	            return +a == +b;
+	        case '[object RegExp]':
+	            return a.source == b.source &&
+	                a.global == b.global &&
+	                a.multiline == b.multiline &&
+	                a.ignoreCase == b.ignoreCase;
+	    }
+	    if (typeof a != 'object' || typeof b != 'object')
+	        return false;
+	    var length = aStack.length;
+	    while (length--) {
+	        if (aStack[length] == a)
+	            return bStack[length] == b;
+	    }
+	    var aCtor = a.constructor, bCtor = b.constructor;
+	    if (aCtor !== bCtor && !(typeof aCtor === 'function' && (aCtor instanceof aCtor) &&
+	        typeof bCtor === 'function' && (bCtor instanceof bCtor))) {
+	        return false;
+	    }
+	    aStack.push(a);
+	    bStack.push(b);
+	    var size = 0, result = true;
+	    if (className === '[object Array]') {
+	        size = a.length;
+	        result = size === b.length;
+	        if (result) {
+	            while (size--) {
+	                if (!(result = eq(a[size], b[size], aStack, bStack)))
+	                    break;
+	            }
+	        }
+	    }
+	    else {
+	        for (var key in a) {
+	            if (objects_1.has(a, key)) {
+	                size++;
+	                if (!(result = objects_1.has(b, key) && eq(a[key], b[key], aStack, bStack)))
+	                    break;
+	            }
+	        }
+	        if (result) {
+	            for (key in b) {
+	                if (objects_1.has(b, key) && !(size--))
+	                    break;
+	            }
+	            result = !size;
+	        }
+	    }
+	    aStack.pop();
+	    bStack.pop();
+	    return result;
+	}
+	;
+
+
+/***/ },
+/* 69 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var utils_1 = __webpack_require__(68);
+	var arrays_1 = __webpack_require__(70);
+	function isObject(obj) {
+	    return obj === Object(obj);
+	}
+	exports.isObject = isObject;
+	function isEmpty(obj) {
+	    return Object.keys(obj).length === 0;
+	}
+	exports.isEmpty = isEmpty;
+	function extend(obj) {
+	    var args = [];
+	    for (var _i = 1; _i < arguments.length; _i++) {
+	        args[_i - 1] = arguments[_i];
+	    }
+	    if (!isObject(obj))
+	        return obj;
+	    var o, k;
+	    for (var _a = 0; _a < args.length; _a++) {
+	        o = args[_a];
+	        if (!isObject(o))
+	            continue;
+	        for (k in o) {
+	            if (has(o, k))
+	                obj[k] = o[k];
+	        }
+	    }
+	    return obj;
+	}
+	exports.extend = extend;
+	function assign(target) {
+	    var args = [];
+	    for (var _i = 1; _i < arguments.length; _i++) {
+	        args[_i - 1] = arguments[_i];
+	    }
+	    if (target === undefined || target === null) {
+	        throw new TypeError('Cannot convert first argument to object');
+	    }
+	    var to = Object(target);
+	    for (var i = 0, ii = args.length; i < ii; i++) {
+	        var nextSource = args[i];
+	        if (nextSource === undefined || nextSource === null) {
+	            continue;
+	        }
+	        nextSource = Object(nextSource);
+	        var keysArray = Object.keys(Object(nextSource));
+	        for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
+	            var nextKey = keysArray[nextIndex];
+	            var desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+	            if (desc !== undefined && desc.enumerable) {
+	                to[nextKey] = nextSource[nextKey];
+	            }
+	        }
+	    }
+	    return to;
+	}
+	exports.assign = assign;
+	function has(obj, prop) {
+	    return Object.prototype.hasOwnProperty.call(obj, prop);
+	}
+	exports.has = has;
+	function pick(obj, props) {
+	    var out = {}, prop;
+	    for (var _i = 0; _i < props.length; _i++) {
+	        prop = props[_i];
+	        if (has(obj, prop))
+	            out[prop] = obj[prop];
+	    }
+	    return out;
+	}
+	exports.pick = pick;
+	function result(obj, prop, ctx, args) {
+	    var ret = obj[prop];
+	    return (typeof ret === 'function') ? utils_1.callFunc(ret, ctx, args || []) : ret;
+	}
+	exports.result = result;
+	function values(obj) {
+	    var output = [];
+	    for (var k in obj)
+	        if (has(obj, k)) {
+	            output.push(obj[k]);
+	        }
+	    return output;
+	}
+	exports.values = values;
+	function intersectionObjects(a, b, predicate) {
+	    var results = [], aElement, existsInB;
+	    for (var i = 0, ii = a.length; i < ii; i++) {
+	        aElement = a[i];
+	        existsInB = arrays_1.any(b, function (bElement) { return predicate(bElement, aElement); });
+	        if (existsInB) {
+	            results.push(aElement);
+	        }
+	    }
+	    return results;
+	}
+	function intersection(results) {
+	    var args = [];
+	    for (var _i = 1; _i < arguments.length; _i++) {
+	        args[_i - 1] = arguments[_i];
+	    }
+	    var lastArgument = args[args.length - 1];
+	    var arrayCount = args.length;
+	    var areEqualFunction = utils_1.equal;
+	    if (typeof lastArgument === "function") {
+	        areEqualFunction = lastArgument;
+	        arrayCount--;
+	    }
+	    for (var i = 0; i < arrayCount; i++) {
+	        var array = args[i];
+	        results = intersectionObjects(results, array, areEqualFunction);
+	        if (results.length === 0)
+	            break;
+	    }
+	    return results;
+	}
+	exports.intersection = intersection;
+
+
+/***/ },
+/* 70 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var utils_1 = __webpack_require__(68);
+	function unique(array) {
+	    return array.filter(function (e, i) {
+	        for (i += 1; i < array.length; i += 1) {
+	            if (utils_1.equal(e, array[i])) {
+	                return false;
+	            }
+	        }
+	        return true;
+	    });
+	}
+	exports.unique = unique;
+	function any(array, predicate) {
+	    for (var i = 0, ii = array.length; i < ii; i++) {
+	        if (predicate(array[i]))
+	            return true;
+	    }
+	    return false;
+	}
+	exports.any = any;
+	function indexOf(array, item) {
+	    for (var i = 0, len = array.length; i < len; i++)
+	        if (array[i] === item)
+	            return i;
+	    return -1;
+	}
+	exports.indexOf = indexOf;
+	function find(array, callback, ctx) {
+	    var i, v;
+	    for (i = 0; i < array.length; i++) {
+	        v = array[i];
+	        if (callback.call(ctx, v))
+	            return v;
+	    }
+	    return null;
+	}
+	exports.find = find;
+	function slice(array, begin, end) {
+	    return Array.prototype.slice.call(array, begin, end);
+	}
+	exports.slice = slice;
+	function flatten(arr) {
+	    return arr.reduce(function (flat, toFlatten) {
+	        return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+	    }, []);
+	}
+	exports.flatten = flatten;
+	function sortBy(obj, value, context) {
+	    var iterator = typeof value === 'function' ? value : function (obj) { return obj[value]; };
+	    return obj
+	        .map(function (value, index, list) {
+	        return {
+	            value: value,
+	            index: index,
+	            criteria: iterator.call(context, value, index, list)
+	        };
+	    })
+	        .sort(function (left, right) {
+	        var a = left.criteria;
+	        var b = right.criteria;
+	        if (a !== b) {
+	            if (a > b || a === void 0)
+	                return 1;
+	            if (a < b || b === void 0)
+	                return -1;
+	        }
+	        return left.index - right.index;
+	    })
+	        .map(function (item) {
+	        return item.value;
+	    });
+	}
+	exports.sortBy = sortBy;
+
+
+/***/ },
+/* 71 */
+/***/ function(module, exports) {
+
+	function camelcase(input) {
+	    return input.toLowerCase().replace(/-(.)/g, function (match, group1) {
+	        return group1.toUpperCase();
+	    });
+	}
+	exports.camelcase = camelcase;
+	;
+	function truncate(str, length) {
+	    var n = str.substring(0, Math.min(length, str.length));
+	    return n + (n.length == str.length ? '' : '...');
+	}
+	exports.truncate = truncate;
+	function humanFileSize(bytes, si) {
+	    if (si === void 0) { si = false; }
+	    var thresh = si ? 1000 : 1024;
+	    if (Math.abs(bytes) < thresh) {
+	        return bytes + ' B';
+	    }
+	    var units = si
+	        ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+	        : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+	    var u = -1;
+	    do {
+	        bytes /= thresh;
+	        ++u;
+	    } while (Math.abs(bytes) >= thresh && u < units.length - 1);
+	    return bytes.toFixed(1) + ' ' + units[u];
+	}
+	exports.humanFileSize = humanFileSize;
+
+
+/***/ },
+/* 72 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var object_1 = __webpack_require__(66);
+	var utils_1 = __webpack_require__(68);
+	var objects_1 = __webpack_require__(69);
+	var Model = (function (_super) {
+	    __extends(Model, _super);
+	    function Model(attributes, options) {
+	        if (attributes === void 0) { attributes = {}; }
+	        if (options === void 0) { options = {}; }
+	        options = options || {};
+	        this._attributes = {};
+	        this.options = options;
+	        if (options.parse)
+	            attributes = this.parse(attributes);
+	        this.set(attributes, null, { silent: true });
+	        this.uid = utils_1.uniqueId('uid');
+	        this._changed = {};
+	        this.collection = options.collection;
+	        this.idAttribute = options.idAttribute || this.idAttribute || 'id';
+	        _super.call(this);
+	    }
+	    Object.defineProperty(Model.prototype, "id", {
+	        get: function () {
+	            if (this.idAttribute in this._attributes)
+	                return this._attributes[this.idAttribute];
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(Model.prototype, "isNew", {
+	        get: function () {
+	            return this.id == null;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(Model.prototype, "isDirty", {
+	        get: function () {
+	            return this.hasChanged();
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Model.prototype.set = function (key, val, options) {
+	        if (options === void 0) { options = {}; }
+	        var attr, attrs = {}, unset, changes, silent, changing, prev, current;
+	        if (key == null)
+	            return this;
+	        if (typeof key === 'object') {
+	            attrs = key;
+	            options = val;
+	        }
+	        else {
+	            attrs[key] = val;
+	        }
+	        options || (options = {});
+	        unset = options.unset;
+	        silent = options.silent;
+	        changes = [];
+	        changing = this._changing;
+	        this._changing = true;
+	        if (!changing) {
+	            this._previousAttributes = objects_1.extend(Object.create(null), this._attributes);
+	            this._changed = {};
+	        }
+	        current = this._attributes, prev = this._previousAttributes;
+	        for (attr in attrs) {
+	            val = attrs[attr];
+	            if (!utils_1.equal(current[attr], val))
+	                changes.push(attr);
+	            if (!utils_1.equal(prev[attr], val)) {
+	                this._changed[attr] = val;
+	            }
+	            else {
+	                delete this._changed[attr];
+	            }
+	            unset ? delete current[attr] : current[attr] = val;
+	        }
+	        if (!silent) {
+	            if (changes.length)
+	                this._pending = !!options;
+	            for (var i = 0, l = changes.length; i < l; i++) {
+	                this.trigger('change:' + changes[i], this, current[changes[i]], options);
+	            }
+	        }
+	        if (changing)
+	            return this;
+	        if (!silent) {
+	            while (this._pending) {
+	                options = this._pending;
+	                this._pending = false;
+	                this.trigger('change', this, options);
+	            }
+	        }
+	        this._pending = false;
+	        this._changing = false;
+	        return this;
+	    };
+	    Model.prototype.get = function (key) {
+	        return this._attributes[key];
+	    };
+	    Model.prototype.unset = function (key, options) {
+	        this.set(key, void 0, objects_1.extend({}, options, { unset: true }));
+	    };
+	    Model.prototype.has = function (attr) {
+	        return this.get(attr) != null;
+	    };
+	    Model.prototype.hasChanged = function (attr) {
+	        if (attr == null)
+	            return !!Object.keys(this.changed).length;
+	        return objects_1.has(this.changed, attr);
+	    };
+	    Model.prototype.clear = function (options) {
+	        var attrs = {};
+	        for (var key in this._attributes)
+	            attrs[key] = void 0;
+	        return this.set(attrs, objects_1.extend({}, options, { unset: true }));
+	    };
+	    Object.defineProperty(Model.prototype, "changed", {
+	        get: function () {
+	            return objects_1.extend({}, this._changed);
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Model.prototype.changedAttributes = function (diff) {
+	        if (!diff)
+	            return this.hasChanged() ? objects_1.extend(Object.create(null), this.changed) : false;
+	        var val, changed = {};
+	        var old = this._changing ? this._previousAttributes : this._attributes;
+	        for (var attr in diff) {
+	            if (utils_1.equal(old[attr], (val = diff[attr])))
+	                continue;
+	            (changed || (changed = {}))[attr] = val;
+	        }
+	        return changed;
+	    };
+	    Model.prototype.previous = function (attr) {
+	        if (attr == null || !this._previousAttributes)
+	            return null;
+	        return this._previousAttributes[attr];
+	    };
+	    Model.prototype.previousAttributes = function () {
+	        return objects_1.extend(Object.create(null), this._previousAttributes);
+	    };
+	    Model.prototype.toJSON = function () {
+	        return JSON.parse(JSON.stringify(this._attributes));
+	    };
+	    Model.prototype.clone = function () {
+	        return new (this.constructor)(this._attributes, this.options);
+	    };
+	    Model.prototype.parse = function (attr, options) {
+	        return attr;
+	    };
+	    Model.prototype.remove = function (options) {
+	        this.trigger('remove', this, this.collection, options);
+	    };
+	    return Model;
+	}(object_1.BaseObject));
+	exports.Model = Model;
+
+
+/***/ },
+/* 73 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var utils_1 = __webpack_require__(68);
+	var objects_1 = __webpack_require__(69);
+	var model_1 = __webpack_require__(72);
+	function objToPaths(obj, separator) {
+	    if (separator === void 0) { separator = "."; }
+	    var ret = {};
+	    if (!obj)
+	        return obj;
+	    for (var key in obj) {
+	        var val = obj[key];
+	        if (val && (val.constructor === Object || val.constructor === Array) && !objects_1.isEmpty(val)) {
+	            var obj2 = objToPaths(val);
+	            for (var key2 in obj2) {
+	                var val2 = obj2[key2];
+	                ret[key + separator + key2] = val2;
+	            }
+	        }
+	        else {
+	            ret[key] = val;
+	        }
+	    }
+	    return ret;
+	}
+	function isOnNestedModel(obj, path, separator) {
+	    if (separator === void 0) { separator = "."; }
+	    var fields = path ? path.split(separator) : [];
+	    if (!obj)
+	        return false;
+	    var result = obj;
+	    for (var i = 0, n = fields.length; i < n; i++) {
+	        if (result instanceof model_1.Model)
+	            return true;
+	        if (!result)
+	            return false;
+	        result = result[fields[i]];
+	    }
+	    return false;
+	}
+	function getNested(obj, path, return_exists, separator) {
+	    if (separator === void 0) { separator = "."; }
+	    if (!obj)
+	        return null;
+	    var fields = path ? path.split(separator) : [];
+	    var result = obj;
+	    return_exists || (return_exists === false);
+	    for (var i = 0, n = fields.length; i < n; i++) {
+	        if (return_exists && !objects_1.has(result, fields[i])) {
+	            return false;
+	        }
+	        result = result instanceof model_1.Model ? result.get(fields[i]) : result[fields[i]];
+	        if (result == null && i < n - 1) {
+	            result = {};
+	        }
+	        if (typeof result === 'undefined') {
+	            if (return_exists) {
+	                return true;
+	            }
+	            return result;
+	        }
+	    }
+	    if (return_exists) {
+	        return true;
+	    }
+	    return result;
+	}
+	function setNested(obj, path, val, options) {
+	    options = options || {};
+	    if (!obj)
+	        return null;
+	    var separator = options.separator || ".";
+	    var fields = path ? path.split(separator) : [];
+	    var result = obj;
+	    for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
+	        var field = fields[i];
+	        if (i === n - 1) {
+	            options.unset ? delete result[field] : result[field] = val;
+	        }
+	        else {
+	            if (typeof result[field] === 'undefined' || !objects_1.isObject(result[field])) {
+	                if (options.unset) {
+	                    delete result[field];
+	                    return;
+	                }
+	                var nextField = fields[i + 1];
+	                result[field] = /^\d+$/.test(nextField) ? [] : {};
+	            }
+	            result = result[field];
+	            if (result instanceof model_1.Model) {
+	                var rest = fields.slice(i + 1);
+	                return result.set(rest.join('.'), val, options);
+	            }
+	        }
+	    }
+	}
+	function deleteNested(obj, path) {
+	    setNested(obj, path, null, {
+	        unset: true
+	    });
+	}
+	var NestedModel = (function (_super) {
+	    __extends(NestedModel, _super);
+	    function NestedModel() {
+	        _super.apply(this, arguments);
+	    }
+	    NestedModel.prototype.get = function (attr) {
+	        return getNested(this._attributes, attr);
+	    };
+	    NestedModel.prototype.set = function (key, val, options) {
+	        var _this = this;
+	        var attr, attrs, unset, changes, silent, changing, prev, current;
+	        if (key == null)
+	            return this;
+	        if (typeof key === 'object') {
+	            attrs = key;
+	            options = val || {};
+	        }
+	        else {
+	            (attrs = {})[key] = val;
+	        }
+	        options || (options = {});
+	        unset = options.unset;
+	        silent = options.silent;
+	        changes = [];
+	        changing = this._changing;
+	        this._changing = true;
+	        if (!changing) {
+	            this._previousAttributes = objects_1.extend({}, this._attributes);
+	            this._changed = {};
+	        }
+	        current = this._attributes, prev = this._previousAttributes;
+	        attrs = objToPaths(attrs);
+	        var alreadyTriggered = {};
+	        var separator = NestedModel.keyPathSeparator;
+	        if (!this._nestedListener)
+	            this._nestedListener = {};
+	        for (attr in attrs) {
+	            val = attrs[attr];
+	            var curVal = getNested(current, attr);
+	            if (!utils_1.equal(curVal, val)) {
+	                changes.push(attr);
+	                this._changed[attr] = val;
+	            }
+	            if (!utils_1.equal(getNested(prev, attr), val)) {
+	                setNested(this.changed, attr, val);
+	            }
+	            else {
+	                deleteNested(this.changed, attr);
+	            }
+	            if (curVal instanceof model_1.Model) {
+	                var fn = this._nestedListener[attr];
+	                if (fn) {
+	                    curVal.off('change', fn);
+	                    delete this._nestedListener[attr];
+	                }
+	            }
+	            if (unset) {
+	                deleteNested(current, attr);
+	            }
+	            else {
+	                if (!isOnNestedModel(current, attr, separator)) {
+	                    if (val instanceof model_1.Model) {
+	                        var fn = function (model) {
+	                            if (model.changed == undefined || objects_1.isEmpty(model.changed))
+	                                return;
+	                            for (var key_1 in model.changed) {
+	                                _this._changed[attr + separator + key_1] = model.changed[key_1];
+	                                _this.trigger('change:' + attr + separator + key_1, model.changed[key_1]);
+	                            }
+	                            _this.trigger('change', _this, options);
+	                        };
+	                        this._nestedListener[attr] = fn;
+	                        val.on('change', fn);
+	                    }
+	                }
+	                else {
+	                    alreadyTriggered[attr] = true;
+	                }
+	                setNested(current, attr, val);
+	            }
+	        }
+	        if (!silent) {
+	            if (changes.length)
+	                this._pending = true;
+	            for (var i = 0, l = changes.length; i < l; i++) {
+	                var key_2 = changes[i];
+	                if (!alreadyTriggered.hasOwnProperty(key_2) || !alreadyTriggered[key_2]) {
+	                    alreadyTriggered[key_2] = true;
+	                    this.trigger('change:' + key_2, this, getNested(current, key_2), options);
+	                }
+	                var fields = key_2.split(separator);
+	                for (var n = fields.length - 1; n > 0; n--) {
+	                    var parentKey = fields.slice(0, n).join(separator), wildcardKey = parentKey + separator + '*';
+	                    if (!alreadyTriggered.hasOwnProperty(wildcardKey) || !alreadyTriggered[wildcardKey]) {
+	                        alreadyTriggered[wildcardKey] = true;
+	                        this.trigger('change:' + wildcardKey, this, getNested(current, parentKey), options);
+	                    }
+	                    if (!alreadyTriggered.hasOwnProperty(parentKey) || !alreadyTriggered[parentKey]) {
+	                        alreadyTriggered[parentKey] = true;
+	                        this.trigger('change:' + parentKey, this, getNested(current, parentKey), options);
+	                    }
+	                }
+	            }
+	        }
+	        if (changing)
+	            return this;
+	        if (!silent) {
+	            while (this._pending) {
+	                this._pending = false;
+	                this.trigger('change', this, options);
+	            }
+	        }
+	        this._pending = false;
+	        this._changing = false;
+	        return this;
+	    };
+	    NestedModel.prototype.clear = function (options) {
+	        var attrs = {};
+	        var shallowAttributes = objToPaths(this._attributes);
+	        for (var key in shallowAttributes)
+	            attrs[key] = void 0;
+	        return this.set(attrs, objects_1.extend({}, options, {
+	            unset: true
+	        }));
+	    };
+	    NestedModel.prototype.hasChanged = function (attr) {
+	        if (attr == null) {
+	            return !Object.keys(this.changed).length;
+	        }
+	        return getNested(this.changed, attr) !== undefined;
+	    };
+	    NestedModel.prototype.changedAttributes = function (diff) {
+	        if (!diff)
+	            return this.hasChanged() ? objToPaths(this.changed) : false;
+	        var old = this._changing ? this._previousAttributes : this._attributes;
+	        diff = objToPaths(diff);
+	        old = objToPaths(old);
+	        var val, changed = false;
+	        for (var attr in diff) {
+	            if (utils_1.equal(old[attr], (val = diff[attr])))
+	                continue;
+	            (changed || (changed = {}))[attr] = val;
+	        }
+	        return changed;
+	    };
+	    NestedModel.prototype.previous = function (attr) {
+	        if (attr == null || !this._previousAttributes) {
+	            return null;
+	        }
+	        return getNested(this._previousAttributes, attr);
+	    };
+	    NestedModel.prototype.previousAttributes = function () {
+	        return objects_1.extend({}, this._previousAttributes);
+	    };
+	    NestedModel.prototype.destroy = function () {
+	        for (var key in this._nestedListener) {
+	            var fn = this._nestedListener[key];
+	            if (fn) {
+	                var m = this.get(key);
+	                if (m)
+	                    m.off(key, fn);
+	            }
+	        }
+	        _super.prototype.destroy.call(this);
+	    };
+	    NestedModel.keyPathSeparator = '.';
+	    return NestedModel;
+	}(model_1.Model));
+	exports.NestedModel = NestedModel;
+
+
+/***/ },
+/* 74 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var objects_1 = __webpack_require__(69);
+	var collection_1 = __webpack_require__(65);
+	var rest_model_1 = __webpack_require__(75);
+	var promises_1 = __webpack_require__(76);
+	var persistence_1 = __webpack_require__(77);
+	var RestCollection = (function (_super) {
+	    __extends(RestCollection, _super);
+	    function RestCollection(models, options) {
+	        if (options === void 0) { options = {}; }
+	        _super.call(this, models, options);
+	        if (options.url)
+	            this.url = options.url;
+	    }
+	    RestCollection.prototype.getURL = function () {
+	        return typeof this.url === 'function' ? this.url() : this.url;
+	    };
+	    RestCollection.prototype.fetch = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        var url = this.getURL();
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        options.url = url;
+	        this.trigger('before:fetch');
+	        return this.sync(persistence_1.RestMethod.Read, this, options)
+	            .then(function (results) {
+	            _this[options.reset ? 'reset' : 'set'](results.content, options);
+	            _this.trigger('fetch');
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', e);
+	            throw e;
+	        });
+	    };
+	    RestCollection.prototype.create = function (value, options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        var model;
+	        var url = this.getURL();
+	        if (url == null)
+	            throw new Error('Url or rootURL no specified');
+	        options.url = url;
+	        if (value instanceof rest_model_1.RestModel) {
+	            model = value;
+	        }
+	        else {
+	            model = new this.Model(value, { parse: true });
+	        }
+	        if (options.wait === void 0)
+	            options.wait = true;
+	        if (!options.wait)
+	            this.add(model, options);
+	        this.trigger('before:create', this, model, value, options);
+	        model.save().then(function () {
+	            if (!options.wait)
+	                _this.add(model, options);
+	            _this.trigger('create', _this, model, value, options);
+	            if (options.complete)
+	                options.complete(null, model);
+	        }).catch(function (e) {
+	            _this.trigger('error', e);
+	            if (options.complete)
+	                options.complete(e, null);
+	        });
+	        return model;
+	    };
+	    RestCollection.prototype.sync = function (method, model, options) {
+	        return persistence_1.sync(method, model, options);
+	    };
+	    return RestCollection;
+	}(collection_1.Collection));
+	exports.RestCollection = RestCollection;
+
+
+/***/ },
+/* 75 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var objects_1 = __webpack_require__(69);
+	var promises_1 = __webpack_require__(76);
+	var nested_model_1 = __webpack_require__(73);
+	var persistence_1 = __webpack_require__(77);
+	function normalize_path(url, id) {
+	    var i, p = "";
+	    if ((i = url.indexOf('?')) >= 0) {
+	        p = url.substr(i);
+	        url = url.substr(0, i);
+	    }
+	    if (url[url.length - 1] !== '/')
+	        url += '/';
+	    return url + id + p;
+	}
+	exports.normalize_path = normalize_path;
+	var RestModel = (function (_super) {
+	    __extends(RestModel, _super);
+	    function RestModel(attr, options) {
+	        if (options === void 0) { options = {}; }
+	        _super.call(this, attr, options);
+	        this.idAttribute = 'id';
+	        if (options.url) {
+	            this.rootURL = options.url;
+	        }
+	    }
+	    RestModel.prototype.getURL = function (id) {
+	        var url = this.rootURL;
+	        if (this.collection && this.collection.getURL()) {
+	            url = this.collection.getURL();
+	        }
+	        if (id && url) {
+	            url = normalize_path(url, this.id);
+	        }
+	        return url;
+	    };
+	    RestModel.prototype.fetch = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        var url = this.getURL();
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        options.url = url;
+	        this.trigger('before:fetch', this, options);
+	        return this.sync(persistence_1.RestMethod.Read, this, options)
+	            .then(function (result) {
+	            if (result)
+	                _this.set(_this.parse(result.content, options), options);
+	            _this.trigger('fetch', _this, result, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', _this, e);
+	            if (e) {
+	                throw e;
+	            }
+	            return _this;
+	        });
+	    };
+	    RestModel.prototype.save = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        this.trigger('before:save', this, options);
+	        var method = persistence_1.RestMethod[this.isNew ? 'Create' : options.changed ? 'Patch' : "Update"];
+	        var url = this.getURL(this.id);
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        options.url = url;
+	        return this.sync(method, this, options)
+	            .then(function (result) {
+	            _this.set(result.content, options);
+	            _this.trigger('save', _this, result, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', _this, e);
+	            throw e;
+	        });
+	    };
+	    RestModel.prototype.remove = function (options) {
+	        var _this = this;
+	        options = options ? objects_1.extend({}, options) : {};
+	        if (this.isNew) {
+	            _super.prototype.remove.call(this, options);
+	            return promises_1.Promise.resolve(this);
+	        }
+	        var url = this.getURL(this.id);
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        this.trigger('before:remove', this, options);
+	        if (!options.wait)
+	            _super.prototype.remove.call(this, options);
+	        options.url = url;
+	        return this.sync(persistence_1.RestMethod.Delete, this, options)
+	            .then(function (result) {
+	            if (!options.wait)
+	                _super.prototype.remove.call(_this, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', _this, e);
+	            throw e;
+	        });
+	    };
+	    RestModel.prototype.sync = function (method, model, options) {
+	        return persistence_1.sync(method, model, options);
+	    };
+	    return RestModel;
+	}(nested_model_1.NestedModel));
+	exports.RestModel = RestModel;
+
+
+/***/ },
+/* 76 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {var objects_1 = __webpack_require__(69);
+	var arrays_1 = __webpack_require__(70);
+	var utils_1 = __webpack_require__(68);
+	exports.Promise = (typeof window === 'undefined') ? global.Promise : window.Promise;
+	function isPromise(obj) {
+	    return obj && typeof obj.then === 'function';
+	}
+	exports.isPromise = isPromise;
+	function toPromise(obj) {
+	    if (!obj) {
+	        return obj;
+	    }
+	    if (isPromise(obj)) {
+	        return obj;
+	    }
+	    if ("function" == typeof obj) {
+	        return thunkToPromise.call(this, obj);
+	    }
+	    if (Array.isArray(obj)) {
+	        return arrayToPromise.call(this, obj);
+	    }
+	    if (objects_1.isObject(obj)) {
+	        return objectToPromise.call(this, obj);
+	    }
+	    return exports.Promise.resolve(obj);
+	}
+	exports.toPromise = toPromise;
+	function thunkToPromise(fn) {
+	    var ctx = this;
+	    return new exports.Promise(function (resolve, reject) {
+	        fn.call(ctx, function (err, res) {
+	            if (err)
+	                return reject(err);
+	            if (arguments.length > 2)
+	                res = arrays_1.slice(arguments, 1);
+	            resolve(res);
+	        });
+	    });
+	}
+	exports.thunkToPromise = thunkToPromise;
+	function arrayToPromise(obj) {
+	    return exports.Promise.all(obj.map(toPromise, this));
+	}
+	exports.arrayToPromise = arrayToPromise;
+	function objectToPromise(obj) {
+	    var results = new obj.constructor();
+	    var keys = Object.keys(obj);
+	    var promises = [];
+	    for (var i = 0; i < keys.length; i++) {
+	        var key = keys[i];
+	        var promise = toPromise.call(this, obj[key]);
+	        if (promise && isPromise(promise))
+	            defer(promise, key);
+	        else
+	            results[key] = obj[key];
+	    }
+	    return exports.Promise.all(promises).then(function () {
+	        return results;
+	    });
+	    function defer(promise, key) {
+	        results[key] = undefined;
+	        promises.push(promise.then(function (res) {
+	            results[key] = res;
+	        }));
+	    }
+	}
+	exports.objectToPromise = objectToPromise;
+	function deferred(fn, ctx) {
+	    var args = [];
+	    for (var _i = 2; _i < arguments.length; _i++) {
+	        args[_i - 2] = arguments[_i];
+	    }
+	    var ret = {};
+	    ret.promise = new exports.Promise(function (resolve, reject) {
+	        ret.resolve = resolve;
+	        ret.reject = reject;
+	        ret.done = function (err, result) { if (err)
+	            return reject(err);
+	        else
+	            resolve(result); };
+	    });
+	    if (typeof fn === 'function') {
+	        utils_1.callFunc(fn, ctx, args.concat([ret.done]));
+	        return ret.promise;
+	    }
+	    return ret;
+	}
+	exports.deferred = deferred;
+	;
+	function callback(promise, callback, ctx) {
+	    promise.then(function (result) {
+	        callback.call(ctx, null, result);
+	    }).catch(function (err) {
+	        callback.call(ctx, err);
+	    });
+	}
+	exports.callback = callback;
+	function delay(timeout) {
+	    var defer = deferred();
+	    timeout == null ? utils_1.nextTick(defer.resolve) : setTimeout(defer.resolve, timeout);
+	    return defer.promise;
+	}
+	exports.delay = delay;
+	;
+	function eachAsync(array, iterator, context, accumulate) {
+	    if (accumulate === void 0) { accumulate = false; }
+	    return mapAsync(array, iterator, context, accumulate)
+	        .then(function () { return void 0; });
+	}
+	exports.eachAsync = eachAsync;
+	function mapAsync(array, iterator, context, accumulate) {
+	    if (accumulate === void 0) { accumulate = false; }
+	    return new exports.Promise(function (resolve, reject) {
+	        var i = 0, len = array.length, errors = [], results = [];
+	        function next(err, result) {
+	            if (err && !accumulate)
+	                return reject(err);
+	            if (err)
+	                errors.push(err);
+	            if (i === len)
+	                return errors.length ? reject(arrays_1.flatten(errors)) : resolve(results);
+	            var ret = iterator.call(context, array[i++]);
+	            if (isPromise(ret)) {
+	                ret.then(function (r) { results.push(r); next(null, r); }, next);
+	            }
+	            else if (ret instanceof Error) {
+	                next(ret);
+	            }
+	            else {
+	                next(null);
+	            }
+	        }
+	        next(null);
+	    });
+	}
+	exports.mapAsync = mapAsync;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
 /* 77 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var promises_1 = __webpack_require__(76);
+	var utils_1 = __webpack_require__(68);
+	var request_1 = __webpack_require__(78);
+	(function (RestMethod) {
+	    RestMethod[RestMethod["Create"] = 0] = "Create";
+	    RestMethod[RestMethod["Update"] = 1] = "Update";
+	    RestMethod[RestMethod["Read"] = 2] = "Read";
+	    RestMethod[RestMethod["Patch"] = 3] = "Patch";
+	    RestMethod[RestMethod["Delete"] = 4] = "Delete";
+	})(exports.RestMethod || (exports.RestMethod = {}));
+	var RestMethod = exports.RestMethod;
+	;
+	var xmlRe = /^(?:application|text)\/xml/;
+	var jsonRe = /^application\/json/;
+	var getData = function (accepts, xhr) {
+	    if (accepts == null)
+	        accepts = xhr.getResponseHeader('content-type');
+	    if (xmlRe.test(accepts)) {
+	        return xhr.responseXML;
+	    }
+	    else if (jsonRe.test(accepts) && xhr.responseText !== '') {
+	        return JSON.parse(xhr.responseText);
+	    }
+	    else {
+	        return xhr.responseText;
+	    }
+	};
+	var isValid = function (xhr) {
+	    return (xhr.status >= 200 && xhr.status < 300) ||
+	        (xhr.status === 304) ||
+	        (xhr.status === 0 && window.location.protocol === 'file:');
+	};
+	function sync(method, model, options) {
+	    var http;
+	    switch (method) {
+	        case RestMethod.Create:
+	            http = 'POST';
+	            break;
+	        case RestMethod.Update:
+	            http = "PUT";
+	            break;
+	        case RestMethod.Patch:
+	            http = "PATCH";
+	            break;
+	        case RestMethod.Delete:
+	            http = "DELETE";
+	            break;
+	        case RestMethod.Read:
+	            http = "GET";
+	            break;
+	        default:
+	            return promises_1.Promise.reject(new Error("Sync: does not recognise method: " + method));
+	    }
+	    var xhr = utils_1.ajax();
+	    var query, url = options.url;
+	    if (options.params)
+	        query = request_1.queryParam(options.params);
+	    if (query) {
+	        var sep = (options.url.indexOf('?') === -1) ? '?' : '&';
+	        url += sep + query.substring(1);
+	    }
+	    return new promises_1.Promise(function (resolve, reject) {
+	        xhr.onreadystatechange = function () {
+	            if (xhr.readyState !== 4)
+	                return;
+	            var response = {
+	                method: method,
+	                status: xhr.status,
+	                content: getData(options.headers['Accept'], xhr)
+	            };
+	            utils_1.proxy(response, xhr, ['getAllResponseHeaders', 'getResponseHeader']);
+	            if (isValid(xhr)) {
+	                return resolve(response);
+	            }
+	            else {
+	                var error = new Error('Server responded with status of ' + xhr.statusText);
+	                return reject(error);
+	            }
+	        };
+	        xhr.open(http, url, true);
+	        if (!(options.headers && options.headers['Accept'])) {
+	            options.headers = {
+	                Accept: "application/json"
+	            };
+	        }
+	        if (options.headers)
+	            for (var key in options.headers) {
+	                xhr.setRequestHeader(key, options.headers[key]);
+	            }
+	        if (options.beforeSend)
+	            options.beforeSend(xhr);
+	        xhr.send(model.toJSON());
+	    });
+	}
+	exports.sync = sync;
+
+
+/***/ },
+/* 78 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var utils_1 = __webpack_require__(68);
+	var promises_1 = __webpack_require__(76);
+	var xmlRe = /^(?:application|text)\/xml/, jsonRe = /^application\/json/, fileProto = /^file:/;
+	function queryParam(obj) {
+	    return '?' + Object.keys(obj).reduce(function (a, k) { a.push(k + '=' + encodeURIComponent(obj[k])); return a; }, []).join('&');
+	}
+	exports.queryParam = queryParam;
+	var isValid = function (xhr, url) {
+	    return (xhr.status >= 200 && xhr.status < 300) ||
+	        (xhr.status === 304) ||
+	        (xhr.status === 0 && fileProto.test(url)) ||
+	        (xhr.status === 0 && window.location.protocol === 'file:');
+	};
+	var Request = (function () {
+	    function Request(_method, _url) {
+	        this._method = _method;
+	        this._url = _url;
+	        this._xhr = utils_1.ajax();
+	    }
+	    Request.prototype.send = function (data) {
+	        this._data = data;
+	        return this;
+	    };
+	    Request.prototype.withCredentials = function (ret) {
+	        this._xhr.withCredentials = ret;
+	        return this;
+	    };
+	    Request.prototype.end = function (data) {
+	        var _this = this;
+	        this._data = data || this._data;
+	        var defer = promises_1.deferred();
+	        this._xhr.addEventListener('readystatechange', function () {
+	            if (_this._xhr.readyState !== XMLHttpRequest.DONE)
+	                return;
+	            if (!isValid(_this._xhr, _this._url)) {
+	                return defer.reject(new Error('server responded with: ' + _this._xhr.status));
+	            }
+	            defer.resolve(_this._xhr.responseText);
+	        });
+	        data = this._data;
+	        var url = this._url;
+	        if (data && data === Object(data)) {
+	            var d = queryParam(data);
+	            url += d;
+	        }
+	        this._xhr.open(this._method, url, true);
+	        this._xhr.send(data);
+	        return defer.promise;
+	    };
+	    Request.prototype.json = function (data) {
+	        var _this = this;
+	        return this.end(data)
+	            .then(function (str) {
+	            var accepts = _this._xhr.getResponseHeader('content-type');
+	            if (jsonRe.test(accepts) && str !== '') {
+	                var json = JSON.parse(str);
+	                return json;
+	            }
+	            else {
+	                throw new Error('json');
+	            }
+	        });
+	    };
+	    Request.prototype.progress = function (fn) {
+	        this._xhr.addEventListener('progress', fn);
+	        return this;
+	    };
+	    Request.prototype.header = function (field, value) {
+	        this._xhr.setRequestHeader(field, value);
+	        return this;
+	    };
+	    return Request;
+	})();
+	exports.Request = Request;
+	var request;
+	(function (request) {
+	    function get(url) {
+	        return new Request('GET', url);
+	    }
+	    request.get = get;
+	    function post(url) {
+	        return new Request('POST', url);
+	    }
+	    request.post = post;
+	    function put(url) {
+	        return new Request('PUT', url);
+	    }
+	    request.put = put;
+	    function del(url) {
+	        return new Request('DELETE', url);
+	    }
+	    request.del = del;
+	})(request = exports.request || (exports.request = {}));
+
+
+/***/ },
+/* 79 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var collection_1 = __webpack_require__(65);
+	var rest_collection_1 = __webpack_require__(74);
+	var promises_1 = __webpack_require__(76);
+	var persistence_1 = __webpack_require__(77);
+	var objects_1 = __webpack_require__(69);
+	var request_1 = __webpack_require__(78);
+	var PARAM_TRIM_RE = /[\s'"]/g;
+	var URL_TRIM_RE = /[<>\s'"]/g;
+	function queryStringToParams(qs) {
+	    var kvp, k, v, ls, params = {}, decode = decodeURIComponent;
+	    var kvps = qs.split('&');
+	    for (var i = 0, l = kvps.length; i < l; i++) {
+	        var param = kvps[i];
+	        kvp = param.split('='), k = kvp[0], v = kvp[1];
+	        if (v == null)
+	            v = true;
+	        k = decode(k), v = decode(v), ls = params[k];
+	        if (Array.isArray(ls))
+	            ls.push(v);
+	        else if (ls)
+	            params[k] = [ls, v];
+	        else
+	            params[k] = v;
+	    }
+	    return params;
+	}
+	var PaginatedCollection = (function (_super) {
+	    __extends(PaginatedCollection, _super);
+	    function PaginatedCollection(models, options) {
+	        if (options === void 0) { options = {}; }
+	        _super.call(this, models, options);
+	        this._state = { first: 1, last: -1, current: 1, size: 10 };
+	        this._link = {};
+	        this.queryParams = {
+	            page: 'page',
+	            size: 'pageSize'
+	        };
+	        if (options.queryParams) {
+	            objects_1.extend(this.queryParams, options.queryParams);
+	        }
+	        if (options.firstPage)
+	            this._state.first = options.firstPage;
+	        if (options.pageSize)
+	            this._state.size = options.pageSize;
+	        this._state.current = this._state.first;
+	        this._page = new collection_1.Collection();
+	        this._page.Model = this.Model;
+	    }
+	    Object.defineProperty(PaginatedCollection.prototype, "page", {
+	        get: function () {
+	            return this._page;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    PaginatedCollection.prototype.hasNext = function () {
+	        return this.hasPage(this._state.current + 1);
+	    };
+	    PaginatedCollection.prototype.hasPrevious = function () {
+	        return this.hasPage(this._state.current - 1);
+	    };
+	    PaginatedCollection.prototype.hasPage = function (page) {
+	        if (this._state.last > -1) {
+	            return page <= this._state.last;
+	        }
+	        return false;
+	    };
+	    PaginatedCollection.prototype.getPreviousPage = function (options) {
+	        options = options ? objects_1.extend({}, options) : {};
+	        options.page = this._state.current - 1;
+	        return this.getPage(options);
+	    };
+	    PaginatedCollection.prototype.getNextPage = function (options) {
+	        options = options ? objects_1.extend({}, options) : {};
+	        options.page = this._state.current + 1;
+	        return this.getPage(options);
+	    };
+	    PaginatedCollection.prototype.getPage = function (options) {
+	        options = options ? objects_1.extend({}, options) : {};
+	        if (options.page === void 0)
+	            return promises_1.Promise.reject(new Error("No page"));
+	        if (this._state.last < options.page && this._state.last != -1) {
+	            options.page = this._state.last;
+	        }
+	        else if (options.page < this._state.first) {
+	            options.page = this._state.first;
+	        }
+	        return this.fetch(options);
+	    };
+	    PaginatedCollection.prototype.fetch = function (options) {
+	        var _this = this;
+	        if (options === void 0) { options = {}; }
+	        options = options ? objects_1.extend({}, options) : {};
+	        var url;
+	        if (!objects_1.has(options, 'page')) {
+	            options.page = this._state.current;
+	        }
+	        var params = options.params ? objects_1.extend({}, options.params) : {};
+	        if (objects_1.has(params, this.queryParams.page))
+	            delete params[this.queryParams.page];
+	        url = this._link[options.page];
+	        if (!url) {
+	            url = this.getURL();
+	        }
+	        if (!url)
+	            return promises_1.Promise.reject(new Error("no url specified"));
+	        var idx = url.indexOf('?');
+	        if (idx > -1) {
+	            params = objects_1.extend(params, queryStringToParams(url.substr(idx + 1)));
+	            url = url.substr(0, idx);
+	        }
+	        if (!objects_1.has(params, this.queryParams.page)) {
+	            params[this.queryParams.page] = options.page;
+	        }
+	        options.params = params;
+	        options.url = url;
+	        this.trigger('before:fetch', this, options);
+	        params[this.queryParams.size] = this._state.size;
+	        if (!this._link[options.page + '']) {
+	            this._link[options.page] = url + request_1.queryParam({ page: options.page });
+	        }
+	        return this.sync(persistence_1.RestMethod.Read, this, options)
+	            .then(function (resp) {
+	            _this._processResponse(resp, options);
+	            _this.trigger('fetch', _this, resp, options);
+	            return _this;
+	        }).catch(function (e) {
+	            _this.trigger('error', e);
+	            throw e;
+	        });
+	    };
+	    PaginatedCollection.prototype._processResponse = function (resp, options) {
+	        var currentPage = options.page;
+	        var links = this._parseLinkHeaders(resp);
+	        if (links.first)
+	            this._link[this._state.first] = links.first;
+	        if (links.prev)
+	            this._link[currentPage - 1] = links.prev;
+	        if (links.next)
+	            this._link[currentPage + 1] = links.next;
+	        if (links.last) {
+	            var last = links.last;
+	            var idx = last.indexOf('?');
+	            if (idx > -1) {
+	                var params = queryStringToParams(last.substr(idx + 1));
+	                if (objects_1.has(params, this.queryParams.page)) {
+	                    this._link[params[this.queryParams.page]] = last;
+	                    this._state.last = parseInt(params[this.queryParams.page]);
+	                }
+	            }
+	        }
+	        this._state.current = currentPage;
+	        var data = resp.content;
+	        if (data && !Array.isArray(data))
+	            data = [data];
+	        if (!data)
+	            return this;
+	        data = this.parse(data);
+	        for (var i = 0, ii = data.length; i < ii; i++) {
+	            data[i] = this._prepareModel(data[i]);
+	        }
+	        this[options.reset ? 'reset' : 'set'](data, options);
+	        this.page.reset(data);
+	        return this;
+	    };
+	    PaginatedCollection.prototype._parseLinkHeaders = function (resp) {
+	        var link = {};
+	        if (typeof resp['getResponseHeader'] !== 'function') {
+	            return link;
+	        }
+	        var linkHeader = resp['getResponseHeader']('Link');
+	        if (!linkHeader)
+	            return link;
+	        linkHeader = linkHeader.split(',');
+	        var relations = ['first', 'prev', 'next', 'last'];
+	        for (var i = 0, ii = linkHeader.length; i < ii; i++) {
+	            var linkParts = linkHeader[i].split(';'), url = linkParts[0].replace(URL_TRIM_RE, ''), params = linkParts.slice(1);
+	            for (var x = 0, xx = params.length; x < xx; x++) {
+	                var paramParts = params[x].split('='), key = paramParts[0].replace(PARAM_TRIM_RE, ''), value = paramParts[1].replace(PARAM_TRIM_RE, '');
+	                if (key == 'rel' && !!~relations.indexOf(value))
+	                    link[value] = url;
+	            }
+	        }
+	        return link;
+	    };
+	    return PaginatedCollection;
+	}(rest_collection_1.RestCollection));
+	exports.PaginatedCollection = PaginatedCollection;
+
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
+	    return new Promise(function (resolve, reject) {
+	        generator = generator.call(thisArg, _arguments);
+	        function cast(value) {
+	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
+	                resolve(value);
+	            });
+	        }
+	        function onfulfill(value) {
+	            try {
+	                step("next", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function onreject(value) {
+	            try {
+	                step("throw", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(verb, value) {
+	            var result = generator[verb](value);
+	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        }
+	        step("next", void 0);
+	    });
+	};
+	var internal_1 = __webpack_require__(16);
+	var errors_1 = __webpack_require__(61);
+	var repository_1 = __webpack_require__(30);
+	var utils = __webpack_require__(6);
+	var module_factory_1 = __webpack_require__(62);
+	var container_1 = __webpack_require__(81);
+	var base_component_1 = __webpack_require__(82);
+	var templ = __webpack_require__(31);
+	var annotations = __webpack_require__(15);
+	exports.decorators = annotations;
+	function service(name, definition) {
+	    var _internal_1$getDepend = internal_1.getDependencies(definition);
+
+	    var _internal_1$getDepend2 = _slicedToArray(_internal_1$getDepend, 1);
+
+	    var fn = _internal_1$getDepend2[0];
+
+	    if (fn && typeof fn === 'function') {
+	        repository_1.Repository.add(internal_1.DependencyType.Service, name, fn);
+	    } else {
+	        throw new errors_1.StickError('service should be a function');
+	    }
+	}
+	exports.service = service;
+	function factory(name, factory) {
+	    var _internal_1$getDepend3 = internal_1.getDependencies(factory);
+
+	    var _internal_1$getDepend4 = _slicedToArray(_internal_1$getDepend3, 1);
+
+	    var fn = _internal_1$getDepend4[0];
+
+	    if (!fn) throw new errors_1.StickError('factory');
+	    repository_1.Repository.add(internal_1.DependencyType.Factory, name, fn);
+	}
+	exports.factory = factory;
+	var container = new container_1.Container();
+	function _module(name) {
+	    var definition = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+	    if (definition == null) {
+	        var _factory = undefined;
+	        // Check if module already is defined
+	        if (container.hasHandler(name)) {
+	            _factory = container.get(name);
+	        } else if (repository_1.Repository.has(internal_1.DependencyType.Module, name)) {
+	            var result = repository_1.Repository.get(internal_1.DependencyType.Module, name);
+	            _factory = new module_factory_1.ModuleFactory(name, result.handler, container.createChild());
+	            container.registerInstance(name, _factory);
+	        } else {
+	            throw new errors_1.StickError("no module named " + name);
+	        }
+	        return _factory;
+	    }
+
+	    var _internal_1$getDepend5 = internal_1.getDependencies(definition);
+
+	    var _internal_1$getDepend6 = _slicedToArray(_internal_1$getDepend5, 2);
+
+	    var def = _internal_1$getDepend6[0];
+	    var deps = _internal_1$getDepend6[1];
+
+	    if (def) {
+	        var fn = undefined;
+	        if (typeof def !== 'function' && utils.isObject(def)) {
+	            var copy = utils.extend({}, def);
+	            if (typeof def.initialize === 'function') {
+	                fn = def.initialize;
+	                delete copy.initialize;
+	            } else if (typeof def.constructor === 'function') {
+	                fn = def.constructor;
+	                delete copy.constructor;
+	            }
+	            if (!deps || deps.length == 0) {
+	                internal_1.getDependencies(fn);
+	            } else {
+	                fn.inject = deps;
+	            }
+	            utils.assign(fn.prototype, copy);
+	        } else if (typeof def === 'function') {
+	            fn = def;
+	        }
+	        if (typeof fn !== 'function') {
+	            throw new errors_1.StickError('controller defition should be a function or an object literal');
+	        }
+	        var _factory2 = new module_factory_1.ModuleFactory(name, fn, container.createChild());
+	        container.registerInstance(name, _factory2, true);
+	        return _factory2;
+	    } else {
+	        throw new errors_1.StickError('controller defition should be a function or an object literal');
+	    }
+	}
+	exports.module = _module;
+	function component(name, handler) {
+	    //let component: ComponentDefinition
+	    var Component = undefined;
+	    if (typeof handler === 'function') {
+	        /*component = {
+	            initialize: <any>handler,
+	        }*/
+	        Component = handler;
+	    } else if (utils.isObject(handler) && typeof handler.initialize === 'function') {
+	        Component = utils.inherits(base_component_1.BaseComponent, handler);
+	    } else {
+	        throw new errors_1.StickError("component should be a function or an object");
+	    }
+	    //let Component = utils.inherits(<any>BaseComponent, component)
+	    templ.component(name, Component);
+	}
+	exports.component = component;
+	function attribute(name, handler) {
+	    templ.attribute(name, handler);
+	}
+	exports.attribute = attribute;
+	function decorator(name, decorator) {
+	    if (utils.has(exports.decorators, name)) {
+	        throw new Error("decorator called " + name + " already defined!");
+	    }
+	    exports.decorators[name] = decorator;
+	}
+	exports.decorator = decorator;
+	function modifier(name, modifier) {
+	    templ.modifier(name, modifier);
+	}
+	exports.modifier = modifier;
+
+/***/ },
+/* 81 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
+	    return new Promise(function (resolve, reject) {
+	        generator = generator.call(thisArg, _arguments);
+	        function cast(value) {
+	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
+	                resolve(value);
+	            });
+	        }
+	        function onfulfill(value) {
+	            try {
+	                step("next", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function onreject(value) {
+	            try {
+	                step("throw", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(verb, value) {
+	            var result = generator[verb](value);
+	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        }
+	        step("next", void 0);
+	    });
+	};
+	function __export(m) {
+	    for (var p in m) {
+	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	    }
+	}
+	var stick_di_1 = __webpack_require__(17);
+	var errors_1 = __webpack_require__(61);
+	var repository_1 = __webpack_require__(30);
+	var internal_1 = __webpack_require__(16);
+	var utils = __webpack_require__(6);
+	var controller_factory_1 = __webpack_require__(60);
+	__export(__webpack_require__(17));
+	function tryCatch(fn, ctx, args) {
+	    var result = undefined,
+	        error = undefined;
+	    try {
+	        result = utils.callFunc(fn, ctx, args);
+	    } catch (e) {
+	        error = e;
+	    }
+	    return [result, error];
+	}
+	exports.tryCatch = tryCatch;
+	// TODO: Handle instances in unregister
+
+	var Container = function (_stick_di_1$DIContain) {
+	    _inherits(Container, _stick_di_1$DIContain);
+
+	    function Container(info) {
+	        _classCallCheck(this, Container);
+
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Container).call(this, info));
+
+	        _this.__instances = new Map();
+	        return _this;
+	    }
+
+	    _createClass(Container, [{
+	        key: "hasInstance",
+	        value: function hasInstance(key) {
+	            return this.__instances.has(key);
+	        }
+	    }, {
+	        key: "hasHandler",
+	        value: function hasHandler(name, parent, repository) {
+	            var has = _get(Object.getPrototypeOf(Container.prototype), "hasHandler", this).call(this, name, parent);
+	            return !has && repository ? repository_1.Repository.hasAny(name) : has;
+	        }
+	    }, {
+	        key: "get",
+	        value: function get(key, targetKey) {
+	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	                var entry;
+	                return regeneratorRuntime.wrap(function _callee$(_context) {
+	                    while (1) {
+	                        switch (_context.prev = _context.next) {
+	                            case 0:
+	                                if (!(key === null || key === undefined)) {
+	                                    _context.next = 2;
+	                                    break;
+	                                }
+
+	                                throw new stick_di_1.DIBadKeyError();
+
+	                            case 2:
+	                                if (!(key === stick_di_1.DIContainer)) {
+	                                    _context.next = 4;
+	                                    break;
+	                                }
+
+	                                return _context.abrupt("return", this);
+
+	                            case 4:
+	                                if (!(key instanceof stick_di_1.Resolver)) {
+	                                    _context.next = 6;
+	                                    break;
+	                                }
+
+	                                return _context.abrupt("return", key.get(this));
+
+	                            case 6:
+	                                entry = this.entries.get(key);
+
+	                                if (!(entry !== undefined)) {
+	                                    _context.next = 9;
+	                                    break;
+	                                }
+
+	                                return _context.abrupt("return", entry[0](this));
+
+	                            case 9:
+	                                if (!(this.parent && this.parent.hasHandler(key))) {
+	                                    _context.next = 11;
+	                                    break;
+	                                }
+
+	                                return _context.abrupt("return", this.parent.get(key, targetKey));
+
+	                            case 11:
+	                                entry = repository_1.Repository.any(key);
+
+	                                if (!(entry != null)) {
+	                                    _context.next = 15;
+	                                    break;
+	                                }
+
+	                                this.register(entry);
+	                                return _context.abrupt("return", this.entries.get(key)[0](this));
+
+	                            case 15:
+	                                if (!(typeof key === 'string')) {
+	                                    _context.next = 17;
+	                                    break;
+	                                }
+
+	                                throw new errors_1.StickDependencyError('no component registered for key: ' + key);
+
+	                            case 17:
+	                                this.autoRegister(key, targetKey);
+	                                entry = this.entries.get(key);
+	                                return _context.abrupt("return", entry[0](this));
+
+	                            case 20:
+	                            case "end":
+	                                return _context.stop();
+	                        }
+	                    }
+	                }, _callee, this);
+	            }));
+	        }
+	    }, {
+	        key: "registerSingleton",
+	        value: function registerSingleton(key, fn) {
+	            var _this2 = this;
+
+	            var targetKey = arguments.length <= 2 || arguments[2] === undefined ? undefined : arguments[2];
+
+	            return this.registerHandler(key, function (x) {
+	                if (_this2.__instances.has(key)) {
+	                    return _this2.__instances.get(key);
+	                } else {
+	                    var singleton = _this2.invoke(fn, null, targetKey);
+	                    if (utils.isPromise(singleton)) {}
+	                    _this2.__instances.set(key, singleton);
+	                    return singleton;
+	                }
+	            });
+	        }
+	    }, {
+	        key: "registerService",
+	        value: function registerService(key, fn) {
+	            var _this3 = this;
+
+	            var targetKey = arguments.length <= 2 || arguments[2] === undefined ? undefined : arguments[2];
+
+	            var name = undefined;
+	            if (typeof key === 'string') {
+	                name = key;
+	            } else {
+	                name = key.name;
+	            }
+	            var configKey = name + 'Provider';
+	            var Config = stick_di_1.Metadata.getOwn(internal_1.DIServiceConfig, fn, targetKey);
+	            if (Config != null) {
+	                if (this.hasHandler(configKey, false, false)) {
+	                    throw new Error("Provider for '" + name + "' already defined");
+	                }
+	                var config = new Config();
+	                this.registerInstance(configKey, config);
+	            }
+	            return this.registerHandler(key, function (x) {
+	                if (_this3.__instances.has(key)) {
+	                    return _this3.__instances.get(key);
+	                } else {
+	                    var singleton = _this3.invoke(fn, null, targetKey);
+	                    _this3.__instances.set(key, singleton);
+	                    _this3.unregister(configKey);
+	                    return singleton;
+	                }
+	            });
+	        }
+	    }, {
+	        key: "registerInstance",
+	        value: function registerInstance(key, instance) {
+	            var track = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
+	            _get(Object.getPrototypeOf(Container.prototype), "registerInstance", this).call(this, key, instance);
+	            if (track) {
+	                this.__instances.set(key, instance);
+	            }
+	        }
+	    }, {
+	        key: "invoke",
+	        value: function invoke(fn, deps, targetKey) {
+	            var info = this._getOrCreateConstructionSet(fn, targetKey);
+	            try {
+	                var keys, args;
+	                if (info.dependencyResolver) {
+	                    args = info.dependencyResolver.resolveDependencies(fn);
+	                } else {
+	                    args = this.resolveDependencies(fn, targetKey);
+	                }
+	                if (deps !== undefined && Array.isArray(deps)) {
+	                    args = args.concat(deps);
+	                }
+	                return utils.arrayToPromise(args).then(function (args) {
+	                    return info.activator.invoke(fn, args, targetKey, keys);
+	                });
+	            } catch (e) {
+	                var activatingText = info.activator instanceof stick_di_1.ClassActivator ? 'instantiating' : 'invoking';
+	                var message = "Error " + activatingText + " " + fn.name + ".";
+	                message += ' Check the inner error for details.';
+	                throw new errors_1.StickDependencyError(message, [e]);
+	            }
+	        }
+	    }, {
+	        key: "clear",
+	        value: function clear() {
+	            var keys = this.__instances.keys();
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+
+	            try {
+	                for (var _iterator = keys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var key = _step.value;
+
+	                    this.destroy(key);
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+	        }
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            var key = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+	            var fn = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+	            if (key == null) {
+	                var _iteratorNormalCompletion2 = true;
+	                var _didIteratorError2 = false;
+	                var _iteratorError2 = undefined;
+
+	                try {
+	                    for (var _iterator2 = this.__instances.keys()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	                        var _key = _step2.value;
+
+	                        this.destroy(_key, fn);
+	                    }
+	                } catch (err) {
+	                    _didIteratorError2 = true;
+	                    _iteratorError2 = err;
+	                } finally {
+	                    try {
+	                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	                            _iterator2.return();
+	                        }
+	                    } finally {
+	                        if (_didIteratorError2) {
+	                            throw _iteratorError2;
+	                        }
+	                    }
+	                }
+
+	                delete this.constructionInfo;
+	                this.constructionInfo = new Map();
+	                //this.entries
+	                return;
+	            }
+	            var instance = this.__instances.get(key);
+	            if (instance) {
+	                if (fn) {
+	                    fn(instance);
+	                } else if (typeof instance.$destroy === 'function') {
+	                    instance.$destroy();
+	                }
+	                this.__instances.delete(key);
+	                instance = void 0;
+	            } else {
+	                console.log('could not find key ', key);
+	            }
+	        }
+	    }, {
+	        key: "register",
+	        value: function register(item) {
+	            switch (item.type) {
+	                case internal_1.DependencyType.Controller:
+	                    var factory = new controller_factory_1.ControllerFactory(item.name, item.handler, this.createChild());
+	                    this.registerInstance(item.name, factory, true);
+	                    break;
+	                case internal_1.DependencyType.Service:
+	                    this.registerService(item.name, item.handler);
+	                    break;
+	                case internal_1.DependencyType.Factory:
+	                    if (typeof item.handler === 'function') {
+	                        internal_1.setActivator(item.handler, stick_di_1.FactoryActivator.instance);
+	                        this.registerSingleton(item.name, item.handler);
+	                    } else {
+	                        this.registerInstance(item.name, item.handler);
+	                    }
+	                    break;
+	            }
+	        }
+	    }, {
+	        key: "createChild",
+	        value: function createChild() {
+	            var child = new Container();
+	            child.parent = this;
+	            return child;
+	        }
+	    }]);
+
+	    return Container;
+	}(stick_di_1.DIContainer);
+
+	exports.Container = Container;
+
+/***/ },
+/* 82 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
+	    return new Promise(function (resolve, reject) {
+	        generator = generator.call(thisArg, _arguments);
+	        function cast(value) {
+	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
+	                resolve(value);
+	            });
+	        }
+	        function onfulfill(value) {
+	            try {
+	                step("next", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function onreject(value) {
+	            try {
+	                step("throw", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(verb, value) {
+	            var result = generator[verb](value);
+	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        }
+	        step("next", void 0);
+	    });
+	};
+	var utilities_1 = __webpack_require__(6);
+	var vnode_1 = __webpack_require__(33);
+
+	var BaseComponent = function () {
+	    function BaseComponent(section, vvnode, attributes, view) {
+	        _classCallCheck(this, BaseComponent);
+
+	        if (this.update) {
+	            this.update = utilities_1.bind(this.update, this);
+	        }
+	        this.section = section;
+	        this.vnode = vvnode;
+	        this.attributes = attributes;
+	        this.view = view;
+	        this.document = view.template.options.document;
+	        if (vvnode.childNodes) this.childTemplate = vnode_1.template(vnode_1.fragment(vvnode.childNodes), view.template.options);
+	        for (var key in attributes) {
+	            this.setAttribute(key, attributes[key]);
+	        }var container = this.view.container;
+	        this.initialize.call(this, container);
+	    }
+
+	    _createClass(BaseComponent, [{
+	        key: "initialize",
+	        value: function initialize() {}
+	    }, {
+	        key: "setAttribute",
+	        value: function setAttribute(key, value) {
+	            this.attributes[key] = value;
+	        }
+	    }, {
+	        key: "removeAttribute",
+	        value: function removeAttribute(key) {
+	            this.attributes[key] = void 0;
+	        }
+	    }, {
+	        key: "getAttribute",
+	        value: function getAttribute(key) {
+	            return this.attributes[key];
+	        }
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            var a = this;
+	            if (typeof a.onDestroy === 'function') {
+	                a.onDestroy();
+	            }
+	        }
+	    }]);
+
+	    return BaseComponent;
+	}();
+
+	exports.BaseComponent = BaseComponent;
+
+/***/ },
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -13525,7 +14307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.HttpService = HttpService;
 
 /***/ },
-/* 78 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -13559,9 +14341,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        step("next", void 0);
 	    });
 	};
-	var Stick = __webpack_require__(58);
-	var template_view_1 = __webpack_require__(79);
-	var templ = __webpack_require__(61);
+	var Stick = __webpack_require__(80);
+	var template_view_1 = __webpack_require__(85);
+	var templ = __webpack_require__(31);
 	var utils = __webpack_require__(6);
 	Stick.factory('$templateResolver', function () {
 	    return function (name) {
@@ -13583,7 +14365,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}]);
 
 /***/ },
-/* 79 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13598,8 +14380,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var view_1 = __webpack_require__(66);
-	var collection_1 = __webpack_require__(48);
+	var view_1 = __webpack_require__(49);
+	var collection_1 = __webpack_require__(64);
 	var utilities_1 = __webpack_require__(6);
 	var debug = __webpack_require__(23)('stick:template:view');
 
@@ -13781,7 +14563,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.TemplateView = TemplateView;
 
 /***/ },
-/* 80 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13867,7 +14649,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Mediator = Mediator;
 
 /***/ },
-/* 81 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -13908,7 +14690,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	};
 	var utils = __webpack_require__(6);
-	var stick = __webpack_require__(58);
+	var stick = __webpack_require__(80);
 
 	var Html = function () {
 	    function Html(el) {
@@ -14026,7 +14808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 82 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14065,26 +14847,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	    }
 	}
-	var stick_1 = __webpack_require__(58);
-	__export(__webpack_require__(79));
-	var controller_1 = __webpack_require__(83);
-	var repeat_1 = __webpack_require__(84);
-	var show_1 = __webpack_require__(85);
-	var unsafe_1 = __webpack_require__(86);
-	var delegate_1 = __webpack_require__(87);
+	var stick_1 = __webpack_require__(80);
+	__export(__webpack_require__(85));
+	var controller_1 = __webpack_require__(89);
+	var repeat_1 = __webpack_require__(90);
+	var show_1 = __webpack_require__(91);
+	var unsafe_1 = __webpack_require__(92);
+	var delegate_1 = __webpack_require__(93);
+	var view_1 = __webpack_require__(94);
 	stick_1.component('controller', controller_1.Controller);
 	stick_1.component('repeat', repeat_1.Repeat);
 	stick_1.component('hide', show_1.Hide);
 	stick_1.component('show', show_1.Show);
 	stick_1.component('unsafe', unsafe_1.Unsafe);
 	stick_1.component('delegate', delegate_1.Delegate);
-	__export(__webpack_require__(60));
+	stick_1.component('view', view_1.View);
+	__export(__webpack_require__(82));
 
 /***/ },
-/* 83 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
 	    return new Promise(function (resolve, reject) {
@@ -14115,150 +14909,145 @@ return /******/ (function(modules) { // webpackBootstrap
 	        step("next", void 0);
 	    });
 	};
-	var controller_factory_1 = __webpack_require__(31);
-	exports.Controller = {
-	    initialize: function initialize($container) {
-	        if (this.attributes['name']) {
-	            this.name = this.attributes['name'];
-	            this.as = this.attributes['as'] || this.name;
+	//import {components, View, compile, vnode} from 'templ'
+	//import {DIContainer} from 'stick.di'
+	var utilities_1 = __webpack_require__(6);
+	var base_component_1 = __webpack_require__(82);
+	var controller_factory_1 = __webpack_require__(60);
+	//import {ComponentDefinition} from '../index'
+
+	var Controller = function (_base_component_1$Bas) {
+	    _inherits(Controller, _base_component_1$Bas);
+
+	    function Controller() {
+	        _classCallCheck(this, Controller);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Controller).apply(this, arguments));
+	    }
+
+	    _createClass(Controller, [{
+	        key: "initialize",
+	        value: function initialize() {
+	            if (this.attributes['name']) {
+	                this.name = this.attributes['name'];
+	                this.as = this.attributes['as'] || this.name;
+	            }
 	        }
-	        // this.factory = $container.get(this.name);
-	        // if (!(this.factory instanceof ControllerFactory)) {
-	        // 	throw new Error(this.name + ' is not a controller');
-	        // }
-	        // let template:string|Template = this.childTemplate
-	        // if (this.attributes['template']) {
-	        // 	template = this.attributes['template'];
-	        // }
-	        // this.factory.create({
-	        // 	template: template,
-	        // 	contextName: this.as
-	        // }).then( controller => {
-	        // 	let el = this.factory.container.get('$el');
-	        // 	this.section.appendChild(el);
-	        // });
-	    },
-	    update: function update() {
-	        return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
-	            var template, controller, el;
-	            return regeneratorRuntime.wrap(function _callee$(_context) {
-	                while (1) {
-	                    switch (_context.prev = _context.next) {
-	                        case 0:
-	                            if (!this.factory) {
-	                                _context.next = 3;
-	                                break;
-	                            }
+	    }, {
+	        key: "update",
+	        value: function update() {
+	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	                var view, template, state, s, controller, el;
+	                return regeneratorRuntime.wrap(function _callee$(_context) {
+	                    while (1) {
+	                        switch (_context.prev = _context.next) {
+	                            case 0:
+	                                if (!this.factory) {
+	                                    _context.next = 7;
+	                                    break;
+	                                }
 
-	                            if (this.factory.container.hasHandler('template')) {}
-	                            return _context.abrupt("return");
+	                                if (!this.factory.container.hasHandler('template')) {
+	                                    _context.next = 6;
+	                                    break;
+	                                }
 
-	                        case 3:
-	                            _context.next = 5;
-	                            return this.view.container.get(this.name);
+	                                _context.next = 4;
+	                                return this.factory.container.get('template');
 
-	                        case 5:
-	                            this.factory = _context.sent;
+	                            case 4:
+	                                view = _context.sent;
 
-	                            if (this.factory instanceof controller_factory_1.ControllerFactory) {
-	                                _context.next = 8;
-	                                break;
-	                            }
+	                                view.update();
 
-	                            throw new Error(this.name + ' is not a controller');
+	                            case 6:
+	                                return _context.abrupt("return");
 
-	                        case 8:
-	                            template = this.childTemplate;
+	                            case 7:
+	                                if (!this.resolving) {
+	                                    _context.next = 9;
+	                                    break;
+	                                }
 
-	                            if (this.attributes['template']) {
-	                                template = this.attributes['template'];
-	                            }
-	                            _context.next = 12;
-	                            return this.factory.create({
-	                                template: template,
-	                                contextName: this.as,
-	                                parentView: this.view
-	                            });
+	                                return _context.abrupt("return");
 
-	                        case 12:
-	                            controller = _context.sent;
-	                            _context.next = 15;
-	                            return this.factory.container.get('$el');
+	                            case 9:
+	                                this.resolving = true;
+	                                _context.next = 12;
+	                                return this.view.container.get(this.name);
 
-	                        case 15:
-	                            el = _context.sent;
+	                            case 12:
+	                                this.factory = _context.sent;
 
-	                            this.section.appendChild(el);
-	                            /*this.factory.create({
-	                                template: template,
-	                                contextName: this.as
-	                            }).then( controller => {
-	                                let el = this.factory.container.get('$el');
-	                                     this.section.appendChild(el);
-	                            });*/
+	                                if (this.factory instanceof controller_factory_1.ControllerFactory) {
+	                                    _context.next = 15;
+	                                    break;
+	                                }
 
-	                        case 17:
-	                        case "end":
-	                            return _context.stop();
+	                                throw new Error(this.name + ' is not a controller');
+
+	                            case 15:
+	                                template = this.childTemplate;
+
+	                                if (this.attributes['template']) {
+	                                    template = this.attributes['template'];
+	                                }
+	                                state = {};
+
+	                                if (this.attributes['state']) {
+	                                    s = this.attributes['state'];
+
+	                                    try {
+	                                        state = utilities_1.isString(s) ? JSON.parse(s) : Object(s);
+	                                    } catch (e) {
+	                                        console.warn('Could not parse model tag');
+	                                    }
+	                                }
+	                                _context.next = 21;
+	                                return this.factory.create({
+	                                    template: template,
+	                                    contextName: this.as,
+	                                    parentView: this.view,
+	                                    state: state
+	                                });
+
+	                            case 21:
+	                                controller = _context.sent;
+	                                _context.next = 24;
+	                                return this.factory.container.get('$el');
+
+	                            case 24:
+	                                el = _context.sent;
+
+	                                this.section.appendChild(el);
+	                                this.resolving = false;
+
+	                            case 27:
+	                            case "end":
+	                                return _context.stop();
+	                        }
 	                    }
-	                }
-	            }, _callee, this);
-	        }));
-	    },
-	    onDestroy: function onDestroy() {
-	        if (this.factory) {
-	            this.factory.destroy();
-	            this.factory = void 0;
+	                }, _callee, this);
+	            }));
 	        }
-	    }
-	};
-	/*export class ControllerComponent extends BaseComponent {
-	    container: DIContainer
-	    as: string
-	    name: string
-	    factory: ControllerFactory
-	    constructor(section:templ.vnode.Section, vvnode:templ.vnode.VNode, attributes:templ.vnode.AttributeMap, view:templ.vnode.IView) {
-	        super(section, vvnode, attributes, view)
-
-	        this.container = (<any>this.view)._container
-	        if (this.attributes['name']) {
-	            this.name = this.attributes['name']
-	            this.as = this.attributes['as'] || this.name
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            if (this.factory) {
+	                this.factory.destroy();
+	                this.factory = void 0;
+	            }
+	            _get(Object.getPrototypeOf(Controller.prototype), "destroy", this).call(this);
 	        }
+	    }]);
 
+	    return Controller;
+	}(base_component_1.BaseComponent);
 
-	        this.factory = (<any>this.view)._container.get(this.name);
-
-	        if (!(this.factory instanceof ControllerFactory)) {
-	            throw new Error(this.name + ' is not a controller');
-	        }
-
-	        let template:string|templ.vnode.Template = this.childTemplate
-	        if (this.attributes['template']) {
-	            template = this.attributes['template'];
-	        }
-
-	        this.factory.create({
-	            template: template
-	        }).then( controller => {
-	            let template = this.factory.container.get('template');
-	            this.section.appendChild(template.render());
-	        });
-
-	    }
-
-	    destroy () {
-
-	        super.destroy();
-	        this.factory.destroy();
-	        this.factory = void 0
-	    }
-
-
-	}*/
+	exports.Controller = Controller;
 
 /***/ },
-/* 84 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14294,7 +15083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        step("next", void 0);
 	    });
 	};
-	var collection_1 = __webpack_require__(48);
+	var collection_1 = __webpack_require__(64);
 	exports.Repeat = {
 	    initialize: function initialize() {
 	        this._children = [];
@@ -14343,9 +15132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // TODO - provide SAME context here for speed and stability
 	            if (n >= this._children.length) {
 	                child = this.childTemplate.view(properties, {
-	                    parent: parent /*,
-	                                   container: parent.container,
-	                                   target: parent.target*/
+	                    parent: parent
 	                });
 	                this._children.push(child);
 	                this.section.appendChild(child.render(properties));
@@ -14364,11 +15151,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        collection.on('add', this._update, this);
 	        collection.on('remove', this._update, this);
 	        collection.on('reset', this._update, this);
+	        collection.on('filter', this._update, this);
 	    },
 	    __removeEventListeners: function __removeEventListeners(collection) {
 	        collection.off('remove', this._update);
 	        collection.off('add', this._update);
 	        collection.off('reset', this._update);
+	        collection.off('filter', this._update);
 	    },
 	    setAttribute: function setAttribute(key, value) {
 	        this[key] = value;
@@ -14408,7 +15197,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 85 */
+/* 91 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14506,7 +15295,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 86 */
+/* 92 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14600,7 +15389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 87 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14634,7 +15423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        step("next", void 0);
 	    });
 	};
-	var templ = __webpack_require__(66);
+	var templ = __webpack_require__(49);
 	var utilities_1 = __webpack_require__(6);
 	exports.Delegate = {
 	    initialize: function initialize($container) {
@@ -14666,6 +15455,142 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._subview.$destroy();
 	    }
 	};
+
+/***/ },
+/* 94 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
+	    return new Promise(function (resolve, reject) {
+	        generator = generator.call(thisArg, _arguments);
+	        function cast(value) {
+	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
+	                resolve(value);
+	            });
+	        }
+	        function onfulfill(value) {
+	            try {
+	                step("next", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function onreject(value) {
+	            try {
+	                step("throw", value);
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(verb, value) {
+	            var result = generator[verb](value);
+	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        }
+	        step("next", void 0);
+	    });
+	};
+	var base_component_1 = __webpack_require__(82);
+
+	var View = function (_base_component_1$Bas) {
+	    _inherits(View, _base_component_1$Bas);
+
+	    function View() {
+	        var _Object$getPrototypeO;
+
+	        _classCallCheck(this, View);
+
+	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	            args[_key] = arguments[_key];
+	        }
+
+	        var _this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(View)).call.apply(_Object$getPrototypeO, [this].concat(args)));
+
+	        _this.resolving = false;
+	        return _this;
+	    }
+
+	    _createClass(View, [{
+	        key: "update",
+	        value: function update() {
+	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	                var template, creator, resolver, tString, view;
+	                return regeneratorRuntime.wrap(function _callee$(_context) {
+	                    while (1) {
+	                        switch (_context.prev = _context.next) {
+	                            case 0:
+	                                if (!this.subview) {
+	                                    _context.next = 2;
+	                                    break;
+	                                }
+
+	                                return _context.abrupt("return", this.subview.update());
+
+	                            case 2:
+	                                if (!this.resolving) {
+	                                    _context.next = 4;
+	                                    break;
+	                                }
+
+	                                return _context.abrupt("return");
+
+	                            case 4:
+	                                this.resolving = true;
+	                                template = this.attributes['template'];
+
+	                                if (!(!template || template == "")) {
+	                                    _context.next = 8;
+	                                    break;
+	                                }
+
+	                                return _context.abrupt("return");
+
+	                            case 8:
+	                                _context.next = 10;
+	                                return this.view.container.get('$templateCreator');
+
+	                            case 10:
+	                                creator = _context.sent;
+	                                _context.next = 13;
+	                                return this.view.container.get('$templateResolver');
+
+	                            case 13:
+	                                resolver = _context.sent;
+	                                _context.next = 16;
+	                                return resolver(template);
+
+	                            case 16:
+	                                tString = _context.sent;
+	                                view = creator(tString, this.view.context);
+
+	                                view.parent = this.view;
+	                                this.subview = view;
+	                                this.section.appendChild(view.render());
+	                                this.resolving = false;
+
+	                            case 22:
+	                            case "end":
+	                                return _context.stop();
+	                        }
+	                    }
+	                }, _callee, this);
+	            }));
+	        }
+	    }]);
+
+	    return View;
+	}(base_component_1.BaseComponent);
+
+	exports.View = View;
 
 /***/ }
 /******/ ])

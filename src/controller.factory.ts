@@ -13,10 +13,11 @@ import {Template} from 'templ/lib/vnode'
 const debug = require('debug')('stick:factory:controller');
 
 export interface ControllerCreateOptions {
-    el?: HTMLElement
-    template?: string | Template
-    contextName: string
-    parentView?: TemplateView
+    el?: HTMLElement;
+    template?: string | Template;
+    contextName: string;
+    parentView?: TemplateView;
+    state: any;
 }
 
 const wrap = (el: Node, name:string, contextName: string) => {
@@ -31,9 +32,9 @@ const wrap = (el: Node, name:string, contextName: string) => {
 
 
 export class ControllerFactory extends EventEmitter {
-    controller: FunctionConstructor;
-    container: Container;
-    name: string;
+    public controller: FunctionConstructor;
+    public container: Container;
+    public name: string;
     private _id: string;
 
     get id(): string {
@@ -73,7 +74,7 @@ export class ControllerFactory extends EventEmitter {
         
         // State
         let $state: State = await this.container.get('$state');
-        $state = $state.createChild(this.container);
+        $state = $state.createChild(this.container, options.state);
         this.container.registerInstance('$state', $state, true);
 
         // Template        

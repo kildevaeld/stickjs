@@ -9,9 +9,9 @@ export declare class State extends NestedModel {
     private _container;
     parent: State;
     container: DIContainer;
-    constructor(container: DIContainer);
+    constructor(container: DIContainer, values?: any);
     get(key: string): any;
     set(key: string | Object, val?: any): this;
-    createChild(container?: DIContainer): State;
+    createChild(container?: DIContainer, values?: any): State;
     $destroy(): void;
 }

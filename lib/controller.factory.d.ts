@@ -8,6 +8,7 @@ export interface ControllerCreateOptions {
     template?: string | Template;
     contextName: string;
     parentView?: TemplateView;
+    state: any;
 }
 export declare class ControllerFactory extends EventEmitter {
     controller: FunctionConstructor;

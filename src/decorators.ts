@@ -1,9 +1,9 @@
 
-import {DependencyType, setDependencyType,DIServiceConfig, Metakey} from './internal'
-import {camelcase, find} from 'utilities'
-import {Metadata, inject} from 'stick.di'
-import {Repository} from './repository'
-
+import {DependencyType, setDependencyType,DIServiceConfig, Metakey} from './internal';
+import {camelcase, find} from 'utilities';
+import {Metadata, inject} from 'stick.di';
+import {Repository} from './repository';
+import * as templ from 'templ';
 export * from 'stick.di/lib/decorators';
 
 export function controller (controllerName?:string): ClassDecorator {
@@ -51,4 +51,16 @@ export function template (name:string): ClassDecorator {
 	return function (target:Function) {
 		Metadata.define(Metakey[Metakey.Template], name, target, undefined)
 	}
+}
+
+export function component(name:string): ClassDecorator {
+    return function(target:any) {
+        templ.component(name, target);
+    }
+}
+
+export function attribute(name:string): ClassDecorator {
+    return function(target:any) {
+        templ.attribute(name, target);
+    }
 }

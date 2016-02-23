@@ -1,133 +1,81 @@
 //import {components, View, compile, vnode} from 'templ'
-import {DIContainer} from 'stick.di'
-import {isPromise, IPromise, Promise} from 'utilities/lib/index'
+//import {DIContainer} from 'stick.di'
+import {isPromise, IPromise, Promise, isString} from 'utilities'
 import {BaseComponent} from './base-component'
 import {TemplateView} from '../template.view'
 import {ControllerFactory} from '../../controller.factory'
 import {Template} from 'templ/lib/vnode'
-import {ComponentDefinition} from '../index'
+//import {ComponentDefinition} from '../index'
 
-export const Controller: ComponentDefinition = {
-	initialize ($container) {
-		if (this.attributes['name']) {
-			this.name = this.attributes['name']
-			this.as = this.attributes['as'] || this.name
-		}
+export class Controller extends BaseComponent {
+    name: string;
+    as: string;
+    factory: ControllerFactory;
+    private resolving: boolean;
+    
+    initialize() {
+        if (this.attributes['name']) {
+            this.name = this.attributes['name']
+            this.as = this.attributes['as'] || this.name
+        }
+    }
 
-		// this.factory = $container.get(this.name);
+    async update() {
+        if (this.factory) {
+            if (this.factory.container.hasHandler('template')) {
+                let view = await this.factory.container.get('template')
+                view.update();
+            }
+            return;
+        }
+        if (this.resolving) {
+            return;
+        }
 
-		// if (!(this.factory instanceof ControllerFactory)) {
-		// 	throw new Error(this.name + ' is not a controller');
-		// }
+        this.resolving = true;
 
-		// let template:string|Template = this.childTemplate
-		// if (this.attributes['template']) {
-		// 	template = this.attributes['template'];
-		// }
+        this.factory = await this.view.container.get(this.name);
 
-		// this.factory.create({
-		// 	template: template,
-		// 	contextName: this.as
-		// }).then( controller => {
-		// 	let el = this.factory.container.get('$el');
+        if (!(this.factory instanceof ControllerFactory)) {
+            throw new Error(this.name + ' is not a controller');
+        }
 
-		// 	this.section.appendChild(el);
-		// });
-	},
+        let template: string | Template = this.childTemplate
+        if (this.attributes['template']) {
+            template = this.attributes['template'];
+        }
 
-	async update() {
-		if (this.factory) {
-			if (this.factory.container.hasHandler('template')) {
+        let state = {};
 
-				//this.factory.container.get('template').update();
-			}
-			return;
-		}
-
-		this.factory = await this.view.container.get(this.name);
-
-		if (!(this.factory instanceof ControllerFactory)) {
-			throw new Error(this.name + ' is not a controller');
-		}
-
-		let template:string|Template = this.childTemplate
-		if (this.attributes['template']) {
-			template = this.attributes['template'];
-		}
+        if (this.attributes['state']) {
+            let s = this.attributes['state']
+            try {
+                state = isString(s) ? JSON.parse(s) : Object(s);
+            } catch (e) {
+                console.warn('Could not parse model tag');
+            }
+        }
 
         let controller = await this.factory.create({
-			template: template,
-			contextName: this.as,
-            parentView: this.view
-		});
-
-
+            template: template,
+            contextName: this.as,
+            parentView: this.view,
+            state: state
+        });
 
         let el = await this.factory.container.get('$el');
         this.section.appendChild(el);
 
-		/*this.factory.create({
-			template: template,
-			contextName: this.as
-		}).then( controller => {
-			let el = this.factory.container.get('$el');
+        this.resolving = false;
 
-			this.section.appendChild(el);
-		});*/
+    }
 
+    destroy() {
+        if (this.factory) {
+            this.factory.destroy()
+            this.factory = void 0;
+        }
+        super.destroy();
+    }
 
-	},
-
-	onDestroy () {
-
-		if (this.factory) {
-			this.factory.destroy()
-			this.factory = void 0;
-		}
-	}
 }
-
-/*export class ControllerComponent extends BaseComponent {
-	container: DIContainer
-	as: string
-	name: string
-	factory: ControllerFactory
-	constructor(section:templ.vnode.Section, vvnode:templ.vnode.VNode, attributes:templ.vnode.AttributeMap, view:templ.vnode.IView) {
-		super(section, vvnode, attributes, view)
-
-		this.container = (<any>this.view)._container
-		if (this.attributes['name']) {
-			this.name = this.attributes['name']
-			this.as = this.attributes['as'] || this.name
-		}
-
-
-		this.factory = (<any>this.view)._container.get(this.name);
-
-		if (!(this.factory instanceof ControllerFactory)) {
-			throw new Error(this.name + ' is not a controller');
-		}
-
-		let template:string|templ.vnode.Template = this.childTemplate
-		if (this.attributes['template']) {
-			template = this.attributes['template'];
-		}
-
-		this.factory.create({
-			template: template
-		}).then( controller => {
-			let template = this.factory.container.get('template');
-			this.section.appendChild(template.render());
-		});
-
-	}
-
-	destroy () {
-
-		super.destroy();
-		this.factory.destroy();
-		this.factory = void 0
-	}
-
-
-}*/
