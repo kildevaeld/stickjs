@@ -13,7 +13,6 @@
     "node_modules"
   ],
   "files": [
-    "src/collection.ts",
     "src/container.ts",
     "src/controller.factory.ts",
     "src/decorators.ts",

@@ -11,7 +11,6 @@ import {AttributeConstructor} from 'templ/lib/vnode';
 import * as templ from 'templ';
 import * as annotations from './decorators'
 
-export const decorators = annotations
 
 export function service(name: string, definition: Function) {
 		let [fn] = getDependencies(definition);
@@ -24,11 +23,11 @@ export function service(name: string, definition: Function) {
 }
 
 export function factory(name: string, factory: any | any[]) {
-
+		
 		let [fn] = getDependencies(factory);
 
 		if (!fn) throw new StickError('factory');
-        
+
 		Repository.add(DependencyType.Factory, name, fn);
 
 }
@@ -53,6 +52,7 @@ export function module(name: string, definition: Function | Object | any[] = nul
 		}
 		return factory;
 	}
+
 
 	let [def, deps] = getDependencies(definition)
 
@@ -85,12 +85,12 @@ export function module(name: string, definition: Function | Object | any[] = nul
 			throw new StickError('controller defition should be a function or an object literal')
 		}
 
-		let factory = new ModuleFactory(name, fn, container.createChild()) 
+		let factory = new ModuleFactory(name, fn, container.createChild())
 		container.registerInstance(name, factory, true);
 		return factory
-		
+
 	} else {
-		throw new StickError('controller defition should be a function or an object literal')	
+		throw new StickError('controller defition should be a function or an object literal')
 	}
 
 }
@@ -123,10 +123,10 @@ export function attribute(name: string, handler: AttributeConstructor) {
 }
 
 export function decorator(name: string, decorator: any) {
-	if (utils.has(decorators, name)) {
+	if (utils.has(annotations, name)) {
 		throw new Error(`decorator called ${name} already defined!`);
 	}
-	decorators[name] = decorator;
+	annotations[name] = decorator;
 }
 
 export function modifier(name: string, modifier: (value:any) => any) {

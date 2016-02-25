@@ -56,35 +56,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	function __export(m) {
 	    for (var p in m) {
 	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -93,10 +64,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(1);
 	__webpack_require__(88);
 	var u = __webpack_require__(6);
+	var d = __webpack_require__(15);
 	exports.utils = u;
+	exports.decorators = d;
 	__export(__webpack_require__(80));
 	__export(__webpack_require__(64));
-	//export * from './decorators';
 	exports.ready = u.domReady();
 
 /***/ },
@@ -105,35 +77,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	function __export(m) {
 	    for (var p in m) {
 	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -141,7 +84,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	__export(__webpack_require__(2));
 	__export(__webpack_require__(83));
-	__export(__webpack_require__(84));
+	__export(__webpack_require__(85));
 	__export(__webpack_require__(86));
 	__export(__webpack_require__(87));
 
@@ -165,33 +108,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
 	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
 	};
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
 	            try {
-	                step("next", value);
+	                step(generator.next(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function onreject(value) {
+	        function rejected(value) {
 	            try {
-	                step("throw", value);
+	                step(generator.throw(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
 	        }
-	        step("next", void 0);
+	        step((generator = generator.apply(thisArg, _arguments)).next());
 	    });
 	};
 	var router_1 = __webpack_require__(3);
@@ -325,7 +263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                throw new Error('[router] controller');
 	            }
 	            return function () {
-	                return __awaiter(_this2, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	                return __awaiter(_this2, void 0, void 0, regeneratorRuntime.mark(function _callee() {
 	                    var target, factory, controller, template;
 	                    return regeneratorRuntime.wrap(function _callee$(_context) {
 	                        while (1) {
@@ -441,35 +379,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	var history_1 = __webpack_require__(4);
 	var eventsjs_1 = __webpack_require__(5);
 	var utilities_1 = __webpack_require__(6);
@@ -480,7 +389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var splatParam = /\*\w+/g;
 	var escapeRegExp = /[\-{}\[\]+?.,\\\^$|#\s]/g;
 	var isRegExp = function isRegExp(value) {
-	    return value ? (typeof value === "undefined" ? "undefined" : _typeof(value)) === 'object' && toString.call(value) === '[object RegExp]' : false;
+	    return value ? (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && toString.call(value) === '[object RegExp]' : false;
 	};
 
 	var Router = function (_eventsjs_1$EventEmit) {
@@ -499,7 +408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(Router, [{
-	        key: "route",
+	        key: 'route',
 	        value: function route(_route, name) {
 	            var _this2 = this;
 
@@ -526,7 +435,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // excellent place to do pre-route setup or post-route cleanup.
 
 	    }, {
-	        key: "execute",
+	        key: 'execute',
 	        value: function execute(callback, name, args) {
 	            if (callback) {
 	                if (this.options.execute) {
@@ -539,7 +448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Simple proxy to `Backbone.history` to save a fragment into the history.
 
 	    }, {
-	        key: "navigate",
+	        key: 'navigate',
 	        value: function navigate(fragment, options) {
 	            this.history.navigate(fragment, options);
 	            return this;
@@ -548,7 +457,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // against the current location hash.
 
 	    }, {
-	        key: "_routeToRegExp",
+	        key: '_routeToRegExp',
 	        value: function _routeToRegExp(route) {
 	            route = route.replace(escapeRegExp, '\\$&').replace(optionalParam, '(?:$1)?').replace(namedParam, function (match, optional) {
 	                return optional ? match : '([^/?]+)';
@@ -560,7 +469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // treated as `null` to normalize cross-browser behavior.
 
 	    }, {
-	        key: "_extractParameters",
+	        key: '_extractParameters',
 	        value: function _extractParameters(route, fragment) {
 	            var params = route.exec(fragment).slice(1);
 	            return params.map(function (param, i) {
@@ -570,9 +479,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	    }, {
-	        key: "$destroy",
+	        key: '$destroy',
 	        value: function $destroy() {
-	            _get(Object.getPrototypeOf(Router.prototype), "destroy", this).call(this);
+	            _get(Object.getPrototypeOf(Router.prototype), 'destroy', this).call(this);
 	            this.history.off();
 	        }
 	    }]);
@@ -596,35 +505,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	var eventsjs_1 = __webpack_require__(5);
 	var utils = __webpack_require__(6);
 	// Cached regex for stripping a leading hash/slash and trailing space.
@@ -662,7 +542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(HistoryApi, [{
-	        key: "atRoot",
+	        key: 'atRoot',
 
 	        // Are we at the app root?
 	        value: function atRoot() {
@@ -672,7 +552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // in Firefox where location.hash will always be decoded.
 
 	    }, {
-	        key: "getHash",
+	        key: 'getHash',
 	        value: function getHash(window) {
 	            var match = (window || this).location.href.match(/#(.*)$/);
 	            return match ? match[1] : '';
@@ -681,7 +561,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // the hash, or the override.
 
 	    }, {
-	        key: "getFragment",
+	        key: 'getFragment',
 	        value: function getFragment(fragment) {
 	            var forcePushState = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
@@ -700,7 +580,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // an existing route, and `false` otherwise.
 
 	    }, {
-	        key: "start",
+	        key: 'start',
 	        value: function start() {
 	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -742,7 +622,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // but possibly useful for unit testing Routers.
 
 	    }, {
-	        key: "stop",
+	        key: 'stop',
 	        value: function stop() {
 	            window.removeEventListener('popstate', this.checkUrl);
 	            window.removeEventListener('hashchange', this.checkUrl);
@@ -752,7 +632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // may override previous routes.
 
 	    }, {
-	        key: "route",
+	        key: 'route',
 	        value: function route(_route, callback) {
 	            this.handlers.unshift({ route: _route, callback: callback });
 	        }
@@ -760,7 +640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // calls `loadUrl`.
 
 	    }, {
-	        key: "checkUrl",
+	        key: 'checkUrl',
 	        value: function checkUrl() {
 	            var current = this.getFragment();
 	            if (current === this.fragment) return false;
@@ -773,7 +653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // returns `false`.
 
 	    }, {
-	        key: "loadUrl",
+	        key: 'loadUrl',
 	        value: function loadUrl(fragment) {
 	            fragment = this.fragment = this.getFragment(fragment);
 	            return this.handlers.some(function (handler) {
@@ -792,7 +672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // you wish to modify the current URL without adding an entry to the history.
 
 	    }, {
-	        key: "navigate",
+	        key: 'navigate',
 	        value: function navigate(fragment, options) {
 	            if (!this.started) return false;
 	            if (!options || options === true) options = { trigger: !!options };
@@ -817,7 +697,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // a new one to the browser history.
 
 	    }, {
-	        key: "_updateHash",
+	        key: '_updateHash',
 	        value: function _updateHash(location, fragment, replace) {
 	            if (replace) {
 	                var href = location.href.replace(/(javascript:|#).*$/, '');
@@ -828,7 +708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
-	        key: "started",
+	        key: 'started',
 	        get: function get() {
 	            return this._started;
 	        }
@@ -2090,7 +1970,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	function __export(m) {
 	    for (var p in m) {
@@ -2160,7 +2040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	var utils = __webpack_require__(6);
 	var stick_di_1 = __webpack_require__(17);
@@ -3959,7 +3839,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	var internal_1 = __webpack_require__(16);
 	var utilities_1 = __webpack_require__(6);
@@ -5473,7 +5353,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            var e = _ref;
-	            
+
 	            this.ref.addEventListener(e, this._onInput);
 	        }
 	    };
@@ -10561,33 +10441,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
 	            try {
-	                step("next", value);
+	                step(generator.next(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function onreject(value) {
+	        function rejected(value) {
 	            try {
-	                step("throw", value);
+	                step(generator.throw(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
 	        }
-	        step("next", void 0);
+	        step((generator = generator.apply(thisArg, _arguments)).next());
 	    });
 	};
 	var utils = __webpack_require__(6);
@@ -10625,7 +10500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(ControllerFactory, [{
-	        key: "create",
+	        key: 'create',
 
 	        /**
 	         * Create an instance of a controller
@@ -10646,7 +10521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return", utils.Promise.resolve(this.container.get(this.name)));
+	                                return _context.abrupt('return', utils.Promise.resolve(this.container.get(this.name)));
 
 	                            case 2:
 	                                this.container.registerSingleton(this.name, this.controller);
@@ -10704,10 +10579,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    }
 	                                    this.trigger('element:attached', el, options.el);
 	                                }
-	                                return _context.abrupt("return", controller);
+	                                return _context.abrupt('return', controller);
 
 	                            case 28:
-	                            case "end":
+	                            case 'end':
 	                                return _context.stop();
 	                        }
 	                    }
@@ -10715,7 +10590,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: "resolveTemplate",
+	        key: 'resolveTemplate',
 	        value: function resolveTemplate(state, options) {
 	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee2() {
 	                var $template, $resolver, promise, _templateString, view, templateString;
@@ -10762,7 +10637,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    container: this.container,
 	                                    parentView: options.parentView
 	                                });
-	                                return _context2.abrupt("return", view);
+	                                return _context2.abrupt('return', view);
 
 	                            case 16:
 	                                promise = $resolver(options.template);
@@ -10770,7 +10645,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                break;
 
 	                            case 19:
-	                                return _context2.abrupt("return", utils.Promise.reject(new errors_1.StickError("no element or template")));
+	                                return _context2.abrupt('return', utils.Promise.reject(new errors_1.StickError("no element or template")));
 
 	                            case 20:
 	                                _context2.next = 22;
@@ -10778,10 +10653,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                            case 22:
 	                                templateString = _context2.sent;
-	                                return _context2.abrupt("return", $template(templateString, state));
+	                                return _context2.abrupt('return', $template(templateString, state));
 
 	                            case 24:
-	                            case "end":
+	                            case 'end':
 	                                return _context2.stop();
 	                        }
 	                    }
@@ -10789,9 +10664,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: "destroy",
+	        key: 'destroy',
 	        value: function destroy() {
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee3() {
+	            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee3() {
 	                var controller;
 	                return regeneratorRuntime.wrap(function _callee3$(_context3) {
 	                    while (1) {
@@ -10811,7 +10686,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                this.container.entries.clear();
 
 	                            case 7:
-	                            case "end":
+	                            case 'end':
 	                                return _context3.stop();
 	                        }
 	                    }
@@ -10819,7 +10694,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: "id",
+	        key: 'id',
 	        get: function get() {
 	            return this._id;
 	        }
@@ -10892,33 +10767,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
 	            try {
-	                step("next", value);
+	                step(generator.next(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function onreject(value) {
+	        function rejected(value) {
 	            try {
-	                step("throw", value);
+	                step(generator.throw(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
 	        }
-	        step("next", void 0);
+	        step((generator = generator.apply(thisArg, _arguments)).next());
 	    });
 	};
 	var internal_1 = __webpack_require__(16);
@@ -10967,7 +10837,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(ModuleFactory, [{
-	        key: "controller",
+	        key: 'controller',
 	        value: function controller(name, definition) {
 	            var _internal_1$getDepend = internal_1.getDependencies(definition);
 
@@ -11007,7 +10877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        }
 	    }, {
-	        key: "service",
+	        key: 'service',
 	        value: function service(name, definition) {
 	            var _internal_1$getDepend3 = internal_1.getDependencies(definition);
 
@@ -11030,7 +10900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 
 	    }, {
-	        key: "factory",
+	        key: 'factory',
 	        value: function factory(name, _factory) {
 	            var _internal_1$getDepend5 = internal_1.getDependencies(_factory);
 
@@ -11061,7 +10931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        */
 
 	    }, {
-	        key: "create",
+	        key: 'create',
 	        value: function create() {
 	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -11078,7 +10948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                                debug("%s: Resolving module %s", this.id, this.name);
 	                                //return utils.Promise.resolve(this.container.get(this.name));
-	                                return _context.abrupt("return", this.container.get(this.name));
+	                                return _context.abrupt('return', this.container.get(this.name));
 
 	                            case 3:
 	                                this.container.registerSingleton('$state', state_1.State);
@@ -11136,13 +11006,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    }
 	                                    this.trigger('element:attached', el, options.el);
 	                                }
-	                                return _context.abrupt("return", mod);
+	                                return _context.abrupt('return', mod);
 
 	                            case 27:
-	                                return _context.abrupt("return", this.container.get(this.name));
+	                                return _context.abrupt('return', this.container.get(this.name));
 
 	                            case 28:
-	                            case "end":
+	                            case 'end':
 	                                return _context.stop();
 	                        }
 	                    }
@@ -11150,7 +11020,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: "configure",
+	        key: 'configure',
 	        value: function configure(name) {
 	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee2() {
 	                var configName, provider, serv;
@@ -11173,7 +11043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context2.abrupt("return", this.container.get(name));
+	                                return _context2.abrupt('return', this.container.get(name));
 
 	                            case 7:
 	                                if (!repository_1.Repository.has(internal_1.DependencyType.Service, name)) {
@@ -11190,13 +11060,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context2.abrupt("return", this.container.get(configName));
+	                                return _context2.abrupt('return', this.container.get(configName));
 
 	                            case 12:
 	                                throw new Error('No provider for ' + name.replace('Provider', ''));
 
 	                            case 13:
-	                            case "end":
+	                            case 'end':
 	                                return _context2.stop();
 	                        }
 	                    }
@@ -11204,7 +11074,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: "resolveTemplate",
+	        key: 'resolveTemplate',
 	        value: function resolveTemplate(state, options) {
 	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee3() {
 	                var $template, $resolver, promise, _templateString, view, templateString;
@@ -11250,7 +11120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                view = options.template.view(state, {
 	                                    container: this.container
 	                                });
-	                                return _context3.abrupt("return", view);
+	                                return _context3.abrupt('return', view);
 
 	                            case 16:
 	                                promise = $resolver(options.template);
@@ -11258,7 +11128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                break;
 
 	                            case 19:
-	                                return _context3.abrupt("return", utils.Promise.reject(new errors_1.StickError("no element or template")));
+	                                return _context3.abrupt('return', utils.Promise.reject(new errors_1.StickError("no element or template")));
 
 	                            case 20:
 	                                _context3.next = 22;
@@ -11266,10 +11136,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                            case 22:
 	                                templateString = _context3.sent;
-	                                return _context3.abrupt("return", $template(templateString, state));
+	                                return _context3.abrupt('return', $template(templateString, state));
 
 	                            case 24:
-	                            case "end":
+	                            case 'end':
 	                                return _context3.stop();
 	                        }
 	                    }
@@ -11277,12 +11147,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: "destroy",
+	        key: 'destroy',
 	        value: function destroy() {
 	            //this.container.destroy();
 	        }
 	    }, {
-	        key: "id",
+	        key: 'id',
 	        get: function get() {
 	            return this._id;
 	        }
@@ -11345,7 +11215,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	    return { attr: attr, deferred: deferred };
 	};
-	var _State = function (_collection_1$NestedM) {
+	var State_1 = undefined;
+	var State = State_1 = function (_collection_1$NestedM) {
 	    _inherits(State, _collection_1$NestedM);
 
 	    function State(container, values) {
@@ -11408,7 +11279,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: "createChild",
 	        value: function createChild(container, values) {
 	            if (!container) container = this.container.createChild();
-	            var state = new _State(container, values);
+	            var state = new State_1(container, values);
 	            state._parent = state;
 	            debug("%s: Create child %s", this.uid, state.uid);
 	            return state;
@@ -11433,8 +11304,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return State;
 	}(collection_1.NestedModel);
-	_State = __decorate([decorators_1.inject('$container')], _State);
-	exports.State = _State;
+	State = State_1 = __decorate([decorators_1.inject('$container')], State);
+	exports.State = State;
 
 /***/ },
 /* 64 */
@@ -11473,6 +11344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    __extends(Collection, _super);
 	    function Collection(models, options) {
 	        if (options === void 0) { options = {}; }
+	        _super.call(this);
 	        this.options = options;
 	        if (this.options.model) {
 	            this.Model = this.options.model;
@@ -11480,7 +11352,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (models) {
 	            this.add(models);
 	        }
-	        _super.call(this);
 	    }
 	    Object.defineProperty(Collection.prototype, "length", {
 	        get: function () {
@@ -12165,6 +12036,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var utils_1 = __webpack_require__(68);
 	var arrays_1 = __webpack_require__(70);
+	function objToPaths(obj, separator) {
+	    if (separator === void 0) { separator = "."; }
+	    var ret = {};
+	    for (var key in obj) {
+	        var val = obj[key];
+	        if (val && (val.constructor === Object || val.constructor === Array) && !isEmpty(val)) {
+	            console.log('VAL', val);
+	            var obj2 = objToPaths(val);
+	            for (var key2 in obj2) {
+	                var val2 = obj2[key2];
+	                ret[key + separator + key2] = val2;
+	            }
+	        }
+	        else {
+	            ret[key] = val;
+	        }
+	    }
+	    return ret;
+	}
+	exports.objToPaths = objToPaths;
 	function isObject(obj) {
 	    return obj === Object(obj);
 	}
@@ -12234,6 +12125,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return out;
 	}
 	exports.pick = pick;
+	function omit(obj, props) {
+	    var out = {};
+	    for (var key in obj) {
+	        if (!!~props.indexOf(key))
+	            continue;
+	        out[key] = obj[key];
+	    }
+	    return out;
+	}
+	exports.omit = omit;
 	function result(obj, prop, ctx, args) {
 	    var ret = obj[prop];
 	    return (typeof ret === 'function') ? utils_1.callFunc(ret, ctx, args || []) : ret;
@@ -12314,11 +12215,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.indexOf = indexOf;
 	function find(array, callback, ctx) {
-	    var i, v;
-	    for (i = 0; i < array.length; i++) {
-	        v = array[i];
-	        if (callback.call(ctx, v))
-	            return v;
+	    var v;
+	    for (var i = 0, ii = array.length; i < ii; i++) {
+	        if (callback.call(ctx, array[i]))
+	            return array[i];
 	    }
 	    return null;
 	}
@@ -12344,8 +12244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    })
 	        .sort(function (left, right) {
-	        var a = left.criteria;
-	        var b = right.criteria;
+	        var a = left.criteria, b = right.criteria;
 	        if (a !== b) {
 	            if (a > b || a === void 0)
 	                return 1;
@@ -12365,6 +12264,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 71 */
 /***/ function(module, exports) {
 
+	function isString(a) {
+	    return typeof a === 'string';
+	}
+	exports.isString = isString;
 	function camelcase(input) {
 	    return input.toLowerCase().replace(/-(.)/g, function (match, group1) {
 	        return group1.toUpperCase();
@@ -12414,6 +12317,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Model(attributes, options) {
 	        if (attributes === void 0) { attributes = {}; }
 	        if (options === void 0) { options = {}; }
+	        _super.call(this);
 	        options = options || {};
 	        this._attributes = {};
 	        this.options = options;
@@ -12424,7 +12328,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._changed = {};
 	        this.collection = options.collection;
 	        this.idAttribute = options.idAttribute || this.idAttribute || 'id';
-	        _super.call(this);
 	    }
 	    Object.defineProperty(Model.prototype, "id", {
 	        get: function () {
@@ -12869,6 +12772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _super.call(this, models, options);
 	        if (options.url)
 	            this.url = options.url;
+	        this.options.queryParameter = this.options.queryParameter || 'q';
 	    }
 	    RestCollection.prototype.getURL = function () {
 	        return typeof this.url === 'function' ? this.url() : this.url;
@@ -12922,6 +12826,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	                options.complete(e, null);
 	        });
 	        return model;
+	    };
+	    RestCollection.prototype.query = function (term, options) {
+	        var _this = this;
+	        var params = (_a = {}, _a[this.options.queryParameter] = term, _a);
+	        var url = this.getURL();
+	        if (url == null)
+	            return promises_1.Promise.reject(new Error('Url or rootURL no specified'));
+	        options.url = url;
+	        objects_1.extend(options.params || {}, params);
+	        this.trigger('before:query');
+	        return this.sync(persistence_1.RestMethod.Read, this, options)
+	            .then(function (results) {
+	            _this.reset(results.content, options);
+	            _this.trigger('query');
+	            return _this.models;
+	        }).catch(function (e) {
+	            _this.trigger('error', e);
+	            throw e;
+	        });
+	        var _a;
 	    };
 	    RestCollection.prototype.sync = function (method, model, options) {
 	        return persistence_1.sync(method, model, options);
@@ -13299,8 +13223,29 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var utils_1 = __webpack_require__(68);
+	var strings_1 = __webpack_require__(71);
+	var objects_1 = __webpack_require__(69);
 	var promises_1 = __webpack_require__(76);
 	var xmlRe = /^(?:application|text)\/xml/, jsonRe = /^application\/json/, fileProto = /^file:/;
+	function queryStringToParams(qs) {
+	    var kvp, k, v, ls, params = {}, decode = decodeURIComponent;
+	    var kvps = qs.split('&');
+	    for (var i = 0, l = kvps.length; i < l; i++) {
+	        var param = kvps[i];
+	        kvp = param.split('='), k = kvp[0], v = kvp[1];
+	        if (v == null)
+	            v = true;
+	        k = decode(k), v = decode(v), ls = params[k];
+	        if (Array.isArray(ls))
+	            ls.push(v);
+	        else if (ls)
+	            params[k] = [ls, v];
+	        else
+	            params[k] = v;
+	    }
+	    return params;
+	}
+	exports.queryStringToParams = queryStringToParams;
 	function queryParam(obj) {
 	    return '?' + Object.keys(obj).reduce(function (a, k) { a.push(k + '=' + encodeURIComponent(obj[k])); return a; }, []).join('&');
 	}
@@ -13315,6 +13260,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Request(_method, _url) {
 	        this._method = _method;
 	        this._url = _url;
+	        this._headers = {};
+	        this._params = {};
 	        this._xhr = utils_1.ajax();
 	    }
 	    Request.prototype.send = function (data) {
@@ -13339,16 +13286,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        data = this._data;
 	        var url = this._url;
-	        if (data && data === Object(data)) {
+	        if (data && data === Object(data) && this._method == 'GET') {
 	            var d = queryParam(data);
 	            url += d;
 	        }
+	        url = this._apply_params(url);
 	        this._xhr.open(this._method, url, true);
+	        for (var key in this._headers) {
+	            this._xhr.setRequestHeader(key, this._headers[key]);
+	        }
 	        this._xhr.send(data);
 	        return defer.promise;
 	    };
 	    Request.prototype.json = function (data) {
 	        var _this = this;
+	        this.header('content-type', 'application/json; charset=utf-8');
+	        if (!strings_1.isString(data)) {
+	            data = JSON.stringify(data);
+	        }
 	        return this.end(data)
 	            .then(function (str) {
 	            var accepts = _this._xhr.getResponseHeader('content-type');
@@ -13366,31 +13321,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this;
 	    };
 	    Request.prototype.header = function (field, value) {
-	        this._xhr.setRequestHeader(field, value);
+	        if (strings_1.isString(field) && strings_1.isString(value)) {
+	            this._headers[field] = value;
+	        }
+	        else if (objects_1.isObject(field)) {
+	            objects_1.extend(this._headers, field);
+	        }
 	        return this;
+	    };
+	    Request.prototype.params = function (value) {
+	        objects_1.extend(this._params, value);
+	        return this;
+	    };
+	    Request.prototype._apply_params = function (url) {
+	        var params = {};
+	        var idx = url.indexOf('?');
+	        if (idx > -1) {
+	            params = objects_1.extend(params, queryStringToParams(url.substr(idx + 1)));
+	            url = url.substr(0, idx);
+	        }
+	        objects_1.extend(params, this._params);
+	        if (!objects_1.isEmpty(params)) {
+	            var sep = (url.indexOf('?') === -1) ? '?' : '&';
+	            url += sep + queryParam(params);
+	        }
+	        return url;
 	    };
 	    return Request;
 	})();
 	exports.Request = Request;
-	var request;
-	(function (request) {
-	    function get(url) {
-	        return new Request('GET', url);
-	    }
-	    request.get = get;
-	    function post(url) {
-	        return new Request('POST', url);
-	    }
-	    request.post = post;
-	    function put(url) {
-	        return new Request('PUT', url);
-	    }
-	    request.put = put;
-	    function del(url) {
-	        return new Request('DELETE', url);
-	    }
-	    request.del = del;
-	})(request = exports.request || (exports.request = {}));
+	exports.request = {};
+	['get', 'post', 'put', 'delete', 'patch', 'head']
+	    .forEach(function (m) {
+	    exports.request[m === 'delete' ? 'del' : m] = function (url) {
+	        return new Request(m.toUpperCase(), url);
+	    };
+	});
 
 
 /***/ },
@@ -13601,35 +13567,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	var internal_1 = __webpack_require__(16);
 	var errors_1 = __webpack_require__(61);
 	var repository_1 = __webpack_require__(30);
@@ -13639,7 +13576,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var base_component_1 = __webpack_require__(82);
 	var templ = __webpack_require__(31);
 	var annotations = __webpack_require__(15);
-	exports.decorators = annotations;
 	function service(name, definition) {
 	    var _internal_1$getDepend = internal_1.getDependencies(definition);
 
@@ -13679,7 +13615,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _factory = new module_factory_1.ModuleFactory(name, result.handler, container.createChild());
 	            container.registerInstance(name, _factory);
 	        } else {
-	            throw new errors_1.StickError("no module named " + name);
+	            throw new errors_1.StickError('no module named ' + name);
 	        }
 	        return _factory;
 	    }
@@ -13744,10 +13680,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.attribute = attribute;
 	function decorator(name, decorator) {
-	    if (utils.has(exports.decorators, name)) {
-	        throw new Error("decorator called " + name + " already defined!");
+	    if (utils.has(annotations, name)) {
+	        throw new Error('decorator called ' + name + ' already defined!');
 	    }
-	    exports.decorators[name] = decorator;
+	    annotations[name] = decorator;
 	}
 	exports.decorator = decorator;
 	function modifier(name, modifier) {
@@ -13771,33 +13707,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
 	            try {
-	                step("next", value);
+	                step(generator.next(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function onreject(value) {
+	        function rejected(value) {
 	            try {
-	                step("throw", value);
+	                step(generator.throw(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
 	        }
-	        step("next", void 0);
+	        step((generator = generator.apply(thisArg, _arguments)).next());
 	    });
 	};
 	function __export(m) {
@@ -13838,18 +13769,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(Container, [{
-	        key: "hasInstance",
+	        key: 'hasInstance',
 	        value: function hasInstance(key) {
 	            return this.__instances.has(key);
 	        }
 	    }, {
-	        key: "hasHandler",
+	        key: 'hasHandler',
 	        value: function hasHandler(name, parent, repository) {
-	            var has = _get(Object.getPrototypeOf(Container.prototype), "hasHandler", this).call(this, name, parent);
+	            var has = _get(Object.getPrototypeOf(Container.prototype), 'hasHandler', this).call(this, name, parent);
 	            return !has && repository ? repository_1.Repository.hasAny(name) : has;
 	        }
 	    }, {
-	        key: "get",
+	        key: 'get',
 	        value: function get(key, targetKey) {
 	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
 	                var entry;
@@ -13870,7 +13801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return", this);
+	                                return _context.abrupt('return', this);
 
 	                            case 4:
 	                                if (!(key instanceof stick_di_1.Resolver)) {
@@ -13878,7 +13809,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return", key.get(this));
+	                                return _context.abrupt('return', key.get(this));
 
 	                            case 6:
 	                                entry = this.entries.get(key);
@@ -13888,7 +13819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return", entry[0](this));
+	                                return _context.abrupt('return', entry[0](this));
 
 	                            case 9:
 	                                if (!(this.parent && this.parent.hasHandler(key))) {
@@ -13896,7 +13827,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return", this.parent.get(key, targetKey));
+	                                return _context.abrupt('return', this.parent.get(key, targetKey));
 
 	                            case 11:
 	                                entry = repository_1.Repository.any(key);
@@ -13907,7 +13838,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                }
 
 	                                this.register(entry);
-	                                return _context.abrupt("return", this.entries.get(key)[0](this));
+	                                return _context.abrupt('return', this.entries.get(key)[0](this));
 
 	                            case 15:
 	                                if (!(typeof key === 'string')) {
@@ -13920,10 +13851,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            case 17:
 	                                this.autoRegister(key, targetKey);
 	                                entry = this.entries.get(key);
-	                                return _context.abrupt("return", entry[0](this));
+	                                return _context.abrupt('return', entry[0](this));
 
 	                            case 20:
-	                            case "end":
+	                            case 'end':
 	                                return _context.stop();
 	                        }
 	                    }
@@ -13931,7 +13862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: "registerSingleton",
+	        key: 'registerSingleton',
 	        value: function registerSingleton(key, fn) {
 	            var _this2 = this;
 
@@ -13949,7 +13880,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	    }, {
-	        key: "registerService",
+	        key: 'registerService',
 	        value: function registerService(key, fn) {
 	            var _this3 = this;
 
@@ -13965,7 +13896,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var Config = stick_di_1.Metadata.getOwn(internal_1.DIServiceConfig, fn, targetKey);
 	            if (Config != null) {
 	                if (this.hasHandler(configKey, false, false)) {
-	                    throw new Error("Provider for '" + name + "' already defined");
+	                    throw new Error('Provider for \'' + name + '\' already defined');
 	                }
 	                var config = new Config();
 	                this.registerInstance(configKey, config);
@@ -13982,17 +13913,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	    }, {
-	        key: "registerInstance",
+	        key: 'registerInstance',
 	        value: function registerInstance(key, instance) {
 	            var track = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-	            _get(Object.getPrototypeOf(Container.prototype), "registerInstance", this).call(this, key, instance);
+	            _get(Object.getPrototypeOf(Container.prototype), 'registerInstance', this).call(this, key, instance);
 	            if (track) {
 	                this.__instances.set(key, instance);
 	            }
 	        }
 	    }, {
-	        key: "invoke",
+	        key: 'invoke',
 	        value: function invoke(fn, deps, targetKey) {
 	            var info = this._getOrCreateConstructionSet(fn, targetKey);
 	            try {
@@ -14010,13 +13941,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	            } catch (e) {
 	                var activatingText = info.activator instanceof stick_di_1.ClassActivator ? 'instantiating' : 'invoking';
-	                var message = "Error " + activatingText + " " + fn.name + ".";
+	                var message = 'Error ' + activatingText + ' ' + fn.name + '.';
 	                message += ' Check the inner error for details.';
 	                throw new errors_1.StickDependencyError(message, [e]);
 	            }
 	        }
 	    }, {
-	        key: "clear",
+	        key: 'clear',
 	        value: function clear() {
 	            var keys = this.__instances.keys();
 	            var _iteratorNormalCompletion = true;
@@ -14045,7 +13976,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
-	        key: "destroy",
+	        key: 'destroy',
 	        value: function destroy() {
 	            var key = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 	            var fn = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
@@ -14095,7 +14026,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
-	        key: "register",
+	        key: 'register',
 	        value: function register(item) {
 	            switch (item.type) {
 	                case internal_1.DependencyType.Controller:
@@ -14116,7 +14047,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
-	        key: "createChild",
+	        key: 'createChild',
 	        value: function createChild() {
 	            var child = new Container();
 	            child.parent = this;
@@ -14139,35 +14070,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	var utilities_1 = __webpack_require__(6);
 	var vnode_1 = __webpack_require__(33);
 
@@ -14191,25 +14093,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(BaseComponent, [{
-	        key: "initialize",
+	        key: 'initialize',
 	        value: function initialize() {}
 	    }, {
-	        key: "setAttribute",
+	        key: 'setAttribute',
 	        value: function setAttribute(key, value) {
 	            this.attributes[key] = value;
 	        }
 	    }, {
-	        key: "removeAttribute",
+	        key: 'removeAttribute',
 	        value: function removeAttribute(key) {
 	            this.attributes[key] = void 0;
 	        }
 	    }, {
-	        key: "getAttribute",
+	        key: 'getAttribute',
 	        value: function getAttribute(key) {
 	            return this.attributes[key];
 	        }
 	    }, {
-	        key: "destroy",
+	        key: 'destroy',
 	        value: function destroy() {
 	            var a = this;
 	            if (typeof a.onDestroy === 'function') {
@@ -14229,130 +14131,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
-	    var c = arguments.length,
-	        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
-	        d;
-	    if ((typeof Reflect === "undefined" ? "undefined" : _typeof(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
-	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
-	var decorators_1 = __webpack_require__(15);
-	var utilities_1 = __webpack_require__(6);
-	var HttpService = function () {
-	    function HttpService() {
-	        _classCallCheck(this, HttpService);
-	    }
-
-	    _createClass(HttpService, [{
-	        key: "get",
-	        value: function get(url) {
-	            return utilities_1.request.get(url);
-	        }
-	    }, {
-	        key: "post",
-	        value: function post(url) {
-	            return utilities_1.request.post(url);
-	        }
-	    }, {
-	        key: "put",
-	        value: function put(url) {
-	            return utilities_1.request.put(url);
-	        }
-	    }, {
-	        key: "del",
-	        value: function del(url) {
-	            return utilities_1.request.del(url);
-	        }
-	    }]);
-
-	    return HttpService;
-	}();
-	HttpService = __decorate([decorators_1.service('$http')], HttpService);
-	exports.HttpService = HttpService;
-
-/***/ },
-/* 84 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
-	var Stick = __webpack_require__(80);
-	var template_view_1 = __webpack_require__(85);
+	var stick_1 = __webpack_require__(80);
+	var template_view_1 = __webpack_require__(84);
 	var templ = __webpack_require__(31);
-	var utils = __webpack_require__(6);
-	Stick.factory('$templateResolver', function () {
-	    return function (name) {
-	        var template = document.getElementById(name);
-	        if (template == null) return utils.Promise.reject(new Error("template with id: '" + name + "' not found"));
-	        return utils.Promise.resolve(template.innerHTML);
-	    };
+	var utilities_1 = __webpack_require__(6);
+	function templateResolver(name) {
+	    var template = document.getElementById(name);
+	    if (template == null) return utilities_1.Promise.reject(new Error('template with id: \'' + name + '\' not found'));
+	    return utilities_1.Promise.resolve(template.innerHTML);
+	}
+	exports.templateResolver = templateResolver;
+	stick_1.factory('$templateResolver', function () {
+	    return templateResolver;
 	});
-	Stick.factory('$templateCreator', ['$templateResolver', '$container', function (resolver, container) {
+	stick_1.factory('$templateCreator', ['$templateResolver', '$container', function (resolver, container) {
 	    return function (templateString, data) {
 	        var template = templ.compile(templateString, {
 	            viewClass: template_view_1.TemplateView
@@ -14365,10 +14157,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}]);
 
 /***/ },
-/* 85 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -14563,6 +14355,60 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.TemplateView = TemplateView;
 
 /***/ },
+/* 85 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+	    var c = arguments.length,
+	        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+	        d;
+	    if ((typeof Reflect === "undefined" ? "undefined" : _typeof(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var decorators_1 = __webpack_require__(15);
+	var utilities_1 = __webpack_require__(6);
+	var HttpService = function () {
+	    function HttpService() {
+	        _classCallCheck(this, HttpService);
+	    }
+
+	    _createClass(HttpService, [{
+	        key: "get",
+	        value: function get(url) {
+	            return utilities_1.request.get(url);
+	        }
+	    }, {
+	        key: "post",
+	        value: function post(url) {
+	            return utilities_1.request.post(url);
+	        }
+	    }, {
+	        key: "put",
+	        value: function put(url) {
+	            return utilities_1.request.put(url);
+	        }
+	    }, {
+	        key: "del",
+	        value: function del(url) {
+	            return utilities_1.request.del(url);
+	        }
+	    }]);
+
+	    return HttpService;
+	}();
+	HttpService = __decorate([decorators_1.service('$http')], HttpService);
+	exports.HttpService = HttpService;
+
+/***/ },
 /* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -14581,35 +14427,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if ((typeof Reflect === "undefined" ? "undefined" : _typeof(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
 	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
 	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
 	};
 	var decorators_1 = __webpack_require__(15);
 	var eventsjs_1 = __webpack_require__(5);
@@ -14660,35 +14477,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	var utils = __webpack_require__(6);
 	var stick = __webpack_require__(80);
 
@@ -14700,34 +14488,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(Html, [{
-	        key: "get",
+	        key: 'get',
 	        value: function get(n) {
 	            n = n === undefined ? 0 : n;
 	            return n >= this.length ? undefined : this._elements[n];
 	        }
 	    }, {
-	        key: "addClass",
+	        key: 'addClass',
 	        value: function addClass(str) {
 	            return this.forEach(function (e) {
 	                utils.addClass(e, str);
 	            });
 	        }
 	    }, {
-	        key: "removeClass",
+	        key: 'removeClass',
 	        value: function removeClass(str) {
 	            return this.forEach(function (e) {
 	                utils.removeClass(e, str);
 	            });
 	        }
 	    }, {
-	        key: "hasClass",
+	        key: 'hasClass',
 	        value: function hasClass(str) {
 	            return this._elements.reduce(function (p, c) {
 	                return utils.hasClass(c, str);
 	            }, false);
 	        }
 	    }, {
-	        key: "attr",
+	        key: 'attr',
 	        value: function attr(key, value) {
 	            var attr = undefined;
 	            if (typeof key === 'string' && value) {
@@ -14744,7 +14532,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	    }, {
-	        key: "parent",
+	        key: 'parent',
 	        value: function parent() {
 	            var out = [];
 	            this.forEach(function (e) {
@@ -14755,7 +14543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return new Html(out);
 	        }
 	    }, {
-	        key: "find",
+	        key: 'find',
 	        value: function find(str) {
 	            var out = [];
 	            this.forEach(function (e) {
@@ -14764,13 +14552,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return new Html(out);
 	        }
 	    }, {
-	        key: "forEach",
+	        key: 'forEach',
 	        value: function forEach(fn) {
 	            this._elements.forEach(fn);
 	            return this;
 	        }
 	    }, {
-	        key: "length",
+	        key: 'length',
 	        get: function get() {
 	            return this._elements.length;
 	        }
@@ -14813,42 +14601,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	function __export(m) {
 	    for (var p in m) {
 	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	    }
 	}
 	var stick_1 = __webpack_require__(80);
-	__export(__webpack_require__(85));
+	__export(__webpack_require__(84));
 	var controller_1 = __webpack_require__(89);
 	var repeat_1 = __webpack_require__(90);
 	var show_1 = __webpack_require__(91);
@@ -14880,33 +14639,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
 	            try {
-	                step("next", value);
+	                step(generator.next(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function onreject(value) {
+	        function rejected(value) {
 	            try {
-	                step("throw", value);
+	                step(generator.throw(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
 	        }
-	        step("next", void 0);
+	        step((generator = generator.apply(thisArg, _arguments)).next());
 	    });
 	};
 	//import {components, View, compile, vnode} from 'templ'
@@ -14926,7 +14680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(Controller, [{
-	        key: "initialize",
+	        key: 'initialize',
 	        value: function initialize() {
 	            if (this.attributes['name']) {
 	                this.name = this.attributes['name'];
@@ -14934,9 +14688,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
-	        key: "update",
+	        key: 'update',
 	        value: function update() {
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
 	                var view, template, state, s, controller, el;
 	                return regeneratorRuntime.wrap(function _callee$(_context) {
 	                    while (1) {
@@ -14961,7 +14715,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                view.update();
 
 	                            case 6:
-	                                return _context.abrupt("return");
+	                                return _context.abrupt('return');
 
 	                            case 7:
 	                                if (!this.resolving) {
@@ -14969,7 +14723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return");
+	                                return _context.abrupt('return');
 
 	                            case 9:
 	                                this.resolving = true;
@@ -15023,7 +14777,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                this.resolving = false;
 
 	                            case 27:
-	                            case "end":
+	                            case 'end':
 	                                return _context.stop();
 	                        }
 	                    }
@@ -15031,13 +14785,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: "destroy",
+	        key: 'destroy',
 	        value: function destroy() {
 	            if (this.factory) {
 	                this.factory.destroy();
 	                this.factory = void 0;
 	            }
-	            _get(Object.getPrototypeOf(Controller.prototype), "destroy", this).call(this);
+	            _get(Object.getPrototypeOf(Controller.prototype), 'destroy', this).call(this);
 	        }
 	    }]);
 
@@ -15054,35 +14808,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	var collection_1 = __webpack_require__(64);
 	exports.Repeat = {
 	    initialize: function initialize() {
@@ -15125,7 +14850,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (as) {
 	                var _ref;
 
-	                properties = new collection_1.NestedModel((_ref = {}, _defineProperty(_ref, as, m), _defineProperty(_ref, "self", this.view.context), _ref));
+	                properties = new collection_1.NestedModel((_ref = {}, _defineProperty(_ref, as, m), _defineProperty(_ref, 'self', this.view.context), _ref));
 	            } else {
 	                properties = m;
 	            }
@@ -15202,35 +14927,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	exports.Show = {
 	    initialize: function initialize() {},
 	    update: function update() {
@@ -15302,35 +14998,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	exports.Unsafe = {
 	    initialize: function initialize() {},
 	    update: function update() {
@@ -15394,35 +15061,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
-	            try {
-	                step("next", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function onreject(value) {
-	            try {
-	                step("throw", value);
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
-	        }
-	        step("next", void 0);
-	    });
-	};
 	var templ = __webpack_require__(49);
 	var utilities_1 = __webpack_require__(6);
 	exports.Delegate = {
@@ -15470,33 +15108,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, Promise, generator) {
-	    return new Promise(function (resolve, reject) {
-	        generator = generator.call(thisArg, _arguments);
-	        function cast(value) {
-	            return value instanceof Promise && value.constructor === Promise ? value : new Promise(function (resolve) {
-	                resolve(value);
-	            });
-	        }
-	        function onfulfill(value) {
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
 	            try {
-	                step("next", value);
+	                step(generator.next(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function onreject(value) {
+	        function rejected(value) {
 	            try {
-	                step("throw", value);
+	                step(generator.throw(value));
 	            } catch (e) {
 	                reject(e);
 	            }
 	        }
-	        function step(verb, value) {
-	            var result = generator[verb](value);
-	            result.done ? resolve(result.value) : cast(result.value).then(onfulfill, onreject);
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
 	        }
-	        step("next", void 0);
+	        step((generator = generator.apply(thisArg, _arguments)).next());
 	    });
 	};
 	var base_component_1 = __webpack_require__(82);
@@ -15520,9 +15153,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(View, [{
-	        key: "update",
+	        key: 'update',
 	        value: function update() {
-	            return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
 	                var template, creator, resolver, tString, view;
 	                return regeneratorRuntime.wrap(function _callee$(_context) {
 	                    while (1) {
@@ -15533,7 +15166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return", this.subview.update());
+	                                return _context.abrupt('return', this.subview.update());
 
 	                            case 2:
 	                                if (!this.resolving) {
@@ -15541,7 +15174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return");
+	                                return _context.abrupt('return');
 
 	                            case 4:
 	                                this.resolving = true;
@@ -15552,7 +15185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return");
+	                                return _context.abrupt('return');
 
 	                            case 8:
 	                                _context.next = 10;
@@ -15578,7 +15211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                this.resolving = false;
 
 	                            case 22:
-	                            case "end":
+	                            case 'end':
 	                                return _context.stop();
 	                        }
 	                    }
