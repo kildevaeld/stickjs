@@ -182,7 +182,7 @@ export class TemplateView extends View {
 
             }
         }
-
+        debug("%s: Got value for key '%s': ", this.id, value);
         return value;
 
     }

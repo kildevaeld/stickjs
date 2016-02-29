@@ -2004,13 +2004,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 	exports.service = service;
-	/*export function factory(factoryName:string): ClassDecorator {
-	    return function (target:Function) {
-
-	        Repository.add(DependencyType.Factory, factoryName, target);
-
-	    }
-	}*/
+	function factory(factoryName) {
+	    return function (target) {};
+	}
+	exports.factory = factory;
 	function config(config) {
 	    return function (target) {
 	        stick_di_1.Metadata.define(internal_1.DIServiceConfig, config, target, undefined);
@@ -11197,7 +11194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var collection_1 = __webpack_require__(64);
 	var utils = __webpack_require__(6);
-	var decorators_1 = __webpack_require__(15);
+	var decorators = __webpack_require__(15);
 	var debug = __webpack_require__(23)('stick:state');
 	function isObject(a) {
 	    return a === Object(a);
@@ -11310,7 +11307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return State;
 	}(collection_1.NestedModel);
-	State = State_1 = __decorate([decorators_1.inject('$container')], State);
+	State = State_1 = __decorate([decorators.inject('$container')], State);
 	exports.State = State;
 
 /***/ },
@@ -13520,6 +13517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                }
 	            }
+	            debug("%s: Got value for key '%s': ", this.id, value);
 	            return value;
 	        }
 	    }, {
@@ -13840,20 +13838,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	var stick_1 = __webpack_require__(74);
 	__export(__webpack_require__(78));
-	var controller_1 = __webpack_require__(83);
-	var repeat_1 = __webpack_require__(84);
+	__webpack_require__(83);
+	__webpack_require__(84);
 	var show_1 = __webpack_require__(85);
 	var unsafe_1 = __webpack_require__(86);
 	var delegate_1 = __webpack_require__(87);
-	var view_1 = __webpack_require__(88);
-	stick_1.component('controller', controller_1.Controller);
-	stick_1.component('repeat', repeat_1.Repeat);
+	__webpack_require__(88);
+	//component('controller', Controller);
+	//component('repeat', Repeat);
 	stick_1.component('hide', show_1.Hide);
 	stick_1.component('show', show_1.Show);
 	stick_1.component('unsafe', unsafe_1.Unsafe);
 	stick_1.component('delegate', delegate_1.Delegate);
-	stick_1.component('view', view_1.View);
+	//component('view', View);
 	__export(__webpack_require__(76));
+	var view_1 = __webpack_require__(49);
+	exports.Reference = view_1.Reference;
+	exports.Assignment = view_1.Assignment;
+	exports.Call = view_1.Call;
 
 /***/ },
 /* 83 */
@@ -13865,12 +13867,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+	    var c = arguments.length,
+	        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+	        d;
+	    if ((typeof Reflect === "undefined" ? "undefined" : _typeof(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
 	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
 	    return new (P || (P = Promise))(function (resolve, reject) {
 	        function fulfilled(value) {
@@ -13900,8 +13912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utilities_1 = __webpack_require__(6);
 	var base_component_1 = __webpack_require__(76);
 	var controller_factory_1 = __webpack_require__(60);
-	//import {ComponentDefinition} from '../index'
-
+	var decorators_1 = __webpack_require__(15);
 	var Controller = function (_base_component_1$Bas) {
 	    _inherits(Controller, _base_component_1$Bas);
 
@@ -13912,7 +13923,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(Controller, [{
-	        key: 'initialize',
+	        key: "initialize",
 	        value: function initialize() {
 	            if (this.attributes['name']) {
 	                this.name = this.attributes['name'];
@@ -13920,7 +13931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
-	        key: 'update',
+	        key: "update",
 	        value: function update() {
 	            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
 	                var view, template, state, s, controller, el;
@@ -13947,7 +13958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                view.update();
 
 	                            case 6:
-	                                return _context.abrupt('return');
+	                                return _context.abrupt("return");
 
 	                            case 7:
 	                                if (!this.resolving) {
@@ -13955,7 +13966,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt('return');
+	                                return _context.abrupt("return");
 
 	                            case 9:
 	                                this.resolving = true;
@@ -14009,7 +14020,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                this.resolving = false;
 
 	                            case 27:
-	                            case 'end':
+	                            case "end":
 	                                return _context.stop();
 	                        }
 	                    }
@@ -14017,20 +14028,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: 'destroy',
+	        key: "destroy",
 	        value: function destroy() {
 	            if (this.factory) {
 	                this.factory.destroy();
 	                this.factory = void 0;
 	            }
-	            _get(Object.getPrototypeOf(Controller.prototype), 'destroy', this).call(this);
+	            _get(Object.getPrototypeOf(Controller.prototype), "destroy", this).call(this);
 	        }
 	    }]);
 
 	    return Controller;
 	}(base_component_1.BaseComponent);
-
-	exports.Controller = Controller;
+	Controller = __decorate([decorators_1.component('controller')], Controller);
+	//decorators.component('controller')(Controller)
 
 /***/ },
 /* 84 */
@@ -14038,120 +14049,286 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+	    var c = arguments.length,
+	        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+	        d;
+	    if ((typeof Reflect === "undefined" ? "undefined" : _typeof(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var decorators = __webpack_require__(15);
 	var collection_1 = __webpack_require__(64);
-	exports.Repeat = {
-	    initialize: function initialize() {
-	        this._children = [];
-	        this._collection = [];
-	    },
-	    update: function update() {
-	        var as = this['as'];
-	        var each = this['each'];
-	        var key = this['key'] || "key";
-	        var n = 0;
-	        var self = this;
-	        var parent = this.view;
-	        if (each === this._collection || !each) {
-	            return;
+	var base_component_1 = __webpack_require__(76);
+	var Repeat = function (_base_component_1$Bas) {
+	    _inherits(Repeat, _base_component_1$Bas);
+
+	    function Repeat() {
+	        _classCallCheck(this, Repeat);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Repeat).apply(this, arguments));
+	    }
+
+	    _createClass(Repeat, [{
+	        key: "initialize",
+	        value: function initialize() {
+	            this._children = [];
+	            this._collection = [];
 	        }
-	        if (this._collection && this._collection instanceof collection_1.Collection) {
-	            this.__removeEventListeners(this._collection);
-	        }
-	        this._collection = each;
-	        this._update();
-	        if (each instanceof collection_1.Collection) {
-	            this.__addEventListeners(each);
-	        }
-	    },
-	    _update: function _update() {
-	        var properties;
-	        var as = this['as'];
-	        var parent = this.view;
-	        var n = 0;
-	        var self = this;
-	        var filter = this['filter'] || function (a) {
-	            return true;
-	        };
-	        this._collection.forEach(function (m) {
-	            if (!filter(m)) {
+	    }, {
+	        key: "update",
+	        value: function update() {
+	            var as = this['as'];
+	            var each = this['each'];
+	            var key = this['key'] || "key";
+	            var n = 0;
+	            var self = this;
+	            var parent = this.view;
+	            if (each === this._collection || !each) {
 	                return;
 	            }
-	            var child;
-	            if (as) {
-	                var _ref;
-
-	                properties = new collection_1.NestedModel((_ref = {}, _defineProperty(_ref, as, m), _defineProperty(_ref, 'self', this.view.context), _ref));
-	            } else {
-	                properties = m;
+	            if (this._collection && this._collection instanceof collection_1.Collection) {
+	                this.__removeEventListeners(this._collection);
 	            }
-	            // TODO - provide SAME context here for speed and stability
-	            if (n >= this._children.length) {
-	                child = this.childTemplate.view(properties, {
-	                    parent: parent
-	                });
-	                this._children.push(child);
-	                this.section.appendChild(child.render(properties));
-	            } else {
-	                child = this._children[n];
-	                child.context = properties;
-	                child.update();
+	            this._collection = each;
+	            this._update();
+	            if (each instanceof collection_1.Collection) {
+	                this.__addEventListeners(each);
 	            }
-	            n++;
-	        }, this);
-	        this._children.splice(n).forEach(function (child) {
-	            child.$destroy();
-	        });
-	    },
-	    __addEventListeners: function __addEventListeners(collection) {
-	        collection.on('add', this._update, this);
-	        collection.on('remove', this._update, this);
-	        collection.on('reset', this._update, this);
-	        collection.on('filter', this._update, this);
-	    },
-	    __removeEventListeners: function __removeEventListeners(collection) {
-	        collection.off('remove', this._update);
-	        collection.off('add', this._update);
-	        collection.off('reset', this._update);
-	        collection.off('filter', this._update);
-	    },
-	    setAttribute: function setAttribute(key, value) {
-	        this[key] = value;
-	    },
-	    setProperty: function setProperty() {
-	        console.log(arguments);
-	    },
-	    onDestroy: function onDestroy() {
-	        if (this._collection && typeof this._collection.destroy === 'function') {
-	            this._collection.destroy();
 	        }
-	        var _iteratorNormalCompletion = true;
-	        var _didIteratorError = false;
-	        var _iteratorError = undefined;
+	    }, {
+	        key: "_update",
+	        value: function _update() {
+	            var properties;
+	            var as = this['as'];
+	            var parent = this.view;
+	            var n = 0;
+	            var self = this;
+	            var filter = this['filter'] || function (a) {
+	                return true;
+	            };
+	            this._collection.forEach(function (m) {
+	                if (!filter(m)) {
+	                    return;
+	                }
+	                var child;
+	                if (as) {
+	                    var _ref;
 
-	        try {
-	            for (var _iterator = this._children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                var child = _step.value;
-
+	                    properties = new collection_1.NestedModel((_ref = {}, _defineProperty(_ref, as, m), _defineProperty(_ref, "self", this.view.context), _ref));
+	                } else {
+	                    properties = m;
+	                }
+	                // TODO - provide SAME context here for speed and stability
+	                if (n >= this._children.length) {
+	                    child = this.childTemplate.view(properties, {
+	                        parent: parent
+	                    });
+	                    this._children.push(child);
+	                    this.section.appendChild(child.render(properties));
+	                } else {
+	                    child = this._children[n];
+	                    child.context = properties;
+	                    child.update();
+	                }
+	                n++;
+	            }, this);
+	            this._children.splice(n).forEach(function (child) {
 	                child.$destroy();
+	            });
+	        }
+	    }, {
+	        key: "__addEventListeners",
+	        value: function __addEventListeners(collection) {
+	            collection.on('add', this._update, this);
+	            collection.on('remove', this._update, this);
+	            collection.on('reset', this._update, this);
+	            collection.on('filter', this._update, this);
+	        }
+	    }, {
+	        key: "__removeEventListeners",
+	        value: function __removeEventListeners(collection) {
+	            collection.off('remove', this._update);
+	            collection.off('add', this._update);
+	            collection.off('reset', this._update);
+	            collection.off('filter', this._update);
+	        }
+	    }, {
+	        key: "setAttribute",
+	        value: function setAttribute(key, value) {
+	            this[key] = value;
+	        }
+	    }, {
+	        key: "onDestroy",
+	        value: function onDestroy() {
+	            if (this._collection && typeof this._collection.destroy === 'function') {
+	                this._collection.destroy();
 	            }
-	        } catch (err) {
-	            _didIteratorError = true;
-	            _iteratorError = err;
-	        } finally {
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+
 	            try {
-	                if (!_iteratorNormalCompletion && _iterator.return) {
-	                    _iterator.return();
+	                for (var _iterator = this._children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var child = _step.value;
+
+	                    child.$destroy();
 	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
 	            } finally {
-	                if (_didIteratorError) {
-	                    throw _iteratorError;
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
 	                }
 	            }
 	        }
+	    }]);
+
+	    return Repeat;
+	}(base_component_1.BaseComponent);
+	Repeat = __decorate([decorators.component("repeat")], Repeat);
+	/*export const Repeat: ComponentDefinition = {
+
+	  initialize() {
+	    this._children = []
+	    this._collection = [];
+
+	  },
+
+	  update() {
+
+	    var as = this['as'];
+	    var each = this['each'];
+	    var key = this['key'] || "key";
+
+	    var n = 0;
+	    var self = this;
+	    var parent = this.view;
+
+	    if (each === this._collection || !each) {
+	      return
 	    }
-	};
+
+	    if (this._collection && this._collection instanceof Collection) {
+	      this.__removeEventListeners(this._collection)
+
+	    }
+
+	    this._collection = each
+
+	    this._update()
+
+	    if (each instanceof Collection) {
+	      this.__addEventListeners(each)
+	    }
+
+	  },
+
+	  _update() {
+
+	    var properties;
+	    var as = this['as'];
+	    var parent = this.view
+	    var n = 0
+
+	    var self = this
+
+	    var filter = this['filter'] || function(a) { return true }
+
+	    this._collection.forEach(function(m: IModel) {
+
+	      if (!filter(m)) { return; }
+
+	      var child;
+
+	      if (as) {
+	        properties = new NestedModel({ [as]: m, self: this.view.context });
+	      } else {
+	        properties = m;
+	      }
+
+	      // TODO - provide SAME context here for speed and stability
+	      if (n >= this._children.length) {
+
+	        child = this.childTemplate.view(properties, {
+	          parent: parent
+	        });
+
+
+	        this._children.push(child);
+
+	        this.section.appendChild(child.render(properties));
+
+	      } else {
+	        child = this._children[n];
+	        child.context = properties;
+	        child.update();
+	      }
+
+	      n++;
+
+	    }, this);
+
+	    this._children.splice(n).forEach(function(child) {
+	      (<any>child).$destroy();
+	    });
+
+
+	  },
+
+	  __addEventListeners<T extends IModel>(collection: Collection<T>) {
+
+	    collection.on('add', this._update, this);
+	    collection.on('remove', this._update, this);
+	    collection.on('reset', this._update, this);
+	    collection.on('filter', this._update, this);
+	  },
+
+	  __removeEventListeners<T extends IModel>(collection: Collection<T>) {
+	    collection.off('remove', this._update);
+	    collection.off('add', this._update);
+	    collection.off('reset', this._update);
+	    collection.off('filter', this._update);
+	  },
+
+	  setAttribute(key: string, value: any) {
+	    this[key] = value
+
+	  },
+
+	  setProperty() {
+	    console.log(arguments)
+	  },
+
+	  onDestroy() {
+	    if (this._collection && typeof this._collection.destroy === 'function') {
+	      this._collection.destroy();
+	    }
+
+	    for (let child of this._children) {
+	      child.$destroy();
+	    }
+	  }
+	}*/
 
 /***/ },
 /* 85 */
@@ -14334,12 +14511,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+	    var c = arguments.length,
+	        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+	        d;
+	    if ((typeof Reflect === "undefined" ? "undefined" : _typeof(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
 	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
 	    return new (P || (P = Promise))(function (resolve, reject) {
 	        function fulfilled(value) {
@@ -14365,7 +14552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	};
 	var base_component_1 = __webpack_require__(76);
-
+	var decorators = __webpack_require__(15);
 	var View = function (_base_component_1$Bas) {
 	    _inherits(View, _base_component_1$Bas);
 
@@ -14385,7 +14572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(View, [{
-	        key: 'update',
+	        key: "update",
 	        value: function update() {
 	            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
 	                var template, creator, resolver, tString, view;
@@ -14398,7 +14585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt('return', this.subview.update());
+	                                return _context.abrupt("return", this.subview.update());
 
 	                            case 2:
 	                                if (!this.resolving) {
@@ -14406,7 +14593,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt('return');
+	                                return _context.abrupt("return");
 
 	                            case 4:
 	                                this.resolving = true;
@@ -14417,7 +14604,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                return _context.abrupt('return');
+	                                return _context.abrupt("return");
 
 	                            case 8:
 	                                _context.next = 10;
@@ -14443,7 +14630,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                this.resolving = false;
 
 	                            case 22:
-	                            case 'end':
+	                            case "end":
 	                                return _context.stop();
 	                        }
 	                    }
@@ -14454,7 +14641,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return View;
 	}(base_component_1.BaseComponent);
-
+	View = __decorate([decorators.component("view")], View);
 	exports.View = View;
 
 /***/ }

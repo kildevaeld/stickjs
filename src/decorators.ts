@@ -4,6 +4,7 @@ import {camelcase, find} from 'utilities';
 import {Metadata, inject} from 'stick.di';
 import {Repository} from './repository';
 import * as templ from 'templ';
+
 export * from 'stick.di/lib/decorators';
 
 export function controller (controllerName?:string): ClassDecorator {
@@ -32,14 +33,11 @@ export function service (serviceName?:string, moduleName?:string): ClassDecorato
 	}
 }
 
-
-/*export function factory(factoryName:string): ClassDecorator {
-	return function (target:Function) {
-
-		Repository.add(DependencyType.Factory, factoryName, target);
-
-	}
-}*/
+export function factory(factoryName?:string): ClassDecorator {
+    return function (target:Function) {
+        
+    }
+}
 
 export function config (config:any): ClassDecorator {
 	return function (target:Function) {

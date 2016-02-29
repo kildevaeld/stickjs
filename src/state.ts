@@ -2,7 +2,7 @@ declare var require:any;
 import {NestedModel, ModelSetOptions} from 'collection';
 import {DIContainer} from 'stick.di';
 import * as utils from 'utilities';
-import {inject} from './decorators';
+import * as decorators from './decorators';
 
 const debug = require('debug')('stick:state');
 
@@ -35,7 +35,7 @@ export const get_atributes = function(attributes:any) {
   return { attr, deferred };
 };
 
-@inject('$container')
+@decorators.inject('$container')
 export class State extends NestedModel {
     private _parent: State;
     private _container: DIContainer;

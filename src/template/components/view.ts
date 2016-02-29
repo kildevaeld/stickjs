@@ -1,8 +1,9 @@
 
 import {BaseComponent} from './base-component';
 import {TemplateView} from '../template.view';
+import * as decorators from '../../decorators';
 
-
+@decorators.component("view")
 export class View extends BaseComponent {
   subview: TemplateView;
   resolving: boolean = false;

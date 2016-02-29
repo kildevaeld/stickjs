@@ -5,20 +5,22 @@ import {BaseComponent} from './base-component'
 import {TemplateView} from '../template.view'
 import {ControllerFactory} from '../../controller.factory'
 import {Template} from 'templ/lib/vnode'
-//import {ComponentDefinition} from '../index'
+import {component} from '../../decorators'
 
-export class Controller extends BaseComponent {
+@component('controller') 
+class Controller extends BaseComponent {
     name: string;
     as: string;
     factory: ControllerFactory;
     private resolving: boolean;
-    
+
     initialize() {
         if (this.attributes['name']) {
             this.name = this.attributes['name']
             this.as = this.attributes['as'] || this.name
         }
     }
+
 
     async update() {
         if (this.factory) {
@@ -79,3 +81,5 @@ export class Controller extends BaseComponent {
     }
 
 }
+
+//decorators.component('controller')(Controller)
