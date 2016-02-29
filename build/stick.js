@@ -3841,6 +3841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var internal_1 = __webpack_require__(16);
 	var utilities_1 = __webpack_require__(6);
 	var stick_di_1 = __webpack_require__(17);
+	var debug = __webpack_require__(23)('stick:container:repository');
 	var fnToStr = Function.prototype.toString;
 	var isNonArrowFnRegex = /^\s*function/;
 	var isArrowFnWithParensRegex = /^\([^\)]*\) *=>/;
@@ -3849,6 +3850,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	(function (Repository) {
 	    Repository.items = [];
 	    function add(type, name, target) {
+	        debug("Adding dependency: %s, name: %s", internal_1.DependencyType[type], name);
 	        var item = undefined;
 	        if (item = utilities_1.find(Repository.items, function (i) {
 	            return i.name == name;
@@ -3880,6 +3882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    Repository.has = has;
 	    function get(type, name) {
+	        debug("Get dependency: %s, name: %s", internal_1.DependencyType[type], name);
 	        return utilities_1.find(Repository.items, function (i) {
 	            return i.name == name && i.type == type;
 	        });

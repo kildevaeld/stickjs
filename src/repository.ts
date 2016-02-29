@@ -1,7 +1,9 @@
+declare var require:any;
 import {DependencyType, getDependencies, DIServiceConfig} from './internal'
 import {find, has} from 'utilities';
 import {Metadata} from 'stick.di'
 
+const debug = require('debug')('stick:container:repository');
 
 export interface ItemMap {
 	name: string
@@ -20,7 +22,7 @@ export module Repository {
 	export const items = [];
 
 	export function add (type:DependencyType, name:string, target:any) {
-
+        debug("Adding dependency: %s, name: %s", DependencyType[type], name)
 		let item;
 		if ((item = find(items, (i) => i.name == name))) {
 			items.splice(items.indexOf(item), 1)
@@ -36,6 +38,7 @@ export module Repository {
                 });
               } catch (e) {}
         }
+        
 		items.push({
 			name: name,
 			handler: target,
@@ -53,6 +56,7 @@ export module Repository {
 	}
 
 	export function get(type: DependencyType, name: string): ItemMap {
+        debug("Get dependency: %s, name: %s", DependencyType[type], name)
 		return find(items, (i) => i.name == name && i.type == type)
 	}
 
