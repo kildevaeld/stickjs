@@ -48,9 +48,11 @@ export class ControllerFactory extends EventEmitter {
         this.name = name;
         this._id = utils.uniqueId("ctrl");
         if (typeof controller === 'function' && controller.name == "") {
-            Object.defineProperty(controller, 'name', {
-                value: name
-            });
+            try {
+                Object.defineProperty(controller, 'name', {
+                    value: name
+                });
+            } catch (e) {}
         }
         debug("%s: Controller factory created: '%s', container %s", this.id, name, this.container.id);
     }
@@ -67,30 +69,30 @@ export class ControllerFactory extends EventEmitter {
         if (this.container.hasInstance(this.name)) {
             return utils.Promise.resolve(this.container.get(this.name));
         }
-        
-        
+
+
         this.container.registerSingleton(this.name, this.controller);
         let contextName = options.contextName || this.name
-        
+
         // State
         let $state: State = await this.container.get('$state');
         $state = $state.createChild(this.container, options.state);
         this.container.registerInstance('$state', $state, true);
 
-        // Template        
+        // Template
         let template = await this.resolveTemplate($state, options);
         debug("%s: Created template: %s", this.id, template.id);
         this.container.registerInstance('template', template, true);
-        
+
         debug("%s: Instantiating controller '%s' as '%s'", this.id, this.name, contextName);
         let controller = await this.container.get(this.name);
-        
+
         $state.set(contextName, controller);
         template.setTarget(controller)
 
         this.trigger('before:template:render');
-        
-        
+
+
         let el = template.render();
         // Wrap element if its a DocumentFragment
         if (el.nodeType === 11 || el.nodeType === 3) {
@@ -100,7 +102,7 @@ export class ControllerFactory extends EventEmitter {
                 el = wrap(el, this.name, contextName);
             }
         }
-        
+
         this.container.registerInstance('$el', el, true)
 
         if (typeof controller.onTemplateRender === 'function') {

@@ -28,11 +28,13 @@ export module Repository {
 		}
 
 		let config = Metadata.get(DIServiceConfig, target)
-        
+
         if (typeof target === 'function' && target.name == "")  {
-            Object.defineProperty(target, 'name', {
-                value: name
-            });
+            try {
+                Object.defineProperty(target, 'name', {
+                    value: name
+                });
+              } catch (e) {}
         }
 		items.push({
 			name: name,

@@ -54,9 +54,12 @@ export class ModuleFactory extends EventEmitter {
         this.container = container
 
         if (typeof module === 'function' && module.name == "") {
-            Object.defineProperty(module, 'name', {
-                value: name
-            });
+            try {
+                Object.defineProperty(module, 'name', {
+                    value: name
+                });
+            } catch (e) {}
+
 
         }
         this._id = utils.uniqueId("mod");
