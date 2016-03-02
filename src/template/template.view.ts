@@ -79,7 +79,7 @@ export class TemplateView extends View {
         //    this.set(k, changed[k])
         //}
 
-        this.update();
+        this.updateLater();
 
     }
 
@@ -134,7 +134,7 @@ export class TemplateView extends View {
 
         }
 
-        this.update()
+        this.updateLater()
     }
 
     render (): HTMLElement {

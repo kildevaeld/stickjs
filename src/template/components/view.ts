@@ -22,6 +22,12 @@ export class View extends BaseComponent {
 
       let template = this.attributes['template'];
 
+      let context = this.attributes['context'];
+
+      if (!context) {
+        context = this.view.context;
+      }
+
       if (!template || template == "") {
           return;
       }
@@ -31,7 +37,7 @@ export class View extends BaseComponent {
 
       let tString = await resolver(template)
 
-      let view = creator(tString, this.view.context);
+      let view = creator(tString, context);
       view.parent = this.view;
       this.subview = view;
 
@@ -39,6 +45,6 @@ export class View extends BaseComponent {
       this.resolving = false;
 
   }
-  
+
 }
 
