@@ -50,7 +50,7 @@ export class TemplateView extends View {
             context.on('change', this._onModelChange, this);
         }
 
-
+        this.updateLater();
 
     }
 
@@ -182,7 +182,7 @@ export class TemplateView extends View {
 
             }
         }
-        debug("%s: Got value for key '%s': ", this.id, value);
+        debug("%s: Got value for key '%s': ", this.id, key, value);
         return value;
 
     }
