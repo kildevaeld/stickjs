@@ -3,9 +3,9 @@ import {callFunc, bind} from 'utilities'
 import {Component, Section, VNode, AttributeMap, IView, fragment, Template, template} from 'templ/lib/vnode'
 import {resolveDependencies} from '../../internal'
 import {TemplateView} from '../template.view'
+import {EventEmitter} from 'eventsjs';
 
-
-export class BaseComponent implements Component {
+export class BaseComponent extends EventEmitter implements Component {
 		section: Section
 		vnode: VNode
 		attributes: AttributeMap
@@ -13,7 +13,9 @@ export class BaseComponent implements Component {
 		document:Document
 		childTemplate:Template
 		constructor(section:Section, vvnode:VNode, attributes:AttributeMap, view:TemplateView) {
-            
+
+			super();
+
 			if ((<any>this).update) {
 				(<any>this).update = bind((<any>this).update, this);
 			}
@@ -47,7 +49,7 @@ export class BaseComponent implements Component {
 		removeAttribute(key:string) {
 			this.attributes[key] = void 0
 		}
-        
+
         getAttribute(key:string) {
             return this.attributes[key];
         }

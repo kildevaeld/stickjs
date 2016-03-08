@@ -1,6 +1,7 @@
 import { Component, Section, VNode, AttributeMap, Template } from 'templ/lib/vnode';
 import { TemplateView } from '../template.view';
-export declare class BaseComponent implements Component {
+import { EventEmitter } from 'eventsjs';
+export declare class BaseComponent extends EventEmitter implements Component {
     section: Section;
     vnode: VNode;
     attributes: AttributeMap;
