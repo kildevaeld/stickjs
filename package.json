@@ -7,10 +7,10 @@
     "url": "https://github.com/kildevaeld/stick/issues"
   },
   "dependencies": {
-    "collection": "git+https://github.com/kildevaeld/collectionjs.git#v0.1.8",
+    "collection": "git+https://github.com/kildevaeld/collectionjs.git",
     "debug": "^2.2.0",
     "stick.di": "git+https://github.com/kildevaeld/dijs.git#v0.1.0",
-    "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git#v0.1.0",
+    "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
     "templ": "git+https://github.com/kildevaeld/templ.git",
     "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
   },
@@ -55,5 +55,5 @@
     "test": "node node_modules/.bin/mocha"
   },
   "typings": "lib/index",
-  "version": "0.3.13"
+  "version": "0.3.14"
 }
