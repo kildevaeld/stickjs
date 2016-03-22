@@ -10,6 +10,7 @@ export declare class State extends NestedModel {
     parent: State;
     container: DIContainer;
     constructor(container: DIContainer, values?: any);
+    pick(attr: string | string[], ...attrs: string[]): any;
     get(key: string): any;
     set(key: string | Object, val?: any): this;
     createChild(container?: DIContainer, values?: any): State;

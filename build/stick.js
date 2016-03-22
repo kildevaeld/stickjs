@@ -11377,6 +11377,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(State, [{
+	        key: "pick",
+	        value: function pick(attr) {
+	            for (var _len = arguments.length, attrs = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	                attrs[_key - 1] = arguments[_key];
+	            }
+
+	            if (arguments.length === 1) {
+	                if (!Array.isArray(attr)) {
+	                    attrs = [attr];
+	                } else {
+	                    attrs = attr;
+	                }
+	            } else {
+	                attrs = [attr].concat(attrs);
+	            }
+	            var out = {};
+	            for (var i = 0, ii = attrs.length; i < ii; i++) {
+	                if (this.has(attrs[i])) out[attrs[i]] = this.get(attrs[i]);
+	            }
+	            return out;
+	        }
+	    }, {
 	        key: "get",
 	        value: function get(key) {
 	            debug("%s: Get attribute: %s", this.uid, key);

@@ -54,6 +54,23 @@ export class State extends NestedModel {
         debug('%s: State created', this.uid);
     }
 
+    public pick(attr:string|string[], ...attrs:string[]): any {
+        if (arguments.length === 1) {
+            if (!Array.isArray(attr)) {
+                attrs = [attr];
+            } else {
+                attrs = <string[]>attr;
+            }
+        } else {
+            attrs = [<string>attr].concat(attrs);
+        }
+        let out = {};
+        for (let i = 0, ii = attrs.length; i < ii; i++ ) {
+            if (this.has(attrs[i])) out[attrs[i]] = this.get(attrs[i]);
+        }
+        
+        return out;
+    }
 
     public get(key: string): any {
         debug("%s: Get attribute: %s", this.uid, key);
