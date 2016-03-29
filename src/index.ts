@@ -7,7 +7,11 @@ export const utils = u;
 export const decorators = d;
 export * from './stick';
 export * from 'collection';
-
 export var ready = u.domReady();
 
 import {Repository} from './repository'
+
+
+import *  as templ from './template'
+
+export const template = templ;
