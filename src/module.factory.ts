@@ -28,9 +28,10 @@ const wrap = (el: Node, name: string) => {
 export type ControllerDefinition = FunctionConstructor | Object | any[];
 
 export interface ModuleCreateOptions {
-    el?: HTMLElement
-    parent?: Container
-    template?: string | Template
+    el?: HTMLElement;
+    parent?: Container;
+    template?: string | Template;
+    state?: any;
 }
 
 export class ModuleFactory extends EventEmitter {
@@ -169,6 +170,10 @@ export class ModuleFactory extends EventEmitter {
         this.container.registerSingleton('$state', State);
 
         let state: State = await this.container.get('$state');
+        
+        if (options.state) {
+            state.set(options.state);
+        }
 
         debug("%s: Creating module %s", this.id, this.name);
 

@@ -6,6 +6,7 @@ export interface ModuleCreateOptions {
     el?: HTMLElement;
     parent?: Container;
     template?: string | Template;
+    state?: any;
 }
 export declare class ModuleFactory extends EventEmitter {
     name: string;
