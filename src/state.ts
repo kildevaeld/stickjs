@@ -1,5 +1,5 @@
 declare var require:any;
-import {NestedModel, ModelSetOptions} from 'collection';
+import {NestedModel, NestedModelSetOptions} from 'collection';
 import {DIContainer} from 'stick.di';
 import * as utils from 'utilities';
 import * as decorators from './decorators';
@@ -73,12 +73,13 @@ export class State extends NestedModel {
     }
 
     public get(key: string): any {
-        debug("%s: Get attribute: %s", this.uid, key);
-        return super.get(key);
+        let data = super.get(key);
+        debug("%s: Get attribute: %s", this.uid, key, data);
+        return data;
     }
 
     public set(key: string | Object, val?: any): this {
-        let opts: ModelSetOptions = {},
+        let opts: NestedModelSetOptions = {array: false},
             value = {},
             unset = {};
         if (typeof key === 'string') {
@@ -102,7 +103,7 @@ export class State extends NestedModel {
         }
 
         if (!utils.isEmpty(attr)) {
-            debug("%s: Set attributes: %j", this.uid, Object.keys(attr));
+            debug("%s: Set attributes: ", this.uid, attr);
             super.set(attr, opts);
         }
 

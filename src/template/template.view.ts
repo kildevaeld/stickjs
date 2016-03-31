@@ -105,6 +105,7 @@ export class TemplateView extends View {
         if (!silent) {
 
             if (!(this.context instanceof Model)) {
+                debug('set value for %s on object', key);
                 super.set(key, val)
                 return this.updateLater();
             }
@@ -127,7 +128,7 @@ export class TemplateView extends View {
                 (<string[]>key).shift()
                 this.root.set(key, val);
             } else {
-
+                debug('set value for %s on model', key);
                 this.context.set((<string[]>key).join('.'), val)
 
             }

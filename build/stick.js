@@ -11548,15 +11548,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: "get",
 	        value: function get(key) {
-	            debug("%s: Get attribute: %s", this.uid, key);
-	            return _get(Object.getPrototypeOf(State.prototype), "get", this).call(this, key);
+	            var data = _get(Object.getPrototypeOf(State.prototype), "get", this).call(this, key);
+	            debug("%s: Get attribute: %s", this.uid, key, data);
+	            return data;
 	        }
 	    }, {
 	        key: "set",
 	        value: function set(key, val) {
 	            var _this2 = this;
 
-	            var opts = {},
+	            var opts = { array: false },
 	                value = {},
 	                unset = {};
 	            if (typeof key === 'string') {
@@ -11581,7 +11582,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	            }
 	            if (!utils.isEmpty(attr)) {
-	                debug("%s: Set attributes: %j", this.uid, Object.keys(attr));
+	                debug("%s: Set attributes: ", this.uid, attr);
 	                _get(Object.getPrototypeOf(State.prototype), "set", this).call(this, attr, opts);
 	            }
 	            if (!utils.isEmpty(unset)) {
@@ -11986,7 +11987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.options = options;
 	        if (options.parse)
 	            attributes = this.parse(attributes);
-	        this.set(attributes, null, { silent: true });
+	        this.set(attributes, { silent: true, array: false });
 	        this.uid = utils_1.uniqueId('uid');
 	        this._changed = {};
 	        this.collection = options.collection;
@@ -12146,14 +12147,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils_1 = __webpack_require__(8);
 	var objects_1 = __webpack_require__(9);
 	var model_1 = __webpack_require__(68);
-	function objToPaths(obj, separator) {
+	function objToPaths(obj, separator, array) {
 	    if (separator === void 0) { separator = "."; }
+	    if (array === void 0) { array = true; }
 	    var ret = {};
 	    if (!obj)
 	        return obj;
 	    for (var key in obj) {
 	        var val = obj[key];
-	        if (val && (val.constructor === Object || val.constructor === Array) && !objects_1.isEmpty(val)) {
+	        if (val && (val.constructor === Object || (array && val.constructor === Array)) && !objects_1.isEmpty(val)) {
 	            var obj2 = objToPaths(val);
 	            for (var key2 in obj2) {
 	                var val2 = obj2[key2];
@@ -12166,6 +12168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return ret;
 	}
+	exports.objToPaths = objToPaths;
 	function isOnNestedModel(obj, path, separator) {
 	    if (separator === void 0) { separator = "."; }
 	    var fields = path ? path.split(separator) : [];
@@ -12208,6 +12211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return result;
 	}
+	exports.getNested = getNested;
 	function setNested(obj, path, val, options) {
 	    options = options || {};
 	    if (!obj)
@@ -12273,9 +12277,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._changed = {};
 	        }
 	        current = this._attributes, prev = this._previousAttributes;
-	        attrs = objToPaths(attrs);
-	        var alreadyTriggered = {};
 	        var separator = NestedModel.keyPathSeparator;
+	        attrs = objToPaths(attrs, separator, options.array);
+	        var alreadyTriggered = {};
 	        if (!this._nestedListener)
 	            this._nestedListener = {};
 	        for (attr in attrs) {
@@ -12286,7 +12290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this._changed[attr] = val;
 	            }
 	            if (!utils_1.equal(getNested(prev, attr), val)) {
-	                setNested(this.changed, attr, val);
+	                setNested(this.changed, attr, val, options);
 	            }
 	            else {
 	                deleteNested(this.changed, attr);
@@ -12320,7 +12324,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                else {
 	                    alreadyTriggered[attr] = true;
 	                }
-	                setNested(current, attr, val);
+	                setNested(current, attr, val, options);
 	            }
 	        }
 	        if (!silent) {
@@ -12872,7 +12876,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.trigger('before:fetch', this, options);
 	        params[this.queryParams.size] = this._state.size;
 	        if (!this._link[options.page + '']) {
-	            this._link[options.page] = url + request_1.queryParam({ page: options.page });
+	            this._link[options.page] = url + '?' + request_1.queryParam({ page: options.page });
 	        }
 	        return this.sync(persistence_1.RestMethod.Read, this, options)
 	            .then(function (resp) {
@@ -13623,6 +13627,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            if (!silent) {
 	                if (!(this.context instanceof collection_1.Model)) {
+	                    debug('set value for %s on object', key);
 	                    _get(Object.getPrototypeOf(TemplateView.prototype), 'set', this).call(this, key, val);
 	                    return this.updateLater();
 	                }
@@ -13641,6 +13646,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    key.shift();
 	                    this.root.set(key, val);
 	                } else {
+	                    debug('set value for %s on model', key);
 	                    this.context.set(key.join('.'), val);
 	                }
 	            }
