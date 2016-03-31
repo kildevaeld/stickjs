@@ -6,12 +6,13 @@ import {BaseComponent} from './base-component';
 import {TemplateView} from '../template.view';
 
 @decorators.component("repeat")
-class Repeat extends BaseComponent {
+export class Repeat extends BaseComponent {
   private _children: TemplateView[];
   private _collection: any;
 
   initialize () {
     this._children = []
+    
     this._collection = [];
   }
 

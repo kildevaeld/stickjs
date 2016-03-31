@@ -8,6 +8,7 @@
     <script src="../build/stick.js"></script>
     <script>
         var factory = stick.module('app', function ($state) {
+        
         this.addTodo = function (e) {
           var todo = $state.get('todo');
           if (todo != "" && todo != undefined) {
@@ -31,7 +32,7 @@
 
         }
         this.removeTodo = function (model) {
-          console.log(model.collection, $state);
+          console.log(model.collection, $state, model);
           $state.get('todos').on('remove', () => {
               console.log('on remove');
           })
@@ -59,6 +60,7 @@
     <button onclick="{{addTodo}}">Add</button>
     <ul>
         <li repeat.each="{{todos}}" repeat.as="todo">
+           
             {{todo.name}} {{todo.done ? '&#10003;' : ''}}
             <button onclick="{{todoDone(todo)}}">Done</button>
             <button onclick="{{removeTodo(todo)}}">Remove</button>

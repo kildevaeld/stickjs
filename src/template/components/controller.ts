@@ -8,7 +8,7 @@ import {Template} from 'templ/lib/vnode'
 import {component} from '../../decorators'
 
 @component('controller') 
-class Controller extends BaseComponent {
+export class Controller extends BaseComponent {
     name: string;
     as: string;
     factory: ControllerFactory;

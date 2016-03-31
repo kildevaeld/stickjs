@@ -152,7 +152,7 @@ export class TemplateView extends View {
     }
 
     get(key: string | string[]): any {
-	    debug("%s: Get value for key: %j", this.id, key);
+	    debug("%s: Get value for key: %j", this.id, key, this.context);
         if (!Array.isArray(key)) key = (<string>key).split(/[,.]/);
 
         let value, context = this.context;

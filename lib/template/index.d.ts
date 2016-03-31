@@ -1,8 +1,7 @@
 export * from './template.view';
-import './components/controller';
-import './components/repeat';
-import './components/view';
+import './attributes';
 export * from './components/base-component';
+export * from './attributes/base-attribute';
 export interface ComponentDefinition {
     [propety: string]: any;
     initialize: ((...args: any[]) => void);
