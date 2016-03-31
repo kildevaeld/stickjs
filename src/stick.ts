@@ -11,6 +11,8 @@ import {AttributeConstructor} from 'templ/lib/vnode';
 import * as templ from 'templ';
 import * as annotations from './decorators'
 
+declare const require:any;
+const debug = require('debug')('stick');
 
 export function service(name: string, definition: Function) {
 		let [fn] = getDependencies(definition);
@@ -114,11 +116,12 @@ export function component(name: string, handler: ComponentDefinition|Function) {
 	}
 
 	//let Component = utils.inherits(<any>BaseComponent, component)
-
+    debug('defining component: %s', name);
 	templ.component(name, Component);
 }
 
 export function attribute(name: string, handler: AttributeConstructor) {
+    debug('defining attribute: %s', name);
 	templ.attribute(name, <any>handler);
 }
 
@@ -130,5 +133,6 @@ export function decorator(name: string, decorator: any) {
 }
 
 export function modifier(name: string, modifier: (value:any) => any) {
+    debug('defining modifier: %s', name);
 	templ.modifier(name, modifier);
 }

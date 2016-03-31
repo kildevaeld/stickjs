@@ -1,5 +1,5 @@
 import * as decorators from '../../decorators';
-import {Collection, IModel, NestedModel, ICollection} from 'collection'
+import {Collection, IModel, NestedModel, ICollection, Model} from 'collection'
 import {bind} from 'utilities/lib/index'
 import {ComponentDefinition} from '../index'
 import {BaseComponent} from './base-component';
@@ -67,6 +67,8 @@ export class Repeat extends BaseComponent {
       } else {
         properties = m;
       }
+      
+      //if (properties instanceof Model)
 
       // TODO - provide SAME context here for speed and stability
       if (n >= this._children.length) {

@@ -4,6 +4,9 @@ import {Reference} from '../';
 import * as utils from 'utilities';
 
 const _events = ['change', 'keyup', 'input'];
+declare var require:any;
+const debug = require('debug')('stick:template:attribute:value');
+
 
 @decorators.attribute('value')
 export class ValueAttribute extends BaseAttribute {
@@ -29,6 +32,7 @@ export class ValueAttribute extends BaseAttribute {
         }
 
         if (model.gettable) {
+           
             this._elementValue(this._parseValue(model.value()));
         }
     }
@@ -50,8 +54,11 @@ export class ValueAttribute extends BaseAttribute {
 
         if (!this.model) return;
 
-        if (utils.equal(this.model.value(), value)) return;
-        
+        if (utils.equal(this.model.value(), value)) {
+            debug('input: no change');    
+            return;
+        }
+        debug('input changed %s',this.model.value() ,value);
         this.model.value(value);
     }
 

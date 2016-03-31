@@ -2138,6 +2138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var repository_1 = __webpack_require__(30);
 	var templ = __webpack_require__(31);
 	__export(__webpack_require__(29));
+	var debug = __webpack_require__(23)('stick:decorators');
 	function controller(controllerName) {
 	    return function (target) {
 	        var name = controllerName || utilities_1.camelcase(target.name);
@@ -2177,12 +2178,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.template = template;
 	function component(name) {
 	    return function (target) {
+	        debug('defining component %s, target: %s', name, target.name);
 	        templ.component(name, target);
 	    };
 	}
 	exports.component = component;
 	function attribute(name) {
 	    return function (target) {
+	        debug('defining attribute %s, target: %s', name, target.name);
 	        templ.attribute(name, target);
 	    };
 	}
@@ -12957,6 +12960,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var base_component_1 = __webpack_require__(76);
 	var templ = __webpack_require__(31);
 	var annotations = __webpack_require__(15);
+	var debug = __webpack_require__(23)('stick');
 	function service(name, definition) {
 	    var _internal_1$getDepend = internal_1.getDependencies(definition);
 
@@ -13053,10 +13057,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw new errors_1.StickError("component should be a function or an object");
 	    }
 	    //let Component = utils.inherits(<any>BaseComponent, component)
+	    debug('defining component: %s', name);
 	    templ.component(name, Component);
 	}
 	exports.component = component;
 	function attribute(name, handler) {
+	    debug('defining attribute: %s', name);
 	    templ.attribute(name, handler);
 	}
 	exports.attribute = attribute;
@@ -13068,6 +13074,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.decorator = decorator;
 	function modifier(name, modifier) {
+	    debug('defining modifier: %s', name);
 	    templ.modifier(name, modifier);
 	}
 	exports.modifier = modifier;
@@ -13617,7 +13624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!silent) {
 	                if (!(this.context instanceof collection_1.Model)) {
 	                    _get(Object.getPrototypeOf(TemplateView.prototype), 'set', this).call(this, key, val);
-	                    return this.update();
+	                    return this.updateLater();
 	                }
 	                if (!Array.isArray(key)) key = key.split(/[,.]/);
 	                if (key[0] === 'this') {
@@ -14056,6 +14063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _1 = __webpack_require__(82);
 	var utils = __webpack_require__(6);
 	var _events = ['change', 'keyup', 'input'];
+	var debug = __webpack_require__(23)('stick:template:attribute:value');
 	var ValueAttribute = function (_base_attribute_1$Bas) {
 	    _inherits(ValueAttribute, _base_attribute_1$Bas);
 
@@ -14122,7 +14130,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            var value = this._parseValue(this._elementValue());
 	            if (!this.model) return;
-	            if (utils.equal(this.model.value(), value)) return;
+	            if (utils.equal(this.model.value(), value)) {
+	                debug('input: no change');
+	                return;
+	            }
+	            debug('input changed %s', this.model.value(), value);
 	            this.model.value(value);
 	        }
 	    }, {
@@ -14532,6 +14544,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                } else {
 	                    properties = m;
 	                }
+	                //if (properties instanceof Model)
 	                // TODO - provide SAME context here for speed and stability
 	                if (n >= this._children.length) {
 	                    child = this.childTemplate.view(properties, {

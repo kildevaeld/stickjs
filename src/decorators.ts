@@ -7,6 +7,10 @@ import * as templ from 'templ';
 
 export * from 'stick.di/lib/decorators';
 
+declare var require:any;
+const debug = require('debug')('stick:decorators');
+
+
 export function controller (controllerName?:string): ClassDecorator {
 	return function (target:Function) {
 		let name = controllerName||camelcase(target.name);
@@ -53,12 +57,14 @@ export function template (name:string): ClassDecorator {
 
 export function component(name:string): ClassDecorator {
     return function(target:any) {
+        debug('defining component %s, target: %s', name, target.name);
         templ.component(name, target);
     }
 }
 
 export function attribute(name:string): ClassDecorator {
     return function(target:any) {
+        debug('defining attribute %s, target: %s', name, target.name);
         templ.attribute(name, target);
     }
 }

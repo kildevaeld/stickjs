@@ -106,7 +106,7 @@ export class TemplateView extends View {
 
             if (!(this.context instanceof Model)) {
                 super.set(key, val)
-                return this.update();
+                return this.updateLater();
             }
 
             if (!Array.isArray(key)) key = (<string>key).split(/[,.]/);
