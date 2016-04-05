@@ -121,7 +121,9 @@ export class RouterService {
 
     public reload() {
       setTimeout(() => {
-        this.router.history.loadUrl();
+        if (!this.router.history.loadUrl()) {
+            this.router.history.trigger('route:unmatched');
+        }
       });
     }
 

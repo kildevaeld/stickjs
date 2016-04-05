@@ -229,7 +229,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var _this = this;
 
 	            setTimeout(function () {
-	                _this.router.history.loadUrl();
+	                if (!_this.router.history.loadUrl()) {
+	                    _this.router.history.trigger('route:unmatched');
+	                }
 	            });
 	        }
 	        /**
@@ -663,6 +665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    handler.callback(fragment);
 	                    return true;
 	                }
+	                return false;
 	            });
 	        }
 	        // Save a fragment into the hash history, or replace the URL state if the
