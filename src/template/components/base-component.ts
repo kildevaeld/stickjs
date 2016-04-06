@@ -4,7 +4,7 @@ import {Component, Section, VNode, AttributeMap, IView, fragment, Template, temp
 import {resolveDependencies} from '../../internal'
 import {TemplateView} from '../template.view'
 import {EventEmitter} from 'eventsjs';
-
+import {Container} from '../../container'
 export class BaseComponent extends EventEmitter implements Component {
 		section: Section
 		vnode: VNode
@@ -37,7 +37,7 @@ export class BaseComponent extends EventEmitter implements Component {
 
 		}
 
-		initialize () {
+		initialize (container:Container) {
 
 		}
 

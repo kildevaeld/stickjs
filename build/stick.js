@@ -13499,7 +13499,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _createClass(BaseComponent, [{
 	        key: 'initialize',
-	        value: function initialize() {}
+	        value: function initialize(container) {}
 	    }, {
 	        key: 'setAttribute',
 	        value: function setAttribute(key, value) {
