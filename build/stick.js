@@ -13521,6 +13521,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var a = this;
 	            if (typeof a.onDestroy === 'function') {
 	                a.onDestroy();
+	            } else if (typeof a.ondestroy === 'function') {
+	                a.ondestroy();
 	            }
 	        }
 	    }]);
@@ -15045,8 +15047,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }));
 	        }
 	    }, {
-	        key: "ondestroy",
-	        value: function ondestroy() {
+	        key: "onDestroy",
+	        value: function onDestroy() {
 	            if (this.subview) {
 	                this.subview.$destroy();
 	            }

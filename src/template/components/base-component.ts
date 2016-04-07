@@ -58,6 +58,8 @@ export class BaseComponent extends EventEmitter implements Component {
 			let a = <any>this
 			if (typeof a.onDestroy === 'function') {
 				a.onDestroy();
-			}
+			} else if (typeof a.ondestroy === 'function') {
+                a.ondestroy();
+            }
 		}
 }

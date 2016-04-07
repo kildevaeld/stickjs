@@ -5,5 +5,5 @@ export declare class View extends BaseComponent {
     resolving: boolean;
     getContext(): any;
     update(): Promise<void>;
-    ondestroy(): void;
+    onDestroy(): void;
 }

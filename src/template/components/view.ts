@@ -65,7 +65,7 @@ export class View extends BaseComponent {
 
   }
   
-  ondestroy() {
+  onDestroy() {
       if (this.subview) {
           this.subview.$destroy();
       }
