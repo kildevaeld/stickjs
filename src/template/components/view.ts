@@ -35,28 +35,6 @@ export class View extends BaseComponent {
   async update () {
 
       if (this.subview) {
-        /*let context: any = this.attributes['context'];
-
-        if (!context) {
-          context = this.view.context;
-        } else {
-
-        if (context instanceof Call) {
-          context = concext.call();
-        }
-
-        if (this.attributes['as']) {
-          let as = this.attributes['as']
-          context = new NestedModel({[as]: context})
-        }*/
-
-      //}
-
-        //let context = this.getContext();
-        //if (this.subview.context == context) return this.subview.update();
-        //this.subview.context = context;
-        //console.log('Conext', context)
-        //return;
         return this.subview.update();
       }
 
@@ -67,16 +45,6 @@ export class View extends BaseComponent {
 
       let template = this.attributes['template'];
 
-      /*let context: any = this.attributes['context'];
-      console.log('HAS CONTEXT', context);
-      if (!context) {
-        context = this.view.context;
-      } else {
-        if (this.attributes['as']) {
-          let as = this.attributes['as']
-          context = new NestedModel({[as]: context})
-        }
-      }*/
       let context = this.getContext();
 
       if (!template || template == "") {
@@ -95,6 +63,12 @@ export class View extends BaseComponent {
       this.section.appendChild(view.render());
       this.resolving = false;
 
+  }
+  
+  ondestroy() {
+      if (this.subview) {
+          this.subview.$destroy();
+      }
   }
 
 }

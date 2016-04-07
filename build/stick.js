@@ -15004,17 +15004,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            case 4:
 	                                this.resolving = true;
 	                                template = this.attributes['template'];
-	                                /*let context: any = this.attributes['context'];
-	                                console.log('HAS CONTEXT', context);
-	                                if (!context) {
-	                                  context = this.view.context;
-	                                } else {
-	                                  if (this.attributes['as']) {
-	                                    let as = this.attributes['as']
-	                                    context = new NestedModel({[as]: context})
-	                                  }
-	                                }*/
-
 	                                context = this.getContext();
 
 	                                if (!(!template || template == "")) {
@@ -15054,6 +15043,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                }, _callee, this);
 	            }));
+	        }
+	    }, {
+	        key: "ondestroy",
+	        value: function ondestroy() {
+	            if (this.subview) {
+	                this.subview.$destroy();
+	            }
 	        }
 	    }]);
 
