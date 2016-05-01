@@ -54,7 +54,7 @@ export class State extends NestedModel {
         debug('%s: State created', this.uid);
     }
 
-    public pick(attr:string|string[], ...attrs:string[]): any {
+    /*public pick(attr:string|string[], ...attrs:string[]): any {
         if (arguments.length === 1) {
             if (!Array.isArray(attr)) {
                 attrs = [attr];
@@ -70,7 +70,7 @@ export class State extends NestedModel {
         }
         
         return out;
-    }
+    }*/
 
     public get(key: string): any {
         let data = super.get(key);
