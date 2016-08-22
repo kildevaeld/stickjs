@@ -17,7 +17,7 @@ export function templateResolver (name:string): IPromise<string> {
 
 		if (template == null)
 			return Promise.reject(new Error(`template with id: '${name}' not found`));
-
+		
 		return Promise.resolve(template.innerHTML);
 }
 
