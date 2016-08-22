@@ -9,3 +9,4 @@ export * from 'collection';
 export declare var ready: (fn: any) => void;
 import * as templ from './template';
 export declare const template: typeof templ;
+export * from './template';

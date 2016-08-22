@@ -15,3 +15,4 @@ import {Repository} from './repository'
 import *  as templ from './template'
 
 export const template = templ;
+export * from './template';
