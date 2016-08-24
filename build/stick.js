@@ -70,6 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(76));
 	__export(__webpack_require__(67));
 	exports.ready = u.domReady();
+	__export(__webpack_require__(1));
 	var templ = __webpack_require__(84);
 	exports.template = templ;
 	__export(__webpack_require__(84));

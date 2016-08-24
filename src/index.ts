@@ -8,7 +8,7 @@ export const decorators = d;
 export * from './stick';
 export * from 'collection';
 export var ready = u.domReady();
-
+export * from './services';
 import {Repository} from './repository'
 
 

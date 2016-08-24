@@ -7,6 +7,7 @@ export declare const decorators: typeof d;
 export * from './stick';
 export * from 'collection';
 export declare var ready: (fn: any) => void;
+export * from './services';
 import * as templ from './template';
 export declare const template: typeof templ;
 export * from './template';
