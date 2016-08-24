@@ -42,8 +42,17 @@
   "homepage": "https://github.com/kildevaeld/stick#readme",
   "jspm": {
     "main": "build/stick.js",
-    "registry": "npm",
+    "registry": "github",
+    "format": "cjs",
     "jspmPackage": true,
+    "dependencies": {
+      "collection": "github:kildevaeld/collectionjs",
+      "debug": "npm:debug@2.2.0",
+      "stick.dk": "github:kildevaeld/dijs",
+      "eventsjs": "github:kildevaeld/eventsjs",
+      "utilities": "github:kildevaeld/utilitiesjs",
+      "templ": "github:kildevaeld/templ"
+    }
   },
   "license": "MIT",
   "main": "index.js",
@@ -57,5 +66,5 @@
     "test": "node node_modules/.bin/mocha"
   },
   "typings": "lib/index",
-  "version": "0.4.5"
+  "version": "0.4.6"
 }
