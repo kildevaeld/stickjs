@@ -42,7 +42,7 @@
   "homepage": "https://github.com/kildevaeld/stick#readme",
   "jspm": {
     "main": "build/stick.js",
-    "registry": "github",
+    "registry": "npm",
     "jspmPackage": true,
   },
   "license": "MIT",
