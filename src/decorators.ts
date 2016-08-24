@@ -1,11 +1,19 @@
 
 import {DependencyType, setDependencyType,DIServiceConfig, Metakey} from './internal';
 import {camelcase, find} from 'utilities';
-import {Metadata, inject} from 'stick.di';
+import {Metadata} from 'stick.di';
 import {Repository} from './repository';
 import * as templ from 'templ';
 
-export * from 'stick.di/lib/decorators';
+import * as di from 'stick.di';
+
+export const inject = di.inject;
+export const autoinject = di.autoinject;
+export const registration = di.registration;
+export const transient = di.transient;
+export const singleton = di.singleton;
+export const instanceActivator = di.instanceActivator;
+//export const factory = di.factory;
 
 declare var require:any;
 const debug = require('debug')('stick:decorators');

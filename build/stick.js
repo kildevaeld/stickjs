@@ -2422,17 +2422,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	function __export(m) {
-	    for (var p in m) {
-	        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	    }
-	}
 	var internal_1 = __webpack_require__(18);
 	var utilities_1 = __webpack_require__(6);
 	var stick_di_1 = __webpack_require__(19);
 	var repository_1 = __webpack_require__(32);
 	var templ = __webpack_require__(33);
-	__export(__webpack_require__(31));
 	var debug = __webpack_require__(25)('stick:decorators');
 	function controller(controllerName) {
 	    return function (target) {

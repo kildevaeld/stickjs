@@ -8,11 +8,11 @@ export const decorators = d;
 export * from './stick';
 export * from 'collection';
 export var ready = u.domReady();
-export * from './services';
+export * from './services/index';
 import {Repository} from './repository'
 
 
-import *  as templ from './template'
+import *  as templ from './template/index'
 
 export const template = templ;
-export * from './template';
+export * from './template/index';
