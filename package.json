@@ -49,9 +49,9 @@
       "collection": "github:kildevaeld/collectionjs",
       "debug": "npm:debug@2.2.0",
       "stick.di": "github:kildevaeld/stick.di@master",
-      "eventsjs": "github:kildevaeld/eventsjs",
-      "utilities": "github:kildevaeld/utilitiesjs",
-      "templ": "github:kildevaeld/templ"
+      "eventsjs": "github:kildevaeld/eventsjs@master",
+      "utilities": "github:kildevaeld/utilitiesjs@master",
+      "templ": "github:kildevaeld/templ@master"
     }
   },
   "license": "MIT",
@@ -66,5 +66,5 @@
     "test": "node node_modules/.bin/mocha"
   },
   "typings": "lib/index",
-  "version": "0.4.7"
+  "version": "0.4.8"
 }
