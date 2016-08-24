@@ -2427,6 +2427,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var stick_di_1 = __webpack_require__(19);
 	var repository_1 = __webpack_require__(32);
 	var templ = __webpack_require__(33);
+	var di = __webpack_require__(19);
+	exports.autoinject = di.autoinject;
+	exports.inject = di.inject;
+	exports.registration = di.registration;
+	exports.transient = di.transient;
+	exports.singleton = di.singleton;
+	exports.instanceActivator = di.instanceActivator;
 	var debug = __webpack_require__(25)('stick:decorators');
 	function controller(controllerName) {
 	    return function (target) {

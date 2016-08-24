@@ -7,13 +7,13 @@ import * as templ from 'templ';
 
 import * as di from 'stick.di';
 
-export const inject = di.inject;
-export const autoinject = di.autoinject;
-export const registration = di.registration;
-export const transient = di.transient;
-export const singleton = di.singleton;
-export const instanceActivator = di.instanceActivator;
-//export const factory = di.factory;
+export const autoinject: (target?: any) => void | ((target: any) => void) = di.autoinject;
+export const inject: (...rest: any[]) => (target: any) => void = di.inject;
+export const registration: (value: any, targetKey?: string) => (target: any) => void = di.registration;
+export const transient: (key?: any, targetKey?: string) => (target: any) => void = di.transient;
+export const singleton: (keyOrRegisterInChild?: any, registerInChild?: boolean, targetKey?: string) => (target: any) => void = di.singleton;
+export const instanceActivator: (value: any, targetKey?: string) => (target: any) => void = di.instanceActivator;
+
 
 declare var require:any;
 const debug = require('debug')('stick:decorators');

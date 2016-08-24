@@ -1,3 +1,9 @@
+export declare const autoinject: (target?: any) => void | ((target: any) => void);
+export declare const inject: (...rest: any[]) => (target: any) => void;
+export declare const registration: (value: any, targetKey?: string) => (target: any) => void;
+export declare const transient: (key?: any, targetKey?: string) => (target: any) => void;
+export declare const singleton: (keyOrRegisterInChild?: any, registerInChild?: boolean, targetKey?: string) => (target: any) => void;
+export declare const instanceActivator: (value: any, targetKey?: string) => (target: any) => void;
 export declare function controller(controllerName?: string): ClassDecorator;
 export declare function module(moduleName?: string): ClassDecorator;
 export declare function service(serviceName?: string, moduleName?: string): ClassDecorator;
