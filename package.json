@@ -46,8 +46,8 @@
     "format": "cjs",
     "jspmPackage": true,
     "dependencies": {
-      "collection": "github:kildevaeld/collectionjs",
-      "debug": "npm:debug@2.2.0",
+      "collection": "github:kildevaeld/collectionjs@master",
+      "debug": "npm:debug@^2.2.0",
       "stick.di": "github:kildevaeld/stick.di@master",
       "eventsjs": "github:kildevaeld/eventsjs@master",
       "utilities": "github:kildevaeld/utilitiesjs@master",
