@@ -9,7 +9,7 @@
   "dependencies": {
     "collection": "git+https://github.com/kildevaeld/collectionjs.git",
     "debug": "^2.2.0",
-    "stick.di": "git+https://github.com/kildevaeld/dijs.git#v0.1.0",
+    "stick.di": "git+https://github.com/kildevaeld/stick.di#v0.1.0",
     "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
     "templ": "git+https://github.com/kildevaeld/templ.git",
     "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
@@ -48,7 +48,7 @@
     "dependencies": {
       "collection": "github:kildevaeld/collectionjs",
       "debug": "npm:debug@2.2.0",
-      "stick.dk": "github:kildevaeld/dijs",
+      "stick.di": "github:kildevaeld/stick.di",
       "eventsjs": "github:kildevaeld/eventsjs",
       "utilities": "github:kildevaeld/utilitiesjs",
       "templ": "github:kildevaeld/templ"
