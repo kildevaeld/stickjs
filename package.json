@@ -48,7 +48,7 @@
     "dependencies": {
       "collection": "github:kildevaeld/collectionjs",
       "debug": "npm:debug@2.2.0",
-      "stick.di": "github:kildevaeld/stick.di",
+      "stick.di": "github:kildevaeld/stick.di@master",
       "eventsjs": "github:kildevaeld/eventsjs",
       "utilities": "github:kildevaeld/utilitiesjs",
       "templ": "github:kildevaeld/templ"
