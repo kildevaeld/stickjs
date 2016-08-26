@@ -1,5 +1,5 @@
 //import {components, View, compile, vnode} from 'templ'
-import {DIContainer} from 'di'
+import {DIContainer} from 'stick.di'
 import {isPromise, IPromise, Promise} from 'utilities/lib/index'
 import {BaseComponent} from './base-component'
 import {TemplateView} from '../template.view'
@@ -38,8 +38,7 @@ export const Controller: ComponentDefinition = {
 	async update() {
 		if (this.factory) {
 			if (this.factory.container.hasHandler('template')) {
-                
-				//this.factory.container.get('template').update();
+				this.factory.container.get('template').update();
 			}
 			return;
 		}

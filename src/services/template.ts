@@ -10,7 +10,7 @@ export interface TemplateResolver {
 }
 
 export interface TemplateCreator {
-	(templateString: string, data:any): TemplateView
+	(templateString: string, data:any): Promise<TemplateView>
 }
 
 
@@ -28,16 +28,14 @@ Stick.factory('$templateResolver', () => {
 
 Stick.factory('$templateCreator', ['$templateResolver', '$container', (resolver:TemplateResolver, container:Container) => {
 	
-	return function (templateString:string, data:any): TemplateView  {
+	return function (templateString:string, data:any): Promise<TemplateView>  {
 		
 			let template = templ.compile(templateString, {
 				viewClass: <any>TemplateView
 			})
-			let view = <any>template.view(data, {
+			return template.render(data, {
 				container: container
 			});
-				
-			return view;
 	}
 	
 }]);

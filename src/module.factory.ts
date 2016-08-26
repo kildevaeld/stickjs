@@ -183,7 +183,7 @@ export class ModuleFactory extends EventEmitter {
 
             this.trigger('before:template:render');
 
-            let el = template.render();
+            let el = await template.render();
 
             if (el.nodeType === 11 || el.nodeType === 3) {
                 if ((<any>el).children.length === 1) {
@@ -254,10 +254,12 @@ export class ModuleFactory extends EventEmitter {
 
         } else if (options.template) {
             if (options.template instanceof Template) {
-                let view = <TemplateView>(<Template>options.template).view(state, {
-                    container: this.container,
-                });
-                return view;
+                
+                let view = await (<Template>options.template).render(state, {
+                    container: this.container
+                })
+
+                return view as TemplateView;
             }
 
             promise = $resolver(<string>options.template);
