@@ -95,9 +95,12 @@ export class Container extends DIContainer {
             } else {
                 let singleton = this.invoke(fn, null, targetKey)
                 if (utils.isPromise(singleton)) {
-                    
+                    return singleton.then( (s) => {
+                        this.__instances.set(key, s);
+                        return s;
+                    })
                 }
-                this.__instances.set(key, singleton)
+                this.__instances.set(key, singleton);
 
                 return singleton
             }

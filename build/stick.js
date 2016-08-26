@@ -13996,7 +13996,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return _this2.__instances.get(key);
 	                } else {
 	                    var singleton = _this2.invoke(fn, null, targetKey);
-	                    if (utils.isPromise(singleton)) {}
+	                    if (utils.isPromise(singleton)) {
+	                        return singleton.then(function (s) {
+	                            _this2.__instances.set(key, s);
+	                            return s;
+	                        });
+	                    }
 	                    _this2.__instances.set(key, singleton);
 	                    return singleton;
 	                }
@@ -15758,9 +15763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (show) {
 	                if (!this.subview) {
 	                    return this.childTemplate.render(this.view.context, {
-	                        parent: this.view /*,
-	                                          container: this.view.container,
-	                                          target: this.view.target*/
+	                        parent: this.view
 	                    }).then(function (view) {
 	                        _this2.subview = view;
 	                        return _this2.subview.render();
@@ -15812,9 +15815,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!hide) {
 	                if (!this.subview) {
 	                    return this.childTemplate.render(this.view.context, {
-	                        parent: this.view /*,
-	                                          container: this.view.container,
-	                                          target: this.view.target*/
+	                        parent: this.view
 	                    }).then(function (view) {
 	                        _this4.subview = view;
 	                        return _this4.subview.render();
@@ -15840,92 +15841,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}(base_component_1.BaseComponent);
 
 	exports.Hide = Hide;
-	/*
-	export const Shower: ComponentDefinition = {
-	  initialize: function initialize() {
-
-	  },
-	  update: function update() {
-	    var show = this.attributes.when;
-
-	    if (this._show === show) {
-	      if (this._subview) {
-	        this._subview.update();
-	      }
-	      return;
-	    }
-
-	    this._show = show;
-
-	    if (show) {
-	      if (!this._subview) {
-	        this._subview = this.childTemplate.view(this.view.context, {
-	          parent: this.view
-	        });
-	        
-	        this.section.appendChild(this._subview.render());
-	      }
-
-	      
-
-	    } else {
-	      if (this._subview) {
-	        this._subview.$destroy();
-	      }
-	      this._subview = void 0;
-	    }
-	  },
-
-	  onDestroy: function destroy() {
-
-	    if (this._subview)
-	      this._subview.$destroy();
-	  }
-	}
-
-	export const Hide2: ComponentDefinition = {
-	  initialize: function initialize() {
-
-	  },
-	  update: function update() {
-	    var hide = this.attributes.when;
-
-	    if (this._hide === hide) {
-	      if (this._subview) {
-	        this._subview.update();
-	      }
-	      return;
-	    }
-
-	    this._hide = hide;
-
-	    if (!hide) {
-	      if (!this._subview) {
-	        this._subview = this.childTemplate.view(this.view.context, {
-	          parent: this.view
-	        });
-	        this.section.appendChild(this._subview.render());
-	      }
-
-	      
-
-	    } else {
-
-	      if (this._subview) {
-	        this._subview.$destroy();
-	      }
-	      this._subview = void 0;
-
-	    }
-	  },
-
-	  onDestroy: function destroy() {
-	    if (this._subview)
-	      this._subview.$destroy();
-	  }
-	};
-
-	*/
 
 /***/ },
 /* 93 */

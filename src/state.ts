@@ -1,4 +1,4 @@
-declare var require:any;
+declare var require: any;
 import {NestedModel, NestedModelSetOptions} from 'collection';
 import {DIContainer} from 'stick.di';
 import * as utils from 'utilities';
@@ -6,33 +6,33 @@ import * as decorators from './decorators';
 
 const debug = require('debug')('stick:state');
 
-function isObject(a:any): a is Object {
+function isObject(a: any): a is Object {
     return a === Object(a);
 }
 
-export const get_atributes = function(attributes:any) {
+export const get_atributes = function (attributes: any) {
 
-  let keys = Object.keys(attributes),
-    deferred = {},
-    attr = {};
+    let keys = Object.keys(attributes),
+        deferred = {},
+        attr = {};
 
-  keys.map(key => {
-    return { key: key, value: attributes[key] };
-  }).filter(pair => {
-    if (!utils.has(attributes, pair.key)) return false
-    if (pair.value && utils.isPromise(pair.value)) {
-      deferred[pair.key] = pair.value;
-      delete attributes[pair.key];
-      return false;
-    }
+    keys.map(key => {
+        return { key: key, value: attributes[key] };
+    }).filter(pair => {
+        if (!utils.has(attributes, pair.key)) return false
+        if (pair.value && utils.isPromise(pair.value)) {
+            deferred[pair.key] = pair.value;
+            delete attributes[pair.key];
+            return false;
+        }
 
-		return true;
+        return true;
 
-	}).forEach((a) => {
-    attr[a.key] = a.value;
-  });
+    }).forEach((a) => {
+        attr[a.key] = a.value;
+    });
 
-  return { attr, deferred };
+    return { attr, deferred };
 };
 
 @decorators.inject('$container')
@@ -48,7 +48,7 @@ export class State extends NestedModel {
         return this._container;
     }
 
-    constructor(container:DIContainer, values?:any) {
+    constructor(container: DIContainer, values?: any) {
         super(values);
         this._container = container;
         debug('%s: State created', this.uid);
@@ -79,7 +79,7 @@ export class State extends NestedModel {
     }
 
     public set(key: string | Object, val?: any): this {
-        let opts: NestedModelSetOptions = {array: false},
+        let opts: NestedModelSetOptions = { array: false },
             value = {},
             unset = {};
         if (typeof key === 'string') {
@@ -95,11 +95,11 @@ export class State extends NestedModel {
         let {attr, deferred} = get_atributes(value);
 
         if (!utils.isEmpty(deferred)) {
-            debug("%s: Resolve deferred values: %j",this.uid, Object.keys(deferred));
+            debug("%s: Resolve deferred values: %j", this.uid, Object.keys(deferred));
             utils.objectToPromise(deferred)
-            .then( obj => {
-               this.set(obj)
-            });
+                .then(obj => {
+                    this.set(obj)
+                });
         }
 
         if (!utils.isEmpty(attr)) {
@@ -118,7 +118,7 @@ export class State extends NestedModel {
         return this;
     }
 
-    public createChild(container?:DIContainer, values?:any): State {
+    public createChild(container?: DIContainer, values?: any): State {
         if (!container) container = this.container.createChild();
         let state = new State(container, values);
         state._parent = state;
@@ -126,7 +126,7 @@ export class State extends NestedModel {
         return state;
     }
 
-    $destroy () {
+    $destroy() {
         super.destroy();
         debug("%s: State destroyed", this.uid);
     }
