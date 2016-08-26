@@ -13696,6 +13696,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var templ = __webpack_require__(33);
 	var annotations = __webpack_require__(17);
 	var debug = __webpack_require__(25)('stick');
+	var repository_2 = __webpack_require__(32);
+	exports.Repository = repository_2.Repository;
 	function service(name, definition) {
 	    var _internal_1$getDepend = internal_1.getDependencies(definition);
 

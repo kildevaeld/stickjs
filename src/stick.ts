@@ -14,6 +14,8 @@ import * as annotations from './decorators'
 declare const require:any;
 const debug = require('debug')('stick');
 
+export {Repository} from './repository'
+
 export function service(name: string, definition: Function) {
 		let [fn] = getDependencies(definition);
 
