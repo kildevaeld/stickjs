@@ -51,7 +51,7 @@
       "stick.di": "github:kildevaeld/stick.di@master",
       "eventsjs": "github:kildevaeld/eventsjs@master",
       "utilities": "github:kildevaeld/utilitiesjs@master",
-      "templ": "github:kildevaeld/templ@master"
+      "templ": "github:kildevaeld/templ@async"
     }
   },
   "license": "MIT",
