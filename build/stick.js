@@ -329,7 +329,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                case 16:
 	                                    template = _context.sent;
 
-	                                    this.swapElements(target, template.render());
+	                                    this.swapElements(target, template.section.render());
 
 	                                case 18:
 	                                case "end":
@@ -405,7 +405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        _classCallCheck(this, Router);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Router).call(this));
+	        var _this = _possibleConstructorReturn(this, (Router.__proto__ || Object.getPrototypeOf(Router)).call(this));
 
 	        _this.history = new history_1.HistoryApi(options);
 	        _this.options = options;
@@ -486,7 +486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: '$destroy',
 	        value: function $destroy() {
-	            _get(Object.getPrototypeOf(Router.prototype), 'destroy', this).call(this);
+	            _get(Router.prototype.__proto__ || Object.getPrototypeOf(Router.prototype), 'destroy', this).call(this);
 	            this.history.off();
 	        }
 	    }]);
@@ -533,7 +533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function HistoryApi(options) {
 	        _classCallCheck(this, HistoryApi);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HistoryApi).call(this));
+	        var _this = _possibleConstructorReturn(this, (HistoryApi.__proto__ || Object.getPrototypeOf(HistoryApi)).call(this));
 
 	        _this.handlers = [];
 	        _this._started = false;
@@ -2529,6 +2529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.DIServiceConfig = "mobyjs:service:config";
 	function getDependencies(fn) {
 	    var dependencies = void 0;
+	    // [dep..., Function] style
 	    if (fn.constructor === Array) {
 	        // TODO: Check for function
 	        var tmp = fn.pop();
@@ -2541,9 +2542,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var _fn = fn;
 	            // FIXME: Find a way not to delete type scripts type descriptions
 	            // But as it is now, context will be inferred as an Object
-	            if (_fn.__metadata__ && _fn.__metadata__.undefined['design:paramtypes']) {
-	                delete _fn.__metadata__.undefined['design:paramtypes'];
-	            }
+	            /*if (_fn.__metadata__ && _fn.__metadata__.undefined['design:paramtypes']) {
+	                delete _fn.__metadata__.undefined['design:paramtypes']
+	             }*/
 	            dependencies = getFunctionParameters(fn);
 	            _fn.inject = dependencies;
 	        }
@@ -4478,7 +4479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    Comment.prototype.render = function render(options) {
-	        return options.document.createComment(this.nodeValue);
+	        return Promise.resolve(options.document.createComment(this.nodeValue));
 	    };
 
 	    return Comment;
@@ -4518,16 +4519,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    Dynamic.prototype._renderElement = function _renderElement(options, renderers) {
-	        var node = this.vnode.render(options, renderers);
-	        renderers.push(new DynamicRenderer(node, this.bindingClass, options));
-	        return node;
+	        var _this = this;
+
+	        return this.vnode.render(options, renderers).then(function (node) {
+	            renderers.push(new DynamicRenderer(node, _this.bindingClass, options));
+	            return node;
+	        });
 	    };
 
 	    Dynamic.prototype._renderComponent = function _renderComponent(options, renderers) {
+	        var _this2 = this;
+
 	        var _r = [];
-	        var element = this.vnode.render(options, _r);
-	        renderers.push(new DynamicComponentRenderer(_r[0], this.bindingClass, options));
-	        return element;
+	        return this.vnode.render(options, _r).then(function (element) {
+	            renderers.push(new DynamicComponentRenderer(_r[0], _this2.bindingClass, options));
+	            return element;
+	        });
 	    };
 
 	    return Dynamic;
@@ -4548,9 +4555,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    DynamicComponentRenderer.prototype.generate = function generate(root, view) {
-	        this.renderer.generate(root, view);
-	        var component = view.bindings[view.bindings.length - 1];
-	        view.bindings.splice(view.bindings.indexOf(component), 0, new this.bindingClass(component, view));
+	        var _this3 = this;
+
+	        return this.renderer.generate(root, view).then(function () {
+	            var component = view.bindings[view.bindings.length - 1];
+	            view.bindings.splice(view.bindings.indexOf(component), 0, new _this3.bindingClass(component, view));
+	        });
 	    };
 
 	    return DynamicComponentRenderer;
@@ -4568,6 +4578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    DynamicRenderer.prototype.generate = function generate(root, view) {
 	        if (!this._refPath) this._refPath = vnode_1.getNodePath(this.ref);
 	        view.bindings.push(new this.bindingClass(vnode_1.getNodeByPath(root, this._refPath), view));
+	        return Promise.resolve();
 	    };
 
 	    return DynamicRenderer;
@@ -4648,7 +4659,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Element.prototype._renderComponent = function _renderComponent(component, options, renderers) {
 	        var section = new fragmentsection_1.FragmentSection(options.document);
 	        renderers.push(new ComponentAttributeRenderer(component, section, this, this._splitAttributes(options), options));
-	        return section.render();
+	        return Promise.resolve(section.render());
 	    };
 
 	    Element.prototype._renderElement = function _renderElement(options, renderers) {
@@ -4658,27 +4669,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var attrKey in _attr.staticAttributes) {
 	            element.setAttribute(attrKey, _attr.staticAttributes[attrKey]);
 	        }
-	        for (var _iterator = this.childNodes, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-	            var _ref;
-
-	            if (_isArray) {
-	                if (_i >= _iterator.length) break;
-	                _ref = _iterator[_i++];
-	            } else {
-	                _i = _iterator.next();
-	                if (_i.done) break;
-	                _ref = _i.value;
+	        var r = this.childNodes.map(function (m) {
+	            return m.render(options, renderers);
+	        });
+	        return Promise.all(r).then(function (children) {
+	            children.forEach(function (child) {
+	                element.appendChild(child);
+	            });
+	            if (Object.keys(_attr.dynamicAttributes).length) {
+	                renderers.push(new ElementAttributeRenderer(new nodesection_1.NodeSection(options.document, element), options, _attr.dynamicAttributes));
 	            }
-
-	            var child = _ref;
-
-	            element.appendChild(child.render(options, renderers));
+	            return element;
+	        });
+	        /*for (let child of this.childNodes) {
+	          element.appendChild(child.render(options, renderers));
 	        }
+	        
 	        // Set dynamic attributes
 	        if (Object.keys(_attr.dynamicAttributes).length) {
-	            renderers.push(new ElementAttributeRenderer(new nodesection_1.NodeSection(options.document, element), options, _attr.dynamicAttributes));
+	               renderers.push(new ElementAttributeRenderer(new NodeSection(options.document, element), options, _attr.dynamicAttributes))
 	        }
-	        return element;
+	             return element;*/
 	    };
 
 	    Element.prototype._splitAttributes = function _splitAttributes(options) {
@@ -4733,6 +4744,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _hydrateDynamicAttributes(ref, this.options, this.dynamicAttributes, view);
 	        }
 	        if (ref.update) view.bindings.push(ref);
+	        return ref.initialize();
 	    };
 
 	    return ComponentAttributeRenderer;
@@ -4750,6 +4762,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ElementAttributeRenderer.prototype.generate = function generate(root, view) {
 	        if (!this._marker) this._marker = this.section.createMarker();
 	        _hydrateDynamicAttributes(this._marker.findNode(root), this.options, this.attributes, view);
+	        return Promise.resolve();
 	    };
 
 	    return ElementAttributeRenderer;
@@ -4774,8 +4787,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function extend(obj) {
-	    var a = undefined,
-	        k = undefined;
+	    var a = void 0,
+	        k = void 0;
 
 	    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
 	        args[_key - 1] = arguments[_key];
@@ -4877,13 +4890,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    Debug.create = function create(namespace) {
-	        var logger = undefined;
+	        var logger = void 0;
 	        if (this.loggers[namespace]) {
 	            logger = this.loggers[namespace]; //.debug
 	        } else {
-	                logger = new Debug(namespace);
-	                this.loggers[namespace] = logger;
-	            }
+	            logger = new Debug(namespace);
+	            this.loggers[namespace] = logger;
+	        }
 	        return bind(logger.debug, logger);
 	    };
 
@@ -5139,6 +5152,48 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
+	            try {
+	                step(generator.next(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function rejected(value) {
+	            try {
+	                step(generator.throw(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
+	        }
+	        step((generator = generator.apply(thisArg, _arguments)).next());
+	    });
+	};
+	/*function iterateSync(list:any[], fn:(child:any) => Promise<any>): Promise<any[]> {
+	  return new Promise((resolve, reject) => {
+	    var current = 0, length = list.length;
+	    var out = [];
+	    const next = (err, value) => {
+	      if (current == length - 1) {
+	        return resolve(out);
+	      } else if (err != null) {
+	        return reject(err)
+	      } else if (err == null && value == null) {
+
+	      }
+	    };
+
+	    next(null, null);
+	  });
+	}*/
+
 	var Fragment = function () {
 	    function Fragment(children) {
 	        _classCallCheck(this, Fragment);
@@ -5151,11 +5206,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    Fragment.prototype.render = function render(options, renderers) {
-	        var fragment = options.document.createDocumentFragment();
-	        for (var i = 0, n = this.childNodes.length; i < n; i++) {
-	            fragment.appendChild(this.childNodes[i].render(options, renderers));
-	        }
-	        return fragment;
+	        return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	            var fragment, i, n, child;
+	            return regeneratorRuntime.wrap(function _callee$(_context) {
+	                while (1) {
+	                    switch (_context.prev = _context.next) {
+	                        case 0:
+	                            fragment = options.document.createDocumentFragment();
+	                            /*let r = this.childNodes.map( c => {
+	                              return c.render(options, renderers);
+	                            });
+	                                   return Promise.all(r)
+	                            .then( childs => {
+	                              childs.forEach( m => fragment.appendChild(<any>m));
+	                              return fragment;
+	                            });*/
+
+	                            i = 0, n = this.childNodes.length;
+
+	                        case 2:
+	                            if (!(i < n)) {
+	                                _context.next = 10;
+	                                break;
+	                            }
+
+	                            _context.next = 5;
+	                            return this.childNodes[i].render(options, renderers);
+
+	                        case 5:
+	                            child = _context.sent;
+
+	                            fragment.appendChild(child);
+
+	                        case 7:
+	                            i++;
+	                            _context.next = 2;
+	                            break;
+
+	                        case 10:
+	                            return _context.abrupt("return", fragment);
+
+	                        case 11:
+	                        case "end":
+	                            return _context.stop();
+	                    }
+	                }
+	            }, _callee, this);
+	        }));
 	    };
 
 	    return Fragment;
@@ -5175,7 +5272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var fragmentsection_1 = __webpack_require__(41);
 	var nodesection_1 = __webpack_require__(42);
 	function section(document, node) {
-	    var section = undefined;
+	    var section = void 0;
 	    if (node.nodeType == 11 /* Fragment */) {
 	            var frag = new fragmentsection_1.FragmentSection(document);
 	            frag.appendChild(node);
@@ -5195,6 +5292,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
+	            try {
+	                step(generator.next(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function rejected(value) {
+	            try {
+	                step(generator.throw(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
+	        }
+	        step((generator = generator.apply(thisArg, _arguments)).next());
+	    });
+	};
 	var section_1 = __webpack_require__(44);
 	var view_1 = __webpack_require__(46);
 
@@ -5204,37 +5325,80 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        this._renderers = [];
 	        this.vnode = vnode;
-	        var node = vnode.render(options, this._renderers);
-	        this.section = section_1.section(options.document, node);
+	        /*let node = vnode.render(<any>options, this._renderers);
+	        
+	        this.section = section(options.document, node)*/
 	        this.options = options;
 	    }
+
+	    Template.prototype.render = function render(context, options) {
+	        var _this = this;
+
+	        return this.vnode.render(this.options, this._renderers).then(function (node) {
+	            _this.section = section_1.section(_this.options.document, node);
+	            return _this.view(context, options);
+	        });
+	    };
 
 	    Template.prototype.view = function view(context) {
 	        var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	        var sec = this.section.clone();
-	        var DestView = this.options.viewClass || view_1.View;
-	        for (var k in this.options) {
-	            if (!options[k]) options[k] = this.options[k];
-	        }
-	        var view = new DestView(sec, this, context, options);
-	        for (var _iterator = this._renderers, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-	            var _ref;
+	        return __awaiter(this, void 0, Promise, regeneratorRuntime.mark(function _callee() {
+	            var sec, DestView, k, view, i, ii;
+	            return regeneratorRuntime.wrap(function _callee$(_context) {
+	                while (1) {
+	                    switch (_context.prev = _context.next) {
+	                        case 0:
+	                            if (!(this.section == null)) {
+	                                _context.next = 2;
+	                                break;
+	                            }
 
-	            if (_isArray) {
-	                if (_i >= _iterator.length) break;
-	                _ref = _iterator[_i++];
-	            } else {
-	                _i = _iterator.next();
-	                if (_i.done) break;
-	                _ref = _i.value;
-	            }
+	                            throw new Error('must call render before view');
 
-	            var renderer = _ref;
+	                        case 2:
+	                            sec = this.section.clone();
+	                            DestView = this.options.viewClass || view_1.View;
 
-	            renderer.generate(sec.node || sec.start.parentNode, view);
-	        }
-	        return view;
+	                            for (k in this.options) {
+	                                if (!options[k]) options[k] = this.options[k];
+	                            }
+	                            view = new DestView(sec, this, context, options);
+	                            /*let all = this._renderers.map( r => {
+	                                return r.generate(sec.node||sec.start.parentNode,view);
+	                            });
+	                            
+	                            return Promise.all(all)
+	                            .then( () => {
+	                                return view;
+	                            });*/
+
+	                            i = 0, ii = this._renderers.length;
+
+	                        case 7:
+	                            if (!(i < ii)) {
+	                                _context.next = 13;
+	                                break;
+	                            }
+
+	                            _context.next = 10;
+	                            return this._renderers[i].generate(sec.node || sec.start.parentNode, view);
+
+	                        case 10:
+	                            i++;
+	                            _context.next = 7;
+	                            break;
+
+	                        case 13:
+	                            return _context.abrupt('return', view);
+
+	                        case 14:
+	                        case 'end':
+	                            return _context.stop();
+	                    }
+	                }
+	            }, _callee, this);
+	        }));
 	    };
 
 	    return Template;
@@ -5277,22 +5441,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    View.prototype.update = function update() {
-	        for (var _iterator = this.bindings, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-	            var _ref;
-
-	            if (_isArray) {
-	                if (_i >= _iterator.length) break;
-	                _ref = _iterator[_i++];
-	            } else {
-	                _i = _iterator.next();
-	                if (_i.done) break;
-	                _ref = _i.value;
-	            }
-
-	            var binding = _ref;
-
-	            binding.update();
-	        }
+	        return Promise.all(this.bindings.map(function (m) {
+	            return m.update();
+	        })).then(function (v) {
+	            return void 0;
+	        });
 	    };
 
 	    View.prototype.addListener = function addListener(elm, eventName, callback) {
@@ -5309,23 +5462,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    View.prototype.render = function render() {
-	        return this.section.render();
+	        return Promise.resolve(this.section.render());
 	    };
 
 	    View.prototype.remove = function remove() {
-	        for (var _iterator2 = this.bindings, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-	            var _ref2;
+	        for (var _iterator = this.bindings, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+	            var _ref;
 
-	            if (_isArray2) {
-	                if (_i2 >= _iterator2.length) break;
-	                _ref2 = _iterator2[_i2++];
+	            if (_isArray) {
+	                if (_i >= _iterator.length) break;
+	                _ref = _iterator[_i++];
 	            } else {
-	                _i2 = _iterator2.next();
-	                if (_i2.done) break;
-	                _ref2 = _i2.value;
+	                _i = _iterator.next();
+	                if (_i.done) break;
+	                _ref = _i.value;
 	            }
 
-	            var binding = _ref2;
+	            var binding = _ref;
 
 	            binding.destroy();
 	        }
@@ -5354,7 +5507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    Text.prototype.render = function render(options) {
-	        return options.document.createTextNode(this.nodeValue);
+	        return Promise.resolve(options.document.createTextNode(this.nodeValue));
 	    };
 
 	    return Text;
@@ -5402,10 +5555,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (vvnode.childNodes) this.childTemplate = template_1.template(fragment_1.fragment(vvnode.childNodes), view.template.options);
 	        for (var key in attributes) {
 	            this.setAttribute(key, attributes[key]);
-	        }this.initialize();
+	        } //this.initialize()
 	    }
 
-	    BaseComponent.prototype.initialize = function initialize() {};
+	    BaseComponent.prototype.initialize = function initialize() {
+	        return Promise.resolve();
+	    };
 
 	    BaseComponent.prototype.setAttribute = function setAttribute(key, value) {
 	        this.attributes[key] = value;
@@ -5434,6 +5589,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
+	            try {
+	                step(generator.next(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function rejected(value) {
+	            try {
+	                step(generator.throw(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
+	        }
+	        step((generator = generator.apply(thisArg, _arguments)).next());
+	    });
+	};
 	var component_1 = __webpack_require__(49);
 	var view_1 = __webpack_require__(51);
 	function _each(target, iterate) {
@@ -5464,7 +5643,120 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _this;
 	    }
 
+	    Repeat.prototype.initialize = function initialize() {
+	        return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
+	            return regeneratorRuntime.wrap(function _callee$(_context) {
+	                while (1) {
+	                    switch (_context.prev = _context.next) {
+	                        case 0:
+	                            _context.next = 2;
+	                            return this.childTemplate.render({}, {});
+
+	                        case 2:
+	                        case 'end':
+	                            return _context.stop();
+	                    }
+	                }
+	            }, _callee, this);
+	        }));
+	    };
+
 	    Repeat.prototype.update = function update() {
+	        return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
+	            var as, each, key, n, self, parent, properties, promises, i, ii, model, child;
+	            return regeneratorRuntime.wrap(function _callee2$(_context2) {
+	                while (1) {
+	                    switch (_context2.prev = _context2.next) {
+	                        case 0:
+	                            as = this['as'];
+	                            each = this['each'];
+	                            key = this['key'] || "key";
+	                            n = 0;
+	                            self = this;
+	                            parent = this.view;
+
+	                            if (each instanceof view_1.Call) {
+	                                each = each.call();
+	                            }
+
+	                            if (!(each == null)) {
+	                                _context2.next = 9;
+	                                break;
+	                            }
+
+	                            return _context2.abrupt('return');
+
+	                        case 9:
+	                            promises = [];
+	                            i = 0, ii = each.length;
+
+	                        case 11:
+	                            if (!(i < ii)) {
+	                                _context2.next = 31;
+	                                break;
+	                            }
+
+	                            model = each[i];
+
+	                            if (as) {
+	                                properties = {};
+	                                properties[key] = i;
+	                                properties[as] = model;
+	                            } else {
+	                                properties = model;
+	                            }
+	                            properties.parent = self.view.context;
+	                            // TODO - provide SAME context here for speed and stability
+
+	                            if (!(n >= self._children.length)) {
+	                                _context2.next = 24;
+	                                break;
+	                            }
+
+	                            _context2.next = 18;
+	                            return this.childTemplate.view(properties, {
+	                                parent: parent
+	                            });
+
+	                        case 18:
+	                            child = _context2.sent;
+
+	                            self._children.push(child);
+	                            self.section.appendChild(child.section.render());
+	                            promises.push(child.render(properties));
+	                            _context2.next = 27;
+	                            break;
+
+	                        case 24:
+	                            child = self._children[n];
+	                            child.context = properties;
+	                            child.update();
+
+	                        case 27:
+	                            n++;
+
+	                        case 28:
+	                            i++;
+	                            _context2.next = 11;
+	                            break;
+
+	                        case 31:
+	                            this._children.splice(n).forEach(function (child) {
+	                                child.remove();
+	                            });
+	                            _context2.next = 34;
+	                            return promises;
+
+	                        case 34:
+	                        case 'end':
+	                            return _context2.stop();
+	                    }
+	                }
+	            }, _callee2, this);
+	        }));
+	    };
+
+	    Repeat.prototype.update2 = function update2() {
 	        var as = this['as'];
 	        var each = this['each'];
 	        var key = this['key'] || "key";
@@ -5475,6 +5767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (each instanceof view_1.Call) {
 	            each = each.call();
 	        }
+	        console.log(each);
 	        _each(each, function (model, k) {
 	            var child;
 	            if (as) {
@@ -5713,10 +6006,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    View.prototype.render = function render() {
-	        this.update();
-	        var section = _vnode$View.prototype.render.call(this);
+	        var _this2 = this;
+
+	        //;
+	        //var section = super.render()
 	        //this.transitions.enter();
-	        return section;
+	        return _vnode$View.prototype.render.call(this).then(function (section) {
+	            return _this2.update();
+	        }).then(function () {
+	            return _this2.section.render();
+	        });
 	    };
 
 	    View.prototype.updateLater = function updateLater() {
@@ -5847,13 +6146,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    ValueAttribute.prototype.update = function update() {
 	        var model = this.model = this.value;
-	        if (!model) return;
+	        if (!model) return Promise.resolve();
 	        if (!model || !(model instanceof view_1.Reference)) {
-	            throw new Error("input value must be a reference. Make sure you have <~> defined");
+	            return Promise.reject(new Error("input value must be a reference. Make sure you have <~> defined"));
 	        }
 	        if (model.gettable) {
 	            this._elementValue(this._parseValue(model.value()));
 	        }
+	        return Promise.resolve();
 	    };
 
 	    ValueAttribute.prototype._parseValue = function _parseValue(value) {
@@ -5864,7 +6164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ValueAttribute.prototype._onInput = function _onInput(event) {
 	        clearInterval(this._autocompleteCheckInterval);
 	        // ignore some keys
-	        if (event && (!event.keyCode || ! ~[27].indexOf(event.keyCode))) {
+	        if (event && (!event.keyCode || !~[27].indexOf(event.keyCode))) {
 	            event.stopPropagation();
 	        }
 	        var value = this._parseValue(this._elementValue());
@@ -5938,7 +6238,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    BaseAttribute.prototype.initialize = function initialize() {};
 
-	    BaseAttribute.prototype.update = function update() {};
+	    BaseAttribute.prototype.update = function update() {
+	        return Promise.resolve();
+	    };
 
 	    BaseAttribute.prototype.destroy = function destroy() {};
 
@@ -5986,7 +6288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    EventAttribute.prototype._onEvent = function _onEvent(e) {
 	        var self = this;
-	        var fn = undefined;
+	        var fn = void 0;
 	        if (this.value instanceof view_1.Assignment) {
 	            fn = this.value.assign;
 	        } else {
@@ -6047,7 +6349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    KeyCodeAttribute.prototype._onEvent = function _onEvent(event) {
-	        if (! ~this.keyCodes.indexOf(event.keyCode)) {
+	        if (!~this.keyCodes.indexOf(event.keyCode)) {
 	            return;
 	        }
 	        _EventAttribute.prototype._onEvent.call(this, event);
@@ -6236,7 +6538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var styles = this.value;
 	        if (typeof styles === "string") {
 	            this.ref.setAttribute("style", styles);
-	            return;
+	            return Promise.resolve();
 	        }
 	        var newStyles = {};
 	        for (var name in styles) {
@@ -6248,6 +6550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var key in newStyles) {
 	            this.ref.style[key] = newStyles[key];
 	        }
+	        return Promise.resolve();
 	    };
 
 	    return StyleAttribute;
@@ -6281,7 +6584,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    FocusAttribute.prototype.initialize = function initialize() {};
 
 	    FocusAttribute.prototype.update = function update() {
-	        if (!this.value) return;
+	        if (!this.value) return Promise.resolve();
 	        if (this.ref.focus) {
 	            var self = this;
 	            //if (!process.browser) return this.node.focus();
@@ -6291,6 +6594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                self.ref.focus();
 	            }, 1);
 	        }
+	        return Promise.resolve();
 	    };
 
 	    return FocusAttribute;
@@ -6579,8 +6883,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Transpiler.prototype._reference = function _reference(expression) {
 	        var keypath = this._referenceKeyPath(expression[1]);
 	        if (expression[2]) {
-	            var gettable = !! ~expression[2].indexOf("<~");
-	            var settable = !! ~expression[2].indexOf("~>");
+	            var gettable = !!~expression[2].indexOf("<~");
+	            var settable = !!~expression[2].indexOf("~>");
 	            return "this.view.ref(" + keypath + ", " + gettable + ", " + settable + ")";
 	        }
 	        return "this.view.get(" + keypath + ")";
@@ -10844,6 +11148,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
+	            try {
+	                step(generator.next(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function rejected(value) {
+	            try {
+	                step(generator.throw(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
+	        }
+	        step((generator = generator.apply(thisArg, _arguments)).next());
+	    });
+	};
 	var utils = __webpack_require__(40);
 
 	var Binding = function () {
@@ -10891,10 +11219,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    Binding.prototype.update = function update(context) {
-	        this._update();
-	        for (var key in this._attrBindings) {
-	            this._attrBindings[key].update();
-	        }
+	        return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
+	            var key;
+	            return regeneratorRuntime.wrap(function _callee$(_context) {
+	                while (1) {
+	                    switch (_context.prev = _context.next) {
+	                        case 0:
+	                            _context.next = 2;
+	                            return this._update();
+
+	                        case 2:
+	                            _context.t0 = regeneratorRuntime.keys(this._attrBindings);
+
+	                        case 3:
+	                            if ((_context.t1 = _context.t0()).done) {
+	                                _context.next = 9;
+	                                break;
+	                            }
+
+	                            key = _context.t1.value;
+	                            _context.next = 7;
+	                            return this._attrBindings[key].update();
+
+	                        case 7:
+	                            _context.next = 3;
+	                            break;
+
+	                        case 9:
+	                        case 'end':
+	                            return _context.stop();
+	                    }
+	                }
+	            }, _callee, this);
+	        }));
 	    };
 
 	    Binding.prototype.destroy = function destroy() {
@@ -10910,7 +11267,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function binding(initialize, update) {
 	    return utils.extendClass(Binding, {
 	        initialize: initialize || function () {},
-	        _update: update || function () {}
+	        _update: update || function () {
+	            return Promise.resolve();
+	        }
 	    });
 	}
 	exports.binding = binding;
@@ -11067,7 +11426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function ControllerFactory(name, controller, container) {
 	        _classCallCheck(this, ControllerFactory);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ControllerFactory).call(this));
+	        var _this = _possibleConstructorReturn(this, (ControllerFactory.__proto__ || Object.getPrototypeOf(ControllerFactory)).call(this));
 
 	        _this.container = container;
 	        _this.controller = controller;
@@ -11140,9 +11499,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                $state.set(contextName, controller);
 	                                template.setTarget(controller);
 	                                this.trigger('before:template:render');
-	                                el = template.render();
-	                                // Wrap element if its a DocumentFragment
+	                                _context.next = 23;
+	                                return template.render();
 
+	                            case 23:
+	                                el = _context.sent;
+
+	                                // Wrap element if its a DocumentFragment
 	                                if (el.nodeType === 11 || el.nodeType === 3) {
 	                                    if (el.children.length === 1) {
 	                                        el = el.firstChild.nodeType === 3 ? wrap(el, this.name, contextName) : el.firstChild;
@@ -11166,7 +11529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                }
 	                                return _context.abrupt('return', controller);
 
-	                            case 28:
+	                            case 30:
 	                            case 'end':
 	                                return _context.stop();
 	                        }
@@ -11204,43 +11567,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                _templateString = options.el.innerHTML;
 
 	                                promise = utils.Promise.resolve(_templateString);
-	                                _context2.next = 20;
+	                                _context2.next = 22;
 	                                break;
 
 	                            case 12:
 	                                if (!options.template) {
-	                                    _context2.next = 19;
+	                                    _context2.next = 21;
 	                                    break;
 	                                }
 
 	                                if (!(options.template instanceof vnode_1.Template)) {
-	                                    _context2.next = 16;
+	                                    _context2.next = 18;
 	                                    break;
 	                                }
 
-	                                view = options.template.view(state, {
+	                                _context2.next = 16;
+	                                return options.template.render(state, {
 	                                    container: this.container,
 	                                    parentView: options.parentView
 	                                });
-	                                return _context2.abrupt('return', view);
 
 	                            case 16:
+	                                view = _context2.sent;
+	                                return _context2.abrupt('return', view);
+
+	                            case 18:
 	                                promise = $resolver(options.template);
-	                                _context2.next = 20;
+	                                _context2.next = 22;
 	                                break;
 
-	                            case 19:
+	                            case 21:
 	                                return _context2.abrupt('return', utils.Promise.reject(new errors_1.StickError("no element or template")));
 
-	                            case 20:
-	                                _context2.next = 22;
+	                            case 22:
+	                                _context2.next = 24;
 	                                return promise;
 
-	                            case 22:
+	                            case 24:
 	                                templateString = _context2.sent;
 	                                return _context2.abrupt('return', $template(templateString, state));
 
-	                            case 24:
+	                            case 26:
 	                            case 'end':
 	                                return _context2.stop();
 	                        }
@@ -11308,7 +11675,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function StickError(message) {
 	        _classCallCheck(this, StickError);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StickError).call(this, message));
+	        var _this = _possibleConstructorReturn(this, (StickError.__proto__ || Object.getPrototypeOf(StickError)).call(this, message));
 
 	        _this.message = message;
 	        return _this;
@@ -11325,7 +11692,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function StickDependencyError(message, errors) {
 	        _classCallCheck(this, StickDependencyError);
 
-	        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(StickDependencyError).call(this, message));
+	        var _this2 = _possibleConstructorReturn(this, (StickDependencyError.__proto__ || Object.getPrototypeOf(StickDependencyError)).call(this, message));
 
 	        _this2.errors = errors;
 	        return _this2;
@@ -11401,7 +11768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function ModuleFactory(name, module, container) {
 	        _classCallCheck(this, ModuleFactory);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ModuleFactory).call(this));
+	        var _this = _possibleConstructorReturn(this, (ModuleFactory.__proto__ || Object.getPrototypeOf(ModuleFactory)).call(this));
 
 	        if (arguments.length != 3) {
 	            throw new Error();
@@ -11551,7 +11918,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                debug("%s: Creating module %s", this.id, this.name);
 
 	                                if (!(options.template || options.el)) {
-	                                    _context.next = 28;
+	                                    _context.next = 30;
 	                                    break;
 	                                }
 
@@ -11573,7 +11940,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                template.setTarget(mod);
 	                                //$state.set(contextName, controller);
 	                                this.trigger('before:template:render');
-	                                el = template.render();
+	                                _context.next = 23;
+	                                return template.render();
+
+	                            case 23:
+	                                el = _context.sent;
 
 	                                if (el.nodeType === 11 || el.nodeType === 3) {
 	                                    if (el.children.length === 1) {
@@ -11598,10 +11969,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                }
 	                                return _context.abrupt('return', mod);
 
-	                            case 28:
+	                            case 30:
 	                                return _context.abrupt('return', this.container.get(this.name));
 
-	                            case 29:
+	                            case 31:
 	                            case 'end':
 	                                return _context.stop();
 	                        }
@@ -11693,42 +12064,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                _templateString = options.el.innerHTML;
 
 	                                promise = utils.Promise.resolve(_templateString);
-	                                _context3.next = 20;
+	                                _context3.next = 22;
 	                                break;
 
 	                            case 12:
 	                                if (!options.template) {
-	                                    _context3.next = 19;
+	                                    _context3.next = 21;
 	                                    break;
 	                                }
 
 	                                if (!(options.template instanceof vnode_1.Template)) {
-	                                    _context3.next = 16;
+	                                    _context3.next = 18;
 	                                    break;
 	                                }
 
-	                                view = options.template.view(state, {
+	                                _context3.next = 16;
+	                                return options.template.render(state, {
 	                                    container: this.container
 	                                });
-	                                return _context3.abrupt('return', view);
 
 	                            case 16:
+	                                view = _context3.sent;
+	                                return _context3.abrupt('return', view);
+
+	                            case 18:
 	                                promise = $resolver(options.template);
-	                                _context3.next = 20;
+	                                _context3.next = 22;
 	                                break;
 
-	                            case 19:
+	                            case 21:
 	                                return _context3.abrupt('return', utils.Promise.reject(new errors_1.StickError("no element or template")));
 
-	                            case 20:
-	                                _context3.next = 22;
+	                            case 22:
+	                                _context3.next = 24;
 	                                return promise;
 
-	                            case 22:
+	                            case 24:
 	                                templateString = _context3.sent;
 	                                return _context3.abrupt('return', $template(templateString, state));
 
-	                            case 24:
+	                            case 26:
 	                            case 'end':
 	                                return _context3.stop();
 	                        }
@@ -11812,7 +12187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function State(container, values) {
 	        _classCallCheck(this, State);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(State).call(this, values));
+	        var _this = _possibleConstructorReturn(this, (State.__proto__ || Object.getPrototypeOf(State)).call(this, values));
 
 	        _this._container = container;
 	        debug('%s: State created', _this.uid);
@@ -11840,7 +12215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return out;
 	        }*/
 	        value: function get(key) {
-	            var data = _get(Object.getPrototypeOf(State.prototype), "get", this).call(this, key);
+	            var data = _get(State.prototype.__proto__ || Object.getPrototypeOf(State.prototype), "get", this).call(this, key);
 	            debug("%s: Get attribute: %s", this.uid, key, data);
 	            return data;
 	        }
@@ -11875,12 +12250,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            if (!utils.isEmpty(attr)) {
 	                debug("%s: Set attributes: ", this.uid, attr);
-	                _get(Object.getPrototypeOf(State.prototype), "set", this).call(this, attr, opts);
+	                _get(State.prototype.__proto__ || Object.getPrototypeOf(State.prototype), "set", this).call(this, attr, opts);
 	            }
 	            if (!utils.isEmpty(unset)) {
 	                // Should unset
 	                debug("%s: Unset attributes: %j", this.uid, Object.keys(unset));
-	                _get(Object.getPrototypeOf(State.prototype), "set", this).call(this, unset);
+	                _get(State.prototype.__proto__ || Object.getPrototypeOf(State.prototype), "set", this).call(this, unset);
 	            }
 	            return this;
 	        }
@@ -11896,7 +12271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: "$destroy",
 	        value: function $destroy() {
-	            _get(Object.getPrototypeOf(State.prototype), "destroy", this).call(this);
+	            _get(State.prototype.__proto__ || Object.getPrototypeOf(State.prototype), "destroy", this).call(this);
 	            debug("%s: State destroyed", this.uid);
 	        }
 	    }, {
@@ -13510,7 +13885,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Container(info) {
 	        _classCallCheck(this, Container);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Container).call(this, info));
+	        var _this = _possibleConstructorReturn(this, (Container.__proto__ || Object.getPrototypeOf(Container)).call(this, info));
 
 	        _this.__instances = new Map();
 	        return _this;
@@ -13524,7 +13899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'hasHandler',
 	        value: function hasHandler(name, parent, repository) {
-	            var has = _get(Object.getPrototypeOf(Container.prototype), 'hasHandler', this).call(this, name, parent);
+	            var has = _get(Container.prototype.__proto__ || Object.getPrototypeOf(Container.prototype), 'hasHandler', this).call(this, name, parent);
 	            return !has && repository ? repository_1.Repository.hasAny(name) : has;
 	        }
 	    }, {
@@ -13665,7 +14040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function registerInstance(key, instance) {
 	            var track = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-	            _get(Object.getPrototypeOf(Container.prototype), 'registerInstance', this).call(this, key, instance);
+	            _get(Container.prototype.__proto__ || Object.getPrototypeOf(Container.prototype), 'registerInstance', this).call(this, key, instance);
 	            if (track) {
 	                this.__instances.set(key, instance);
 	            }
@@ -13832,7 +14207,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function BaseComponent(section, vvnode, attributes, view) {
 	        _classCallCheck(this, BaseComponent);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BaseComponent).call(this));
+	        var _this = _possibleConstructorReturn(this, (BaseComponent.__proto__ || Object.getPrototypeOf(BaseComponent)).call(this));
 
 	        if (_this.update) {
 	            _this.update = utilities_1.bind(_this.update, _this);
@@ -13846,13 +14221,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var key in attributes) {
 	            _this.setAttribute(key, attributes[key]);
 	        }var container = _this.view.container;
-	        _this.initialize.call(_this, container);
 	        return _this;
 	    }
 
 	    _createClass(BaseComponent, [{
 	        key: 'initialize',
-	        value: function initialize(container) {}
+	        value: function initialize() {
+	            return Promise.resolve();
+	        }
 	    }, {
 	        key: 'setAttribute',
 	        value: function setAttribute(key, value) {
@@ -13909,10 +14285,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var template = templ.compile(templateString, {
 	            viewClass: template_view_1.TemplateView
 	        });
-	        var view = template.view(data, {
+	        return template.render(data, {
 	            container: container
 	        });
-	        return view;
 	    };
 	}]);
 
@@ -13943,7 +14318,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function TemplateView(section, template, context, options) {
 	        _classCallCheck(this, TemplateView);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TemplateView).call(this, section, template, null, options));
+	        var _this = _possibleConstructorReturn(this, (TemplateView.__proto__ || Object.getPrototypeOf(TemplateView)).call(this, section, template, null, options));
 
 	        _this._onModelChange = utilities_1.bind(_this._onModelChange, _this);
 	        _this.context = context;
@@ -13986,7 +14361,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!silent) {
 	                if (!(this.context instanceof collection_1.Model)) {
 	                    debug('set value for %s on object', key);
-	                    _get(Object.getPrototypeOf(TemplateView.prototype), 'set', this).call(this, key, val);
+	                    _get(TemplateView.prototype.__proto__ || Object.getPrototypeOf(TemplateView.prototype), 'set', this).call(this, key, val);
 	                    return this.updateLater();
 	                }
 	                if (!Array.isArray(key)) key = key.split(/[,.]/);
@@ -14014,7 +14389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'render',
 	        value: function render() {
 	            debug("%s: Render", this.id);
-	            return _get(Object.getPrototypeOf(TemplateView.prototype), 'render', this).call(this);
+	            return _get(TemplateView.prototype.__proto__ || Object.getPrototypeOf(TemplateView.prototype), 'render', this).call(this);
 	        }
 	    }, {
 	        key: 'update',
@@ -14023,7 +14398,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            /*nextTick(() => {
 	                super.update();
 	            });*/
-	            _get(Object.getPrototypeOf(TemplateView.prototype), 'update', this).call(this);
+	            return _get(TemplateView.prototype.__proto__ || Object.getPrototypeOf(TemplateView.prototype), 'update', this).call(this);
 	        }
 	    }, {
 	        key: 'get',
@@ -14039,7 +14414,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            key = key.join('.');
 	            if (!value) {
 	                if (!(this.context instanceof collection_1.Model)) {
-	                    value = _get(Object.getPrototypeOf(TemplateView.prototype), 'get', this).call(this, key);
+	                    value = _get(TemplateView.prototype.__proto__ || Object.getPrototypeOf(TemplateView.prototype), 'get', this).call(this, key);
 	                } else {
 	                    value = context.get(key);
 	                }
@@ -14060,13 +14435,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this._context.off('change', this._onModelChange, this);
 	            }
 	            debug("%s: Remove", this.id);
-	            _get(Object.getPrototypeOf(TemplateView.prototype), 'remove', this).call(this);
+	            _get(TemplateView.prototype.__proto__ || Object.getPrototypeOf(TemplateView.prototype), 'remove', this).call(this);
 	        }
 	    }, {
 	        key: '$destroy',
 	        value: function $destroy() {
 	            debug("%s: Destroy", this.id);
 	            this.remove();
+	            _get(TemplateView.prototype.__proto__ || Object.getPrototypeOf(TemplateView.prototype), 'destroy', this).call(this);
 	            //delete this._container;
 	            //delete this._delegator;
 	            //this.context = null;
@@ -14434,7 +14810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function ValueAttribute() {
 	        _classCallCheck(this, ValueAttribute);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(ValueAttribute).apply(this, arguments));
+	        return _possibleConstructorReturn(this, (ValueAttribute.__proto__ || Object.getPrototypeOf(ValueAttribute)).apply(this, arguments));
 	    }
 
 	    _createClass(ValueAttribute, [{
@@ -14470,13 +14846,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: "update",
 	        value: function update() {
 	            var model = this.model = this.value;
-	            if (!model) return;
+	            if (!model) return Promise.resolve();
 	            if (!model || !(model instanceof _1.Reference)) {
-	                throw new Error("input value must be a reference. Make sure you have <~> defined");
+	                throw Promise.reject(new Error("input value must be a reference. Make sure you have <~> defined"));
 	            }
 	            if (model.gettable) {
 	                this._elementValue(this._parseValue(model.value()));
 	            }
+	            return Promise.resolve();
 	        }
 	    }, {
 	        key: "_parseValue",
@@ -14568,7 +14945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function BaseAttribute() {
 	    _classCallCheck(this, BaseAttribute);
 
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(BaseAttribute).apply(this, arguments));
+	    return _possibleConstructorReturn(this, (BaseAttribute.__proto__ || Object.getPrototypeOf(BaseAttribute)).apply(this, arguments));
 	  }
 
 	  return BaseAttribute;
@@ -14656,65 +15033,78 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Controller() {
 	        _classCallCheck(this, Controller);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Controller).apply(this, arguments));
+	        return _possibleConstructorReturn(this, (Controller.__proto__ || Object.getPrototypeOf(Controller)).apply(this, arguments));
 	    }
 
 	    _createClass(Controller, [{
 	        key: "initialize",
 	        value: function initialize() {
-	            if (this.attributes['name']) {
-	                this.name = this.attributes['name'];
-	                this.as = this.attributes['as'] || this.name;
-	            }
-	        }
-	    }, {
-	        key: "update",
-	        value: function update() {
 	            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
-	                var view, template, state, s, controller, el;
 	                return regeneratorRuntime.wrap(function _callee$(_context) {
 	                    while (1) {
 	                        switch (_context.prev = _context.next) {
 	                            case 0:
+	                                if (this.attributes['name']) {
+	                                    this.name = this.attributes['name'];
+	                                    this.as = this.attributes['as'] || this.name;
+	                                }
+
+	                            case 1:
+	                            case "end":
+	                                return _context.stop();
+	                        }
+	                    }
+	                }, _callee, this);
+	            }));
+	        }
+	    }, {
+	        key: "update",
+	        value: function update() {
+	            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
+	                var view, template, state, s, controller, el;
+	                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+	                    while (1) {
+	                        switch (_context2.prev = _context2.next) {
+	                            case 0:
 	                                if (!this.factory) {
-	                                    _context.next = 7;
+	                                    _context2.next = 7;
 	                                    break;
 	                                }
 
 	                                if (!this.factory.container.hasHandler('template')) {
-	                                    _context.next = 6;
+	                                    _context2.next = 6;
 	                                    break;
 	                                }
 
-	                                _context.next = 4;
+	                                _context2.next = 4;
 	                                return this.factory.container.get('template');
 
 	                            case 4:
-	                                view = _context.sent;
+	                                view = _context2.sent;
 
 	                                view.update();
 
 	                            case 6:
-	                                return _context.abrupt("return");
+	                                return _context2.abrupt("return");
 
 	                            case 7:
 	                                if (!this.resolving) {
-	                                    _context.next = 9;
+	                                    _context2.next = 9;
 	                                    break;
 	                                }
 
-	                                return _context.abrupt("return");
+	                                return _context2.abrupt("return");
 
 	                            case 9:
 	                                this.resolving = true;
-	                                _context.next = 12;
+	                                _context2.next = 12;
 	                                return this.view.container.get(this.name);
 
 	                            case 12:
-	                                this.factory = _context.sent;
+	                                this.factory = _context2.sent;
 
 	                                if (this.factory instanceof controller_factory_1.ControllerFactory) {
-	                                    _context.next = 15;
+	                                    _context2.next = 15;
 	                                    break;
 	                                }
 
@@ -14737,7 +15127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                        console.warn('Could not parse model tag');
 	                                    }
 	                                }
-	                                _context.next = 21;
+	                                _context2.next = 21;
 	                                return this.factory.create({
 	                                    template: template,
 	                                    contextName: this.as,
@@ -14746,22 +15136,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                });
 
 	                            case 21:
-	                                controller = _context.sent;
-	                                _context.next = 24;
+	                                controller = _context2.sent;
+	                                _context2.next = 24;
 	                                return this.factory.container.get('$el');
 
 	                            case 24:
-	                                el = _context.sent;
+	                                el = _context2.sent;
 
 	                                this.section.appendChild(el);
 	                                this.resolving = false;
 
 	                            case 27:
 	                            case "end":
-	                                return _context.stop();
+	                                return _context2.stop();
 	                        }
 	                    }
-	                }, _callee, this);
+	                }, _callee2, this);
 	            }));
 	        }
 	    }, {
@@ -14771,7 +15161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.factory.destroy();
 	                this.factory = void 0;
 	            }
-	            _get(Object.getPrototypeOf(Controller.prototype), "destroy", this).call(this);
+	            _get(Controller.prototype.__proto__ || Object.getPrototypeOf(Controller.prototype), "destroy", this).call(this);
 	        }
 	    }]);
 
@@ -14787,38 +15177,118 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 	var templ = __webpack_require__(51);
 	var utilities_1 = __webpack_require__(6);
-	exports.Delegate = {
+	var base_component_1 = __webpack_require__(78);
+
+	var Delegate = function (_base_component_1$Bas) {
+	    _inherits(Delegate, _base_component_1$Bas);
+
+	    function Delegate() {
+	        _classCallCheck(this, Delegate);
+
+	        return _possibleConstructorReturn(this, (Delegate.__proto__ || Object.getPrototypeOf(Delegate)).apply(this, arguments));
+	    }
+
+	    _createClass(Delegate, [{
+	        key: 'initialize',
+	        value: function initialize() {
+	            var _this2 = this;
+
+	            this._onEvent = utilities_1.bind(this._onEvent, this);
+	            return this.childTemplate.render(this.view.context, {
+	                parent: this.view
+	            }).then(function (view) {
+	                _this2.subview = view;
+	                return _this2.subview.render();
+	            }).then(function (el) {
+	                _this2.el = _this2.document.createElement('div');
+	                _this2.el.appendChild(el);
+	                _this2.section.appendChild(_this2.el);
+	                var event = _this2.attributes['event'] || 'click';
+	                utilities_1.delegate(_this2.el, _this2.attributes['selector'], 'click', _this2._onEvent);
+	            });
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update() {
+	            return Promise.resolve();
+	        }
+	    }, {
+	        key: '_onEvent',
+	        value: function _onEvent(e) {
+	            var self = this;
+	            var fn = this.attributes['click'];
+	            //let fn;
+	            if (fn instanceof templ.Assignment) {
+	                fn = fn.assign;
+	            }
+	            if (typeof fn !== 'function') {
+	                throw new Error('[event] value is not a function');
+	            }
+	            fn(e);
+	        }
+	    }, {
+	        key: 'onDestroy',
+	        value: function onDestroy() {
+	            utilities_1.undelegate(this.el, this.attributes['selector'], 'click', this._onEvent);
+	            if (this.subview) this.subview.$destroy();
+	        }
+	    }]);
+
+	    return Delegate;
+	}(base_component_1.BaseComponent);
+
+	exports.Delegate = Delegate;
+	/*
+	export const Delegate: ComponentDefinition = {
 	    initialize: function initialize($container) {
-	        this._onEvent = utilities_1.bind(this._onEvent, this);
+	        this._onEvent = bind(this._onEvent, this);
+
 	        var view = this.childTemplate.view(this.view.context, {
 	            parent: this.view
 	        });
+
 	        this._subview = view;
+
 	        this._container = this.document.createElement('div');
 	        this._container.appendChild(view.render());
+
 	        this.section.appendChild(this._container);
-	        utilities_1.delegate(this._container, this.attributes.selector, 'click', this._onEvent);
+
+
+	        delegate(this._container, this.attributes.selector, 'click', this._onEvent);
 	    },
-	    update: function update() {},
+	    update: function update() { },
 	    _onEvent: function _onEvent(e) {
 	        var self = this;
+
 	        var fn = this.attributes.click;
+	        
 	        //let fn;
 	        if (fn instanceof templ.Assignment) {
 	            fn = fn.assign;
 	        }
+
 	        if (typeof fn !== 'function') {
+	           
 	            throw new Error('[event] value is not a function');
 	        }
 	        fn(e);
 	    },
 	    onDestroy: function destroy() {
-	        utilities_1.undelegate(this._container, this.attributes.selector, 'click', this._onEvent);
+	        undelegate(this._container, this.attributes.selector, 'click', this._onEvent);
 	        this._subview.$destroy();
 	    }
-	};
+	}*/
 
 /***/ },
 /* 91 */
@@ -14846,48 +15316,186 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
 	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
 	};
+	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) {
+	            try {
+	                step(generator.next(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function rejected(value) {
+	            try {
+	                step(generator.throw(value));
+	            } catch (e) {
+	                reject(e);
+	            }
+	        }
+	        function step(result) {
+	            result.done ? resolve(result.value) : new P(function (resolve) {
+	                resolve(result.value);
+	            }).then(fulfilled, rejected);
+	        }
+	        step((generator = generator.apply(thisArg, _arguments)).next());
+	    });
+	};
 	var decorators = __webpack_require__(17);
 	var collection_1 = __webpack_require__(67);
 	var base_component_1 = __webpack_require__(78);
+	var template_view_1 = __webpack_require__(80);
+	var view_1 = __webpack_require__(51);
+	function iterate(list, fn) {
+	    if (list instanceof collection_1.Collection) {
+	        list = list.models;
+	    } else if (list instanceof template_view_1.TemplateView) {
+	        return Promise.resolve();
+	    }
+	    return new Promise(function (resolve, reject) {
+	        var promises = [];
+	        for (var i = 0, ii = list.length; i < ii; i++) {
+	            promises.push(fn(list[i], i));
+	        }
+	        Promise.all(promises).then(resolve).catch(reject);
+	    });
+	}
 	var Repeat = function (_base_component_1$Bas) {
 	    _inherits(Repeat, _base_component_1$Bas);
 
 	    function Repeat() {
 	        _classCallCheck(this, Repeat);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Repeat).apply(this, arguments));
+	        return _possibleConstructorReturn(this, (Repeat.__proto__ || Object.getPrototypeOf(Repeat)).apply(this, arguments));
 	    }
 
 	    _createClass(Repeat, [{
 	        key: "initialize",
 	        value: function initialize() {
-	            this._children = [];
-	            this._collection = [];
+	            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
+	                return regeneratorRuntime.wrap(function _callee$(_context) {
+	                    while (1) {
+	                        switch (_context.prev = _context.next) {
+	                            case 0:
+	                                this._children = [];
+	                                this._collection = [];
+	                                _context.next = 4;
+	                                return this.childTemplate.render(this.view.context, {
+	                                    parent: this.view
+	                                });
+
+	                            case 4:
+	                            case "end":
+	                                return _context.stop();
+	                        }
+	                    }
+	                }, _callee, this);
+	            }));
 	        }
 	    }, {
 	        key: "update",
 	        value: function update() {
+	            var _this2 = this;
+
 	            var as = this['as'];
 	            var each = this['each'];
 	            var key = this['key'] || "key";
 	            var n = 0;
 	            var self = this;
 	            var parent = this.view;
-	            if (each === this._collection || !each) {
-	                return;
+	            if (each === this._collection || each == null) {
+	                return Promise.resolve();
+	            }
+	            if (each instanceof view_1.Call) {
+	                each = each.call();
 	            }
 	            if (this._collection && this._collection instanceof collection_1.Collection) {
 	                this.__removeEventListeners(this._collection);
 	            }
 	            this._collection = each;
-	            this._update();
-	            if (each instanceof collection_1.Collection) {
-	                this.__addEventListeners(each);
-	            }
+	            return this._update().then(function () {
+	                if (each instanceof collection_1.Collection) {
+	                    _this2.__addEventListeners(each);
+	                }
+	            });
 	        }
 	    }, {
 	        key: "_update",
 	        value: function _update() {
+	            var _this3 = this;
+
+	            var properties;
+	            var as = this['as'];
+	            var parent = this.view;
+	            var i = 0;
+	            var filter = this['filter'] || function (a) {
+	                return true;
+	            };
+	            return iterate(this._collection, function (m, n) {
+	                return __awaiter(_this3, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
+	                    var child, _ref;
+
+	                    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+	                        while (1) {
+	                            switch (_context2.prev = _context2.next) {
+	                                case 0:
+	                                    if (filter(m)) {
+	                                        _context2.next = 2;
+	                                        break;
+	                                    }
+
+	                                    return _context2.abrupt("return");
+
+	                                case 2:
+	                                    if (as) {
+	                                        properties = new collection_1.NestedModel((_ref = {}, _defineProperty(_ref, as, m), _defineProperty(_ref, "self", this.view.context), _ref));
+	                                    } else {
+	                                        properties = m;
+	                                    }
+	                                    //if (properties instanceof Model)
+	                                    // TODO - provide SAME context here for speed and stability
+
+	                                    if (!(n >= this._children.length)) {
+	                                        _context2.next = 13;
+	                                        break;
+	                                    }
+
+	                                    _context2.next = 6;
+	                                    return this.childTemplate.view(properties, {
+	                                        parent: parent
+	                                    });
+
+	                                case 6:
+	                                    child = _context2.sent;
+
+	                                    this._children.push(child);
+	                                    this.section.appendChild(child.section.render());
+	                                    i++;
+	                                    return _context2.abrupt("return", child.render(properties));
+
+	                                case 13:
+	                                    child = this._children[n];
+	                                    child.context = properties;
+	                                    child.update();
+
+	                                case 16:
+	                                    i++;
+
+	                                case 17:
+	                                case "end":
+	                                    return _context2.stop();
+	                            }
+	                        }
+	                    }, _callee2, this);
+	                }));
+	            }).then(function () {
+	                _this3._children.splice(i).forEach(function (child) {
+	                    child.$destroy();
+	                });
+	            });
+	        }
+	    }, {
+	        key: "_update2",
+	        value: function _update2() {
 	            var properties;
 	            var as = this['as'];
 	            var parent = this.view;
@@ -14902,9 +15510,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	                var child;
 	                if (as) {
-	                    var _ref;
+	                    var _ref2;
 
-	                    properties = new collection_1.NestedModel((_ref = {}, _defineProperty(_ref, as, m), _defineProperty(_ref, "self", this.view.context), _ref));
+	                    properties = new collection_1.NestedModel((_ref2 = {}, _defineProperty(_ref2, as, m), _defineProperty(_ref2, "self", this.view.context), _ref2));
 	                } else {
 	                    properties = m;
 	                }
@@ -15111,72 +15719,213 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 92 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	exports.Show = {
-	    initialize: function initialize() {},
-	    update: function update() {
-	        var show = this.attributes.when;
-	        if (this._show === show) {
-	            if (this._subview) {
-	                this._subview.update();
-	            }
-	            return;
-	        }
-	        this._show = show;
-	        if (show) {
-	            if (!this._subview) {
-	                this._subview = this.childTemplate.view(this.view.context, {
-	                    parent: this.view /*,
-	                                      container: this.view.container,
-	                                      target: this.view.target*/
-	                });
-	                this.section.appendChild(this._subview.render());
-	            }
-	        } else {
-	            if (this._subview) {
-	                this._subview.$destroy();
-	            }
-	            this._subview = void 0;
-	        }
-	    },
-	    onDestroy: function destroy() {
-	        if (this._subview) this._subview.$destroy();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var base_component_1 = __webpack_require__(78);
+
+	var Show = function (_base_component_1$Bas) {
+	    _inherits(Show, _base_component_1$Bas);
+
+	    function Show() {
+	        _classCallCheck(this, Show);
+
+	        return _possibleConstructorReturn(this, (Show.__proto__ || Object.getPrototypeOf(Show)).apply(this, arguments));
 	    }
-	};
-	exports.Hide = {
-	    initialize: function initialize() {},
-	    update: function update() {
-	        var hide = this.attributes.when;
-	        if (this._hide === hide) {
-	            if (this._subview) {
-	                this._subview.update();
+
+	    _createClass(Show, [{
+	        key: 'update',
+	        value: function update() {
+	            var _this2 = this;
+
+	            var show = this.attributes['when'];
+	            if (this._shown === show) {
+	                if (this.subview) {
+	                    this.subview.update();
+	                }
+	                return Promise.resolve();
 	            }
-	            return;
+	            this._shown = show;
+	            if (show) {
+	                if (!this.subview) {
+	                    return this.childTemplate.render(this.view.context, {
+	                        parent: this.view /*,
+	                                          container: this.view.container,
+	                                          target: this.view.target*/
+	                    }).then(function (view) {
+	                        _this2.subview = view;
+	                        return _this2.subview.render();
+	                    }).then(function (elm) {
+	                        _this2.section.appendChild(elm);
+	                    });
+	                }
+	            } else {
+	                if (this.subview) {
+	                    this.subview.$destroy();
+	                }
+	                this.subview = void 0;
+	            }
 	        }
-	        this._hide = hide;
-	        if (!hide) {
-	            if (!this._subview) {
-	                this._subview = this.childTemplate.view(this.view.context, {
-	                    parent: this.view /*,
-	                                      container: this.view.container,
-	                                      target: this.view.target*/
-	                });
-	                this.section.appendChild(this._subview.render());
-	            }
-	        } else {
-	            if (this._subview) {
-	                this._subview.$destroy();
-	            }
-	            this._subview = void 0;
+	    }, {
+	        key: 'onDestroy',
+	        value: function onDestroy() {
+	            if (this.subview) this.subview.$destroy();
 	        }
-	    },
-	    onDestroy: function destroy() {
-	        if (this._subview) this._subview.$destroy();
+	    }]);
+
+	    return Show;
+	}(base_component_1.BaseComponent);
+
+	exports.Show = Show;
+
+	var Hide = function (_base_component_1$Bas2) {
+	    _inherits(Hide, _base_component_1$Bas2);
+
+	    function Hide() {
+	        _classCallCheck(this, Hide);
+
+	        return _possibleConstructorReturn(this, (Hide.__proto__ || Object.getPrototypeOf(Hide)).apply(this, arguments));
 	    }
+
+	    _createClass(Hide, [{
+	        key: 'update',
+	        value: function update() {
+	            var _this4 = this;
+
+	            var hide = this.attributes['when'];
+	            if (this._hide === hide) {
+	                if (this.subview) {
+	                    this.subview.update();
+	                }
+	                return Promise.resolve();
+	            }
+	            this._hide = hide;
+	            if (!hide) {
+	                if (!this.subview) {
+	                    return this.childTemplate.render(this.view.context, {
+	                        parent: this.view /*,
+	                                          container: this.view.container,
+	                                          target: this.view.target*/
+	                    }).then(function (view) {
+	                        _this4.subview = view;
+	                        return _this4.subview.render();
+	                    }).then(function (elm) {
+	                        _this4.section.appendChild(elm);
+	                    });
+	                }
+	            } else {
+	                if (this.subview) {
+	                    this.subview.$destroy();
+	                }
+	                this.subview = void 0;
+	            }
+	        }
+	    }, {
+	        key: 'onDestroy',
+	        value: function onDestroy() {
+	            if (this.subview) this.subview.$destroy();
+	        }
+	    }]);
+
+	    return Hide;
+	}(base_component_1.BaseComponent);
+
+	exports.Hide = Hide;
+	/*
+	export const Shower: ComponentDefinition = {
+	  initialize: function initialize() {
+
+	  },
+	  update: function update() {
+	    var show = this.attributes.when;
+
+	    if (this._show === show) {
+	      if (this._subview) {
+	        this._subview.update();
+	      }
+	      return;
+	    }
+
+	    this._show = show;
+
+	    if (show) {
+	      if (!this._subview) {
+	        this._subview = this.childTemplate.view(this.view.context, {
+	          parent: this.view
+	        });
+	        
+	        this.section.appendChild(this._subview.render());
+	      }
+
+	      
+
+	    } else {
+	      if (this._subview) {
+	        this._subview.$destroy();
+	      }
+	      this._subview = void 0;
+	    }
+	  },
+
+	  onDestroy: function destroy() {
+
+	    if (this._subview)
+	      this._subview.$destroy();
+	  }
+	}
+
+	export const Hide2: ComponentDefinition = {
+	  initialize: function initialize() {
+
+	  },
+	  update: function update() {
+	    var hide = this.attributes.when;
+
+	    if (this._hide === hide) {
+	      if (this._subview) {
+	        this._subview.update();
+	      }
+	      return;
+	    }
+
+	    this._hide = hide;
+
+	    if (!hide) {
+	      if (!this._subview) {
+	        this._subview = this.childTemplate.view(this.view.context, {
+	          parent: this.view
+	        });
+	        this.section.appendChild(this._subview.render());
+	      }
+
+	      
+
+	    } else {
+
+	      if (this._subview) {
+	        this._subview.$destroy();
+	      }
+	      this._subview = void 0;
+
+	    }
+	  },
+
+	  onDestroy: function destroy() {
+	    if (this._subview)
+	      this._subview.$destroy();
+	  }
 	};
+
+	*/
 
 /***/ },
 /* 93 */
@@ -15301,7 +16050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _inherits(View, _base_component_1$Bas);
 
 	    function View() {
-	        var _Object$getPrototypeO;
+	        var _ref;
 
 	        _classCallCheck(this, View);
 
@@ -15309,7 +16058,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            args[_key] = arguments[_key];
 	        }
 
-	        var _this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(View)).call.apply(_Object$getPrototypeO, [this].concat(args)));
+	        var _this = _possibleConstructorReturn(this, (_ref = View.__proto__ || Object.getPrototypeOf(View)).call.apply(_ref, [this].concat(args)));
 
 	        _this.resolving = false;
 	        return _this;

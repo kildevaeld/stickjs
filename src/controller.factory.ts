@@ -93,7 +93,7 @@ export class ControllerFactory extends EventEmitter {
         this.trigger('before:template:render');
 
 
-        let el = template.render();
+        let el = await template.render();
         // Wrap element if its a DocumentFragment
         if (el.nodeType === 11 || el.nodeType === 3) {
             if ((<any>el).children.length === 1) {
@@ -137,11 +137,13 @@ export class ControllerFactory extends EventEmitter {
 
         } else if (options.template) {
             if (options.template instanceof Template) {
-                let view = <TemplateView>(<Template>options.template).view(state, {
+                
+                let view = await (<Template>options.template).render(state, {
                     container: this.container,
                     parentView: options.parentView
-                });
-                return view;
+                })
+
+                return view as TemplateView;
             }
 
             promise = $resolver(<string>options.template);

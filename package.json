@@ -11,7 +11,7 @@
     "debug": "^2.2.0",
     "stick.di": "git+https://github.com/kildevaeld/stick.di#v0.1.0",
     "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
-    "templ": "git+https://github.com/kildevaeld/templ.git",
+    "templ": "git+https://github.com/kildevaeld/templ.git#async",
     "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
   },
   "devDependencies": {
@@ -66,5 +66,5 @@
     "test": "node node_modules/.bin/mocha"
   },
   "typings": "lib/index",
-  "version": "0.4.9"
+  "version": "0.4.10"
 }

@@ -3,9 +3,10 @@ import { BaseComponent } from './base-component';
 export declare class Repeat extends BaseComponent {
     private _children;
     private _collection;
-    initialize(): void;
-    update(): void;
-    _update(): void;
+    initialize(): Promise<void>;
+    update(): Promise<void>;
+    _update(): Promise<void>;
+    _update2(): void;
     __addEventListeners<T extends IModel>(collection: Collection<T>): void;
     __removeEventListeners<T extends IModel>(collection: Collection<T>): void;
     setAttribute(key: string, value: any): void;

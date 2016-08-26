@@ -5,7 +5,7 @@ export declare class Controller extends BaseComponent {
     as: string;
     factory: ControllerFactory;
     private resolving;
-    initialize(): void;
+    initialize(): Promise<void>;
     update(): Promise<void>;
     destroy(): void;
 }

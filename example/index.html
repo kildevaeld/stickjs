@@ -92,6 +92,9 @@
 			})
 			.controller('page1', function ($state) {
                 $state.set('title', 'La lal la');
+				this.onDestroy = function () {
+					console.log('page 1 destroyed')
+				}
 				//$context.title = 'La lal la'
 				//$context.$publish('event', {name:'test'})
 			}).controller('page2', function ($state) {

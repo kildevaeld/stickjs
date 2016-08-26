@@ -191,7 +191,7 @@ export class RouterService {
             }
             this._currentController = factory;
             let template = await factory.container.get('template');
-            this.swapElements(target, template.render())
+            this.swapElements(target, template.section.render())
             
         }
     }

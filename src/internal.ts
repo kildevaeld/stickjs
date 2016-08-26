@@ -34,7 +34,8 @@ export const DIServiceConfig = "mobyjs:service:config"
 
 export function getDependencies (fn:Function|Object|any[]): [Function, any[]] {
   let dependencies: any[];
- 
+  
+  // [dep..., Function] style
   if (fn.constructor === Array) {
     // TODO: Check for function
     let tmp = (<any[]>fn).pop()
@@ -49,9 +50,10 @@ export function getDependencies (fn:Function|Object|any[]): [Function, any[]] {
       let _fn = <any>fn
       // FIXME: Find a way not to delete type scripts type descriptions
       // But as it is now, context will be inferred as an Object
-      if (_fn.__metadata__ && _fn.__metadata__.undefined['design:paramtypes']) {
+      /*if (_fn.__metadata__ && _fn.__metadata__.undefined['design:paramtypes']) {
           delete _fn.__metadata__.undefined['design:paramtypes']
-       }
+       }*/
+       
       
       dependencies = getFunctionParameters(<Function>fn);
       _fn.inject = dependencies;

@@ -30,15 +30,12 @@ export class BaseComponent extends EventEmitter implements Component {
 			if (vvnode.childNodes) this.childTemplate = template(fragment(vvnode.childNodes), view.template.options);
   		    for (var key in attributes) this.setAttribute(key, attributes[key]);
 
-			let container = this.view.container
-
-
-            this.initialize.call(this, container);
+			let container = this.view.container;
 
 		}
 
-		initialize (container:Container) {
-
+		initialize (): Promise<void> {
+			return Promise.resolve();
 		}
 
 

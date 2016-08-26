@@ -138,17 +138,18 @@ export class TemplateView extends View {
         this.updateLater()
     }
 
-    render (): HTMLElement {
+    render (): Promise<HTMLElement> {
         debug("%s: Render", this.id);
-        return <HTMLElement>super.render();
+        return <Promise<HTMLElement>>super.render();
     }
 
-    update() {
+    update(): Promise<void> {
         debug("%s: Update", this.id);
         /*nextTick(() => {
             super.update();
         });*/
-        super.update();
+
+        return super.update();
 
     }
 
@@ -199,6 +200,7 @@ export class TemplateView extends View {
     $destroy() {
         debug("%s: Destroy", this.id);
         this.remove();
+        super.destroy();
         //delete this._container;
         //delete this._delegator;
         //this.context = null;

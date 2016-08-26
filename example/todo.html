@@ -2,70 +2,70 @@
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>
 
-    <script src="../build/stick.js"></script>
-    <script>
-        var factory = stick.module('app', function ($state) {
-        
-        this.addTodo = function (e) {
-          var todo = $state.get('todo');
-          if (todo != "" && todo != undefined) {
-            $state.get('todos').push({
-              name: todo,
-              done: false
-            });
-            $state.set('todo', '');
-          }
+  <script src="../build/stick.js"></script>
+  <script>
+    var factory = stick.module('app', function($state) {
 
-          console.log($state);
-
-        };
-
-        this.todoDone = function (model) {
-
-          model.set('done', true);
-          console.log('DONE', model)
-
-          //$state.trigger('change');
-
+      this.addTodo = function(e) {
+        var todo = $state.get('todo');
+        if (todo != "" && todo != undefined) {
+          $state.get('todos').push({
+            name: todo,
+            done: false
+          });
+          
         }
-        this.removeTodo = function (model) {
-          console.log(model.collection, $state, model);
-          $state.get('todos').on('remove', () => {
-              console.log('on remove');
-          })
-          $state.get('todos').remove(model);
+        $state.set('todo', '');
+        console.log($state);
 
-        }
-        $state.set('todos', new stick.Collection());
-        $state.set('todo', '')
+      };
+
+      this.todoDone = function(model) {
+
+        model.set('done', true);
+        console.log('DONE', model)
+
+        //$state.trigger('change');
+
+      }
+      this.removeTodo = function(model) {
+        console.log(model.collection, $state, model);
+        $state.get('todos').on('remove', () => {
+          console.log('on remove');
+        })
+        $state.get('todos').remove(model);
+
+      }
+      $state.set('todos', new stick.Collection());
+      $state.set('todo', '')
 
 
+    });
+
+    stick.ready(function() {
+      factory.create({
+        el: document.body
+      }).catch(function(e) {
+        console.error(e)
       });
-
-      stick.ready(function () {
-        factory.create({
-          el: document.body
-        }).catch(function (e) {
-          console.error(e)
-        });
-      });
-    </script>
+    });
+  </script>
 </head>
 
 <body>
-    <input type="text" onenter="{{addTodo}}" value="{{<~>todo}}" />
-    <button onclick="{{addTodo}}">Add</button>
-    <ul>
-        <li repeat.each="{{todos}}" repeat.as="todo">
-           
-            {{todo.name}} {{todo.done ? '&#10003;' : ''}}
-            <button onclick="{{todoDone(todo)}}">Done</button>
-            <button onclick="{{removeTodo(todo)}}">Remove</button>
-        </li>
-    </ul>
+  <input type="text" onenter="{{addTodo}}" value="{{<~>todo}}" />
+  <button onclick="{{addTodo}}">Add</button>
+  <ul>
+    <li repeat.each="{{todos}}" repeat.as="todo">
+
+      {{todo.name}} {{todo.done ? '&#10003;' : ''}}
+      <button onclick="{{todoDone(todo)}}">Done</button>
+      <button onclick="{{removeTodo(todo)}}">Remove</button>
+    </li>
+  </ul>
 </body>
 
 </html>

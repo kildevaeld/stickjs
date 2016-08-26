@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <script src="../build/stick.js"></script>
+    <script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>
+
+</head>
+
+<body>
+    <button id="remove">Remove</button>
+    <div id="app">
+        <input value="{{<~>count}}" />
+        <ul>
+            <repeat each="{{items(count)}}" as="item" delegate.selector="li" delegate.click="{{onClick}}">
+                <li>{{item.name}}</li>
+            </repeat>
+        </ul>
+
+        <controller name="main">
+            Main controller {{title}}
+            <a href="#hello">Tryk</a>
+        </controller>
+        <div class="controller"></div>
+
+    </div>
+
+    <script>
+        'use strict';
+        console.log(stick)
+
+
+
+        var factory = stick.module('app', ['$state', '$router', function($state, $router) {
+            //console.log($state);
+
+            $state.set({
+                title: 'Hey Joe',
+                count: 10,
+                items: function(count) {
+                    
+                    var items = [];
+                    for (var i = 0; i < count; i++) {
+                        items.push({
+                            name: 'Item ' + i
+                        });
+                        
+                    }
+                    //console.log('items', items)
+                    return items;
+                }
+            })
+
+            this.onClick = function(e) {
+                console.log(e.delegateTarget.innerText)
+            }
+
+
+
+        }]);
+
+        factory.controller('main', {
+            initialize: function($state) {
+                $state.set('title', 'Hello')
+                //console.log($state)
+            }
+        })
+
+
+
+        factory.create({
+            el: document.querySelector('#app')
+        }).then(function(a) {
+            //console.log(a);
+
+        }).catch(function(e) {
+            console.error(e)
+        })
+
+
+        document.querySelector('#remove').addEventListener('click', function() {
+            factory.destroy();
+        })
+    </script>
+</body>
+
+</html>

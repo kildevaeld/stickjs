@@ -1,7 +1,6 @@
 import { Component, Section, VNode, AttributeMap, Template } from 'templ/lib/vnode';
 import { TemplateView } from '../template.view';
 import { EventEmitter } from 'eventsjs';
-import { Container } from '../../container';
 export declare class BaseComponent extends EventEmitter implements Component {
     section: Section;
     vnode: VNode;
@@ -10,7 +9,7 @@ export declare class BaseComponent extends EventEmitter implements Component {
     document: Document;
     childTemplate: Template;
     constructor(section: Section, vvnode: VNode, attributes: AttributeMap, view: TemplateView);
-    initialize(container: Container): void;
+    initialize(): Promise<void>;
     setAttribute(key: string, value: any): void;
     removeAttribute(key: string): void;
     getAttribute(key: string): string;

@@ -14,7 +14,7 @@ export class Controller extends BaseComponent {
     factory: ControllerFactory;
     private resolving: boolean;
 
-    initialize() {
+    async initialize() {
         if (this.attributes['name']) {
             this.name = this.attributes['name']
             this.as = this.attributes['as'] || this.name
