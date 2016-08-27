@@ -1,2 +1,5 @@
-import { ComponentDefinition } from '../index';
-export declare const Unsafe: ComponentDefinition;
+import { BaseComponent } from './base-component';
+export declare class Unsafe extends BaseComponent {
+    currentValue: any;
+    update(): Promise<void>;
+}
