@@ -16053,14 +16053,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                            case 18:
 	                                tString = _context.sent;
-	                                view = creator(tString, context);
+	                                _context.next = 21;
+	                                return creator(tString, context);
+
+	                            case 21:
+	                                view = _context.sent;
 
 	                                view.parent = this.view;
 	                                this.subview = view;
 	                                this.section.appendChild(view.render());
 	                                this.resolving = false;
 
-	                            case 24:
+	                            case 26:
 	                            case "end":
 	                                return _context.stop();
 	                        }

@@ -59,7 +59,7 @@ export class View extends BaseComponent {
 
         let tString = await resolver(template)
 
-        let view = creator(tString, context);
+        let view = await creator(tString, context);
         view.parent = this.view;
         this.subview = view;
 
