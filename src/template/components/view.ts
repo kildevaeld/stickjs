@@ -63,7 +63,7 @@ export class View extends BaseComponent {
         view.parent = this.view;
         this.subview = view;
 
-        this.section.appendChild(view.render());
+        this.section.appendChild(await view.render());
         this.resolving = false;
 
     }

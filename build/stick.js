@@ -16061,10 +16061,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                                view.parent = this.view;
 	                                this.subview = view;
-	                                this.section.appendChild(view.render());
+	                                _context.t0 = this.section;
+	                                _context.next = 27;
+	                                return view.render();
+
+	                            case 27:
+	                                _context.t1 = _context.sent;
+
+	                                _context.t0.appendChild.call(_context.t0, _context.t1);
+
 	                                this.resolving = false;
 
-	                            case 26:
+	                            case 30:
 	                            case "end":
 	                                return _context.stop();
 	                        }
