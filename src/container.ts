@@ -90,7 +90,6 @@ export class Container extends DIContainer {
 
         return this.registerHandler(key, (x) => {
             if (this.__instances.has(key)) {
-
                 return this.__instances.get(key)
             } else {
                 let singleton = this.invoke(fn, null, targetKey)
