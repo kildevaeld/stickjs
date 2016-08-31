@@ -46,7 +46,7 @@ export class Container extends DIContainer {
             throw new DIBadKeyError();
         }
 
-        if (key === DIContainer) {
+        if (key === DIContainer || key == Container) {
             return this;
         }
 

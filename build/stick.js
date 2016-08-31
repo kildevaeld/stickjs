@@ -15323,30 +15323,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
 	    }return c > 3 && r && Object.defineProperty(target, key, r), r;
 	};
-	var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) {
-	            try {
-	                step(generator.next(value));
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function rejected(value) {
-	            try {
-	                step(generator.throw(value));
-	            } catch (e) {
-	                reject(e);
-	            }
-	        }
-	        function step(result) {
-	            result.done ? resolve(result.value) : new P(function (resolve) {
-	                resolve(result.value);
-	            }).then(fulfilled, rejected);
-	        }
-	        step((generator = generator.apply(thisArg, _arguments)).next());
-	    });
-	};
 	var decorators = __webpack_require__(17);
 	var collection_1 = __webpack_require__(67);
 	var base_component_1 = __webpack_require__(78);
@@ -15378,25 +15354,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(Repeat, [{
 	        key: "initialize",
 	        value: function initialize() {
-	            return __awaiter(this, void 0, void 0, regeneratorRuntime.mark(function _callee() {
-	                return regeneratorRuntime.wrap(function _callee$(_context) {
-	                    while (1) {
-	                        switch (_context.prev = _context.next) {
-	                            case 0:
-	                                this._children = [];
-	                                this._collection = [];
-	                                _context.next = 4;
-	                                return this.childTemplate.render(this.view.context, {
-	                                    parent: this.view
-	                                });
-
-	                            case 4:
-	                            case "end":
-	                                return _context.stop();
-	                        }
-	                    }
-	                }, _callee, this);
-	            }));
+	            this._children = [];
+	            this._collection = [];
+	            return this.childTemplate.render(this.view.context, {
+	                parent: this.view
+	            });
 	        }
 	    }, {
 	        key: "update",
@@ -15438,62 +15400,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return true;
 	            };
 	            return iterate(this._collection, function (m, n) {
-	                return __awaiter(_this3, void 0, void 0, regeneratorRuntime.mark(function _callee2() {
-	                    var child, _ref;
+	                if (!filter(m)) {
+	                    return Promise.resolve();
+	                }
+	                var child;
+	                if (as) {
+	                    var _ref;
 
-	                    return regeneratorRuntime.wrap(function _callee2$(_context2) {
-	                        while (1) {
-	                            switch (_context2.prev = _context2.next) {
-	                                case 0:
-	                                    if (filter(m)) {
-	                                        _context2.next = 2;
-	                                        break;
-	                                    }
-
-	                                    return _context2.abrupt("return");
-
-	                                case 2:
-	                                    if (as) {
-	                                        properties = new collection_1.NestedModel((_ref = {}, _defineProperty(_ref, as, m), _defineProperty(_ref, "self", this.view.context), _ref));
-	                                    } else {
-	                                        properties = m;
-	                                    }
-	                                    //if (properties instanceof Model)
-	                                    // TODO - provide SAME context here for speed and stability
-
-	                                    if (!(n >= this._children.length)) {
-	                                        _context2.next = 13;
-	                                        break;
-	                                    }
-
-	                                    _context2.next = 6;
-	                                    return this.childTemplate.view(properties, {
-	                                        parent: parent
-	                                    });
-
-	                                case 6:
-	                                    child = _context2.sent;
-
-	                                    this._children.push(child);
-	                                    this.section.appendChild(child.section.render());
-	                                    i++;
-	                                    return _context2.abrupt("return", child.render(properties));
-
-	                                case 13:
-	                                    child = this._children[n];
-	                                    child.context = properties;
-	                                    child.update();
-
-	                                case 16:
-	                                    i++;
-
-	                                case 17:
-	                                case "end":
-	                                    return _context2.stop();
-	                            }
-	                        }
-	                    }, _callee2, this);
-	                }));
+	                    properties = new collection_1.NestedModel((_ref = {}, _defineProperty(_ref, as, m), _defineProperty(_ref, "self", _this3.view.context), _ref));
+	                } else {
+	                    properties = m;
+	                }
+	                //if (properties instanceof Model)
+	                // TODO - provide SAME context here for speed and stability
+	                if (n >= _this3._children.length) {
+	                    /*child = await this.childTemplate.view(properties, {
+	                      parent: parent
+	                    });*/
+	                    return _this3.childTemplate.view(properties, {
+	                        parent: parent
+	                    }).then(function (child) {
+	                        _this3._children.push(child);
+	                        _this3.section.appendChild(child.section.render());
+	                        i++;
+	                        return child.render(properties);
+	                    });
+	                } else {
+	                    child = _this3._children[n];
+	                    child.context = properties;
+	                    child.update();
+	                    i++;
+	                    return Promise.resolve();
+	                }
 	            }).then(function () {
 	                _this3._children.splice(i).forEach(function (child) {
 	                    child.$destroy();

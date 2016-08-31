@@ -28,12 +28,12 @@ export class Repeat extends BaseComponent {
   private _children: TemplateView[];
   private _collection: any;
 
-  async initialize () {
+  initialize (): Promise<void> {
     this._children = []
     
     this._collection = [];
 
-    await this.childTemplate.render(this.view.context, {
+    return this.childTemplate.render(this.view.context, {
       parent: this.view
     });
   }
@@ -85,9 +85,9 @@ export class Repeat extends BaseComponent {
 
     
     
-    return iterate(this._collection, async (m: IModel, n) => {
+    return iterate(this._collection, (m: IModel, n) => {
 
-      if (!filter(m)) { return; }
+      if (!filter(m)) { return Promise.resolve(); }
 
       var child;
 
@@ -102,24 +102,33 @@ export class Repeat extends BaseComponent {
       // TODO - provide SAME context here for speed and stability
       if (n >= this._children.length) {
 
-        child = await this.childTemplate.view(properties, {
+        /*child = await this.childTemplate.view(properties, {
           parent: parent
+        });*/
+
+        return this.childTemplate.view(properties, {
+          parent: parent
+        }).then( child => {
+          this._children.push(child);
+
+          this.section.appendChild(child.section.render());
+          i++
+          
+          return child.render(properties);
+
         });
 
 
-        this._children.push(child);
-
-        this.section.appendChild(child.section.render());
-        i++
         
-        return child.render(properties);
       } else {
         child = this._children[n];
         child.context = properties;
         child.update();
+        i++;
+        return Promise.resolve();
       }
       
-      i++;
+      
 
     }).then(() => {
       
