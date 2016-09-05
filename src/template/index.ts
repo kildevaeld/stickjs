@@ -29,4 +29,4 @@ export interface AttributeDefinition {
 }
 
 
-export {Reference, Assignment, Call} from 'templ/lib/view'
+export {Reference, Assignment, Call} from 'templ/lib/action';

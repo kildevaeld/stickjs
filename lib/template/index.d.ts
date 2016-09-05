@@ -11,4 +11,4 @@ export interface AttributeDefinition {
     initialize?: (...args: any[]) => void;
     update?: () => void;
 }
-export { Reference, Assignment, Call } from 'templ/lib/view';
+export { Reference, Assignment, Call } from 'templ/lib/action';

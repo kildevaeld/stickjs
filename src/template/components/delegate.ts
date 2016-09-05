@@ -1,5 +1,5 @@
 'use strict';
-import * as templ from 'templ/lib/view';
+import {isAssignment} from 'templ/lib/action';
 import {bind, delegate, undelegate} from 'utilities';
 import {ComponentDefinition} from '../index'
 import {BaseComponent} from './base-component';
@@ -39,7 +39,7 @@ export class Delegate extends BaseComponent {
         var fn: any = this.attributes['click'];
         
         //let fn;
-        if (fn instanceof templ.Assignment) {
+        if (isAssignment(fn)) {
             fn = fn.assign;
         }
 

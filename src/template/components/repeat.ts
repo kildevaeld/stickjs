@@ -4,7 +4,7 @@ import {bind} from 'utilities/lib/index'
 import {ComponentDefinition} from '../index'
 import {BaseComponent} from './base-component';
 import {TemplateView} from '../template.view';
-import {Call} from 'templ/lib/view';
+import {isCall} from 'templ/lib/action';
 
 function iterate(list, fn: (model:IModel, index: number) => Promise<void>): Promise<void> {
   
@@ -35,7 +35,7 @@ export class Repeat extends BaseComponent {
 
     return this.childTemplate.render(this.view.context, {
       parent: this.view
-    });
+    }).then( v => {});
   }
 
   update(): Promise<void> {
@@ -52,7 +52,7 @@ export class Repeat extends BaseComponent {
       return Promise.resolve();
     }
 
-    if (each instanceof Call) {
+    if (isCall(each)) {
         each = each.call();
     }
     
@@ -69,9 +69,6 @@ export class Repeat extends BaseComponent {
         this.__addEventListeners(each)
       }
     });
-    
-
-    
 
   }
 
@@ -109,12 +106,12 @@ export class Repeat extends BaseComponent {
         return this.childTemplate.view(properties, {
           parent: parent
         }).then( child => {
-          this._children.push(child);
+          this._children.push(<TemplateView>child);
 
           this.section.appendChild(child.section.render());
           i++
           
-          return child.render(properties);
+          return (<TemplateView>child).render().then( e => {});
 
         });
 

@@ -3,7 +3,7 @@ import {BaseComponent} from './base-component';
 import {TemplateView} from '../template.view';
 import * as decorators from '../../decorators';
 import {NestedModel} from 'collection';
-import {Call} from '../'
+import {Call} from 'templ/lib/action';
 
 @decorators.component("view")
 export class View extends BaseComponent {

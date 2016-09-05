@@ -9,9 +9,9 @@
   "dependencies": {
     "collection": "git+https://github.com/kildevaeld/collectionjs.git",
     "debug": "^2.2.0",
-    "stick.di": "git+https://github.com/kildevaeld/stick.di#v0.1.0",
+    "stick.di": "git+https://github.com/kildevaeld/stick.di",
     "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
-    "templ": "git+https://github.com/kildevaeld/templ.git#async",
+    "templ": "git+https://github.com/kildevaeld/templ.git",
     "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
   },
   "devDependencies": {
@@ -51,7 +51,7 @@
       "stick.di": "github:kildevaeld/stick.di@master",
       "eventsjs": "github:kildevaeld/eventsjs@master",
       "utilities": "github:kildevaeld/utilitiesjs@master",
-      "templ": "github:kildevaeld/templ@async"
+      "templ": "github:kildevaeld/templ@master"
     }
   },
   "license": "MIT",
@@ -66,5 +66,5 @@
     "test": "node node_modules/.bin/mocha"
   },
   "typings": "lib/index",
-  "version": "0.5.1"
+  "version": "0.5.2"
 }
