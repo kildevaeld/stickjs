@@ -2,8 +2,8 @@ import {component} from '../stick'
 
 export * from './template.view'
 
-import './attributes';
-import {Show, Hide, Unsafe, Delegate} from './components';
+import './attributes/index';
+import {Show, Hide, Unsafe, Delegate} from './components/index';
 
 import * as templ from 'templ'
 

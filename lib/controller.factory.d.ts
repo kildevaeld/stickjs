@@ -2,7 +2,7 @@ import { Container } from './container';
 import { EventEmitter } from 'eventsjs';
 import { State } from './state';
 import { TemplateView } from './template/template.view';
-import { Template } from 'templ/lib/vnode';
+import { Template } from 'templ/lib/vnode/index';
 export interface ControllerCreateOptions {
     el?: HTMLElement;
     template?: string | Template;

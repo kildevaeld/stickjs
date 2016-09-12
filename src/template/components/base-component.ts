@@ -1,6 +1,6 @@
 
 import {callFunc, bind} from 'utilities'
-import {Component, Section, VNode, AttributeMap, IView, fragment, Template, template} from 'templ/lib/vnode'
+import {Component, Section, VNode, AttributeMap, IView, fragment, Template, template} from 'templ/lib/vnode/index'
 import {resolveDependencies} from '../../internal'
 import {TemplateView} from '../template.view'
 import {EventEmitter} from 'eventsjs';

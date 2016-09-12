@@ -1,5 +1,5 @@
 export * from './template.view';
-import './attributes';
+import './attributes/index';
 export * from './components/base-component';
 export * from './attributes/base-attribute';
 export interface ComponentDefinition {

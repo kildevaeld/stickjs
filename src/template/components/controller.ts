@@ -4,7 +4,7 @@ import {isPromise, IPromise, Promise, isString} from 'utilities'
 import {BaseComponent} from './base-component'
 import {TemplateView} from '../template.view'
 import {ControllerFactory} from '../../controller.factory'
-import {Template} from 'templ/lib/vnode'
+import {Template} from 'templ/lib/vnode/index'
 import {component} from '../../decorators'
 
 @component('controller') 

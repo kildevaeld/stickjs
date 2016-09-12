@@ -8,7 +8,7 @@ import {FactoryActivator} from 'stick.di'
 import {TemplateCreator, TemplateResolver} from './services/template'
 import {StickError} from './errors'
 import {TemplateView} from './template/template.view'
-import {Template} from 'templ/lib/vnode'
+import {Template} from 'templ/lib/vnode/index'
 
 const debug = require('debug')('stick:factory:controller');
 

@@ -1,5 +1,5 @@
 import { BaseAttribute } from './base-attribute';
-import { Reference } from '../';
+import { Reference } from 'templ/lib/action';
 export declare class ValueAttribute extends BaseAttribute {
     model: Reference;
     _autocompleteCheckInterval: number;

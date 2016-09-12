@@ -1,6 +1,6 @@
 import {BaseAttribute} from './base-attribute';
 import * as decorators from '../../decorators';
-import {Reference} from '../';
+import {Reference} from 'templ/lib/action';
 import * as utils from 'utilities';
 
 const _events = ['change', 'keyup', 'input'];

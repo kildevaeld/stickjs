@@ -1,6 +1,6 @@
 import { Container } from './container';
 import { EventEmitter } from 'eventsjs';
-import { Template } from 'templ/lib/vnode';
+import { Template } from 'templ/lib/vnode/index';
 export declare type ControllerDefinition = FunctionConstructor | Object | any[];
 export interface ModuleCreateOptions {
     el?: HTMLElement;

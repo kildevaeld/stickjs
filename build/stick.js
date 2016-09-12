@@ -1679,40 +1679,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	var cachedSetTimeout;
 	var cachedClearTimeout;
 
-	function defaultSetTimout() {
-	    throw new Error('setTimeout has not been defined');
-	}
-	function defaultClearTimeout () {
-	    throw new Error('clearTimeout has not been defined');
-	}
 	(function () {
 	    try {
-	        if (typeof setTimeout === 'function') {
-	            cachedSetTimeout = setTimeout;
-	        } else {
-	            cachedSetTimeout = defaultSetTimout;
-	        }
+	        cachedSetTimeout = setTimeout;
 	    } catch (e) {
-	        cachedSetTimeout = defaultSetTimout;
+	        cachedSetTimeout = function () {
+	            throw new Error('setTimeout is not defined');
+	        }
 	    }
 	    try {
-	        if (typeof clearTimeout === 'function') {
-	            cachedClearTimeout = clearTimeout;
-	        } else {
-	            cachedClearTimeout = defaultClearTimeout;
-	        }
+	        cachedClearTimeout = clearTimeout;
 	    } catch (e) {
-	        cachedClearTimeout = defaultClearTimeout;
+	        cachedClearTimeout = function () {
+	            throw new Error('clearTimeout is not defined');
+	        }
 	    }
 	} ())
 	function runTimeout(fun) {
 	    if (cachedSetTimeout === setTimeout) {
 	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    // if setTimeout wasn't available but was latter defined
-	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-	        cachedSetTimeout = setTimeout;
 	        return setTimeout(fun, 0);
 	    }
 	    try {
@@ -1733,11 +1718,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function runClearTimeout(marker) {
 	    if (cachedClearTimeout === clearTimeout) {
 	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    // if clearTimeout wasn't available but was latter defined
-	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-	        cachedClearTimeout = clearTimeout;
 	        return clearTimeout(marker);
 	    }
 	    try {
@@ -12590,7 +12570,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils = __webpack_require__(6);
 	var eventsjs_1 = __webpack_require__(5);
 	var errors_1 = __webpack_require__(73);
-	var vnode_1 = __webpack_require__(43);
+	var index_1 = __webpack_require__(43);
 	var debug = __webpack_require__(25)('stick:factory:controller');
 	var wrap = function wrap(el, name, contextName) {
 	    var div = document.createElement('controller');
@@ -12756,7 +12736,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                if (!(options.template instanceof vnode_1.Template)) {
+	                                if (!(options.template instanceof index_1.Template)) {
 	                                    _context2.next = 18;
 	                                    break;
 	                                }
@@ -12929,7 +12909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var errors_1 = __webpack_require__(73);
 	var stick_di_1 = __webpack_require__(19);
 	var utils = __webpack_require__(6);
-	var vnode_1 = __webpack_require__(43);
+	var index_1 = __webpack_require__(43);
 	var state_1 = __webpack_require__(75);
 	var controller_factory_1 = __webpack_require__(72);
 	//import {Observer} from './observer'
@@ -13253,7 +13233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                    break;
 	                                }
 
-	                                if (!(options.template instanceof vnode_1.Template)) {
+	                                if (!(options.template instanceof index_1.Template)) {
 	                                    _context3.next = 18;
 	                                    break;
 	                                }
@@ -13485,33 +13465,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	__export(__webpack_require__(81));
 	__export(__webpack_require__(82));
 	__export(__webpack_require__(84));
-	var collection_2 = __webpack_require__(77);
-	var rest_collection_2 = __webpack_require__(81);
-	var model_2 = __webpack_require__(79);
-	function isCollection(a) {
-	    if (a == null)
-	        return false;
-	    return (a instanceof collection_2.Collection) || a.__classType == 'Collection' || a.__classType == 'RestCollection';
-	}
-	exports.isCollection = isCollection;
-	function isRestCollection(a) {
-	    if (a == null)
-	        return false;
-	    return (a instanceof rest_collection_2.RestCollection) || a.__classType == 'RestCollection';
-	}
-	exports.isRestCollection = isRestCollection;
-	function isModel(a) {
-	    if (a == null)
-	        return false;
-	    return (a instanceof model_2.Model) || a.__classType === 'Model' || a.__classType === 'RestModel';
-	}
-	exports.isModel = isModel;
-	function isRestModel(a) {
-	    if (a == null)
-	        return false;
-	    return (a instanceof model_2.Model) || a.__classType === 'RestModel';
-	}
-	exports.isRestModel = isRestModel;
 
 
 /***/ },
@@ -13529,6 +13482,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var objects_1 = __webpack_require__(9);
 	var arrays_1 = __webpack_require__(7);
 	var utils_1 = __webpack_require__(8);
+	function isCollection(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof Collection) || a.__classType == 'Collection' || a.__classType == 'RestCollection';
+	}
+	exports.isCollection = isCollection;
 	var setOptions = { add: true, remove: true, merge: true };
 	var addOptions = { add: true, remove: false };
 	var Collection = (function (_super) {
@@ -13785,7 +13744,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.models.map(function (m) { return m.toJSON(); });
 	    };
 	    Collection.prototype._prepareModel = function (value) {
-	        if (value instanceof model_1.Model)
+	        if (model_1.isModel(value))
 	            return value;
 	        if (objects_1.isObject(value))
 	            return new this.Model(value, { parse: true });
@@ -13863,6 +13822,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var object_1 = __webpack_require__(78);
 	var utils_1 = __webpack_require__(8);
 	var objects_1 = __webpack_require__(9);
+	function isModel(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof Model) || a.__classType === 'Model' || a.__classType === 'RestModel';
+	}
+	exports.isModel = isModel;
 	var Model = (function (_super) {
 	    __extends(Model, _super);
 	    function Model(attributes, options) {
@@ -14092,7 +14057,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return false;
 	    var result = obj;
 	    for (var i = 0, n = fields.length; i < n; i++) {
-	        if (result instanceof model_1.Model)
+	        if (model_1.isModel(result))
 	            return true;
 	        if (!result)
 	            return false;
@@ -14111,7 +14076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (return_exists && !objects_1.has(result, fields[i])) {
 	            return false;
 	        }
-	        result = result instanceof model_1.Model ? result.get(fields[i]) : result[fields[i]];
+	        result = model_1.isModel(result) ? result.get(fields[i]) : result[fields[i]];
 	        if (result == null && i < n - 1) {
 	            result = {};
 	        }
@@ -14150,7 +14115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                result[field] = /^\d+$/.test(nextField) ? [] : {};
 	            }
 	            result = result[field];
-	            if (result instanceof model_1.Model) {
+	            if (model_1.isModel(result)) {
 	                var rest = fields.slice(i + 1);
 	                return result.set(rest.join('.'), val, options);
 	            }
@@ -14211,7 +14176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            else {
 	                deleteNested(this.changed, attr);
 	            }
-	            if (curVal instanceof model_1.Model) {
+	            if (model_1.isModel(curVal)) {
 	                var fn = this._nestedListener[attr];
 	                if (fn) {
 	                    curVal.off('change', fn);
@@ -14223,7 +14188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            else {
 	                if (!isOnNestedModel(current, attr, separator)) {
-	                    if (val instanceof model_1.Model) {
+	                    if (model_1.isModel(val)) {
 	                        var fn = function (model) {
 	                            if (model.changed == undefined || objects_1.isEmpty(model.changed))
 	                                return;
@@ -14367,6 +14332,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var rest_model_1 = __webpack_require__(82);
 	var promises_1 = __webpack_require__(11);
 	var persistence_1 = __webpack_require__(83);
+	function isRestCollection(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof RestCollection) || a.__classType == 'RestCollection';
+	}
+	exports.isRestCollection = isRestCollection;
 	var RestCollection = (function (_super) {
 	    __extends(RestCollection, _super);
 	    function RestCollection(models, options) {
@@ -14411,7 +14382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (url == null)
 	            throw new Error('Url or rootURL no specified');
 	        options.url = url;
-	        if (value instanceof rest_model_1.RestModel) {
+	        if (rest_model_1.isRestModel(value)) {
 	            model = value;
 	        }
 	        else {
@@ -14478,8 +14449,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var objects_1 = __webpack_require__(9);
 	var promises_1 = __webpack_require__(11);
+	var model_1 = __webpack_require__(79);
 	var nested_model_1 = __webpack_require__(80);
 	var persistence_1 = __webpack_require__(83);
+	function isRestModel(a) {
+	    if (a == null)
+	        return false;
+	    return (a instanceof model_1.Model) || a.__classType === 'RestModel';
+	}
+	exports.isRestModel = isRestModel;
 	function normalize_path(url, id) {
 	    var i, p = "";
 	    if ((i = url.indexOf('?')) >= 0) {
@@ -15443,7 +15421,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var utilities_1 = __webpack_require__(6);
-	var vnode_1 = __webpack_require__(43);
+	var index_1 = __webpack_require__(43);
 	var eventsjs_1 = __webpack_require__(5);
 
 	var BaseComponent = function (_eventsjs_1$EventEmit) {
@@ -15462,7 +15440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.attributes = attributes;
 	        _this.view = view;
 	        _this.document = view.template.options.document;
-	        if (vvnode.childNodes) _this.childTemplate = vnode_1.template(vnode_1.fragment(vvnode.childNodes), view.template.options);
+	        if (vvnode.childNodes) _this.childTemplate = index_1.template(index_1.fragment(vvnode.childNodes), view.template.options);
 	        for (var key in attributes) {
 	            _this.setAttribute(key, attributes[key]);
 	        }var container = _this.view.container;
@@ -15994,11 +15972,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var stick_1 = __webpack_require__(85);
 	__export(__webpack_require__(89));
 	__webpack_require__(94);
-	var components_1 = __webpack_require__(97);
-	stick_1.component('hide', components_1.Hide);
-	stick_1.component('show', components_1.Show);
-	stick_1.component('unsafe', components_1.Unsafe);
-	stick_1.component('delegate', components_1.Delegate);
+	var index_1 = __webpack_require__(97);
+	stick_1.component('hide', index_1.Hide);
+	stick_1.component('show', index_1.Show);
+	stick_1.component('unsafe', index_1.Unsafe);
+	stick_1.component('delegate', index_1.Delegate);
 	__export(__webpack_require__(87));
 	__export(__webpack_require__(96));
 	var action_1 = __webpack_require__(58);
@@ -16045,7 +16023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var base_attribute_1 = __webpack_require__(96);
 	var decorators = __webpack_require__(17);
-	var _1 = __webpack_require__(93);
+	var action_1 = __webpack_require__(58);
 	var utils = __webpack_require__(6);
 	var _events = ['change', 'keyup', 'input'];
 	var debug = __webpack_require__(25)('stick:template:attribute:value');
@@ -16092,7 +16070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function update() {
 	            var model = this.model = this.value;
 	            if (!model) return Promise.resolve();
-	            if (!model || !(model instanceof _1.Reference)) {
+	            if (!model || !(model instanceof action_1.Reference)) {
 	                throw Promise.reject(new Error("input value must be a reference. Make sure you have <~> defined"));
 	            }
 	            if (model.gettable) {
