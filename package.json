@@ -41,7 +41,6 @@
   },
   "homepage": "https://github.com/kildevaeld/stick#readme",
   "jspm": {
-    "main": "build/stick.js",
     "registry": "github",
     "format": "cjs",
     "jspmPackage": true,
@@ -66,5 +65,5 @@
     "test": "node node_modules/.bin/mocha"
   },
   "typings": "lib/index",
-  "version": "0.5.2"
+  "version": "0.5.3"
 }
