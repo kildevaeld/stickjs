@@ -4368,7 +4368,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        })) {
 	            Repository.items.splice(Repository.items.indexOf(item), 1);
 	        }
-	        var config = stick_di_1.Metadata.get(internal_1.DIServiceConfig, target);
+	        var config = void 0;
+	        try {
+	            config = stick_di_1.Metadata.get(internal_1.DIServiceConfig, target);
+	        } catch (e) {}
 	        if (typeof target === 'function' && target.name == "") {
 	            try {
 	                Object.defineProperty(target, 'name', {
@@ -14914,6 +14917,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var debug = __webpack_require__(25)('stick');
 	var repository_2 = __webpack_require__(32);
 	exports.Repository = repository_2.Repository;
+	var module_factory_2 = __webpack_require__(74);
+	exports.ModuleFactory = module_factory_2.ModuleFactory;
 	function service(name, definition) {
 	    var _internal_1$getDepend = internal_1.getDependencies(definition);
 

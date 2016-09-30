@@ -15,6 +15,7 @@ declare const require:any;
 const debug = require('debug')('stick');
 
 export {Repository} from './repository'
+export {ModuleFactory} from './module.factory';
 
 export function service(name: string, definition: Function) {
 		let [fn] = getDependencies(definition);

@@ -29,7 +29,10 @@ export module Repository {
 			//throw new Error(`${type} named ${name} already imported as ${item.type}`);
 		}
 
-		let config = Metadata.get(DIServiceConfig, target)
+		let config;
+		try {
+			config = Metadata.get(DIServiceConfig, target)	
+		} catch (e) {}
 
         if (typeof target === 'function' && target.name == "")  {
             try {

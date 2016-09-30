@@ -2,6 +2,7 @@ import { ModuleFactory } from './module.factory';
 import { ComponentDefinition } from './template/index';
 import { AttributeConstructor } from 'templ/lib/vnode';
 export { Repository } from './repository';
+export { ModuleFactory } from './module.factory';
 export declare function service(name: string, definition: Function): void;
 export declare function factory(name: string, factory: any | any[]): void;
 export declare function module(name: string, definition?: Function | Object | any[]): ModuleFactory;
