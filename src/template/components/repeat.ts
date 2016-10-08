@@ -1,6 +1,6 @@
 import * as decorators from '../../decorators';
-import {Collection, IModel, NestedModel, ICollection, Model} from 'collection'
-import {bind} from 'utilities/lib/index'
+import {Collection, IModel, NestedModel, ICollection, Model, isCollection} from 'collection'
+import {bind} from 'orange'
 import {ComponentDefinition} from '../index'
 import {BaseComponent} from './base-component';
 import {TemplateView} from '../template.view';
@@ -8,7 +8,7 @@ import {isCall} from 'templ/lib/action';
 
 function iterate(list, fn: (model:IModel, index: number) => Promise<void>): Promise<void> {
   
-  if (list instanceof Collection) {
+  if (isCollection(list)) {
     list = list.models;
   } else if (list instanceof TemplateView) {
     return Promise.resolve();
@@ -56,7 +56,7 @@ export class Repeat extends BaseComponent {
         each = each.call();
     }
     
-    if (this._collection && this._collection instanceof Collection) {
+    if (this._collection &&  isCollection(this._collection)) {
       this.__removeEventListeners(this._collection)
 
     }
@@ -65,7 +65,7 @@ export class Repeat extends BaseComponent {
 
     return this._update()
     .then(() => {
-      if (each instanceof Collection) {
+      if (isCollection(each)) {
         this.__addEventListeners(each)
       }
     });

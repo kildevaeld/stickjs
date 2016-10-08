@@ -1,6 +1,6 @@
 declare var require: any;
 import {Container} from './container';
-import * as utils from 'utilities';
+import * as utils from 'orange';
 import {EventEmitter} from 'eventsjs';
 import {State} from './state';
 import {setActivator} from './internal'

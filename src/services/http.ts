@@ -1,22 +1,22 @@
-import {service} from '../decorators'
-import {request, Request} from 'utilities'
+import { service } from '../decorators'
+import * as request from 'orange.request'
 
 @service('$http')
 export class HttpService {
-	
-	get (url:any): Request {
+
+	get(url: any): request.HttpRequest {
 		return request.get(url)
 	}
-	
-	post (url:any): Request {
+
+	post(url: any): request.HttpRequest {
 		return request.post(url)
 	}
-	
-	put (url:any): Request {
+
+	put(url: any): request.HttpRequest {
 		return request.put(url)
 	}
-	
-	del (url:any): Request {
+
+	del(url: any): request.HttpRequest {
 		return request.del(url)
 	}
 }

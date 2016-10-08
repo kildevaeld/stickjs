@@ -1,6 +1,6 @@
 
 import {DependencyType, setDependencyType,DIServiceConfig, Metakey} from './internal';
-import {camelcase, find} from 'utilities';
+import {camelcase, find} from 'orange';
 import {Metadata} from 'stick.di';
 import {Repository} from './repository';
 import * as templ from 'templ';

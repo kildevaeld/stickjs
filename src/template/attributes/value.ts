@@ -1,7 +1,7 @@
 import {BaseAttribute} from './base-attribute';
 import * as decorators from '../../decorators';
 import {Reference} from 'templ/lib/action';
-import * as utils from 'utilities';
+import * as utils from 'orange';
 
 const _events = ['change', 'keyup', 'input'];
 declare var require:any;

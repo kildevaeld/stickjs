@@ -2,7 +2,7 @@ declare var require:any;
 import {View, IDelegator} from 'templ/lib/view'
 import {Model, NestedModel} from 'collection'
 import {DIContainer} from 'stick.di'
-import {bind, uniqueId, nextTick} from 'utilities';
+import {bind, uniqueId, nextTick} from 'orange';
 
 const debug = require('debug')('stick:template:view');
 
@@ -40,7 +40,7 @@ export class TemplateView extends View {
     set context(context: any) {
 
         if (this._context && this._context instanceof Model) {
-            this._context.off('change', this._onModelChange, this);
+            this._context.off('change', this._onModelChange);
 
         }
 
@@ -191,7 +191,7 @@ export class TemplateView extends View {
 
     remove() {
         if (this._context && this._context instanceof Model) {
-            this._context.off('change', this._onModelChange, this);
+            this._context.off('change', this._onModelChange);
         }
         debug("%s: Remove", this.id);
         super.remove();

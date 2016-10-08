@@ -1,4 +1,4 @@
-import * as utils from 'utilities';
+import * as utils from 'orange';
 import { DIContainer } from 'stick.di';
 export declare function getFunctionParameters(fn: Function, cache?: boolean): string[];
 export declare enum DependencyType {

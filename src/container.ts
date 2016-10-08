@@ -4,7 +4,7 @@ import {Metadata, DIContainer, IHandlerFunc, ConstructionInfo,
 import {StickDependencyError} from './errors'
 import {Repository, ItemMap} from './repository'
 import {DependencyType, setActivator, DIServiceConfig} from './internal'
-import * as utils from 'utilities'
+import * as utils from 'orange';
 
 import {ControllerFactory} from './controller.factory'
 

@@ -1,7 +1,7 @@
 import {factory} from '../stick';
 import {TemplateView} from '../template/template.view';
 import * as templ from 'templ';
-import {IPromise, Promise} from 'utilities';
+import {IPromise, Promise} from 'orange';
 import {Container} from '../container'
 
 export interface TemplateResolver {

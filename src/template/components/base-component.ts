@@ -1,5 +1,5 @@
 
-import {callFunc, bind} from 'utilities'
+import {callFunc, bind} from 'orange'
 import {Component, Section, VNode, AttributeMap, IView, fragment, Template, template} from 'templ/lib/vnode/index'
 import {resolveDependencies} from '../../internal'
 import {TemplateView} from '../template.view'

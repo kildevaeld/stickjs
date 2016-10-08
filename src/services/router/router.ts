@@ -1,7 +1,7 @@
 
 import {HistoryApi, Handler} from './history'
 import {EventEmitter} from 'eventsjs'
-import {callFunc} from 'utilities'
+import {callFunc} from 'orange'
 // Cached regular expressions for matching named param parts and splatted
 // parts of route strings.
 const optionalParam = /\((.*?)\)/g;

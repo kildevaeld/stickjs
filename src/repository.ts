@@ -1,6 +1,6 @@
 declare var require:any;
 import {DependencyType, getDependencies, DIServiceConfig} from './internal'
-import {find, has} from 'utilities';
+import {find, has} from 'orange';
 import {Metadata} from 'stick.di'
 
 const debug = require('debug')('stick:container:repository');

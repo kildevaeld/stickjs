@@ -12,7 +12,9 @@
     "stick.di": "git+https://github.com/kildevaeld/stick.di",
     "eventsjs": "git+https://github.com/kildevaeld/eventsjs.git",
     "templ": "git+https://github.com/kildevaeld/templ.git",
-    "utilities": "git+https://github.com/kildevaeld/utilitiesjs.git"
+    "orange":  "git+https://github.com/kildevaeld/orange.git",
+    "orange.request": "git+https://github.com/kildevaeld/orange.request.git",
+    "orange.dom": "git+https://github.com/kildevaeld/orange.dom.git"
   },
   "devDependencies": {
     "babel": "^6.3.26",
@@ -49,7 +51,9 @@
       "debug": "npm:debug@^2.2.0",
       "stick.di": "github:kildevaeld/stick.di@master",
       "eventsjs": "github:kildevaeld/eventsjs@master",
-      "utilities": "github:kildevaeld/utilitiesjs@master",
+      "orange": "github:kildevaeld/orange@master",
+      "orange.dom": "github:kildevaeld/orange.dom@master",
+      "orange.request": "github:kildevaeld/orange.request@master",
       "templ": "github:kildevaeld/templ@master"
     }
   },
@@ -65,5 +69,5 @@
     "test": "node node_modules/.bin/mocha"
   },
   "typings": "lib/index",
-  "version": "0.5.6"
+  "version": "0.6.0"
 }

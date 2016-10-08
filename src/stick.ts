@@ -1,7 +1,7 @@
 import {getDependencies, DependencyType, setActivator} from './internal'
 import {StickError} from './errors'
 import {Repository} from './repository'
-import * as utils from 'utilities'
+import * as utils from 'orange'
 
 import {ModuleFactory} from './module.factory'
 import {Container, FactoryActivator} from './container'

@@ -1,7 +1,7 @@
 declare var require: any;
 import {NestedModel, NestedModelSetOptions} from 'collection';
 import {DIContainer} from 'stick.di';
-import * as utils from 'utilities';
+import * as utils from 'orange';
 import * as decorators from './decorators';
 
 const debug = require('debug')('stick:state');

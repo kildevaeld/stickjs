@@ -1,6 +1,6 @@
 
 import {EventEmitter} from 'eventsjs'
-import * as utils from 'utilities'
+import * as utils from 'orange'
 
 // Cached regex for stripping a leading hash/slash and trailing space.
 const routeStripper = /^[#\/]|\s+$/g;

@@ -1,5 +1,5 @@
 import {EventEmitter} from 'eventsjs'
-import * as utils from 'utilities'
+import * as utils from 'orange'
 
 export class Observer extends EventEmitter {
 	private observer: MutationObserver

@@ -1,5 +1,5 @@
 import {Router, RouteHandler, IRouterOptions} from './router';
-import * as utils from 'utilities';
+import * as utils from 'orange';
 import {Container} from '../../container';
 import {service, inject, config} from '../../decorators';
 import {ControllerFactory} from '../../controller.factory';

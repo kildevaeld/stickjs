@@ -1,6 +1,5 @@
-//import {components, View, compile, vnode} from 'templ'
-//import {DIContainer} from 'stick.di'
-import {isPromise, IPromise, Promise, isString} from 'utilities'
+
+import {isPromise, IPromise, Promise, isString} from 'orange'
 import {BaseComponent} from './base-component'
 import {TemplateView} from '../template.view'
 import {ControllerFactory} from '../../controller.factory'

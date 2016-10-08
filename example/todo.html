@@ -5,7 +5,13 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <script src="../node_modules/babel-polyfill/dist/polyfill.js"></script>
 
-  <script src="../build/stick.js"></script>
+  <script src="../node_modules/eventsjs/dist/events.js"></script>
+		<script src="../node_modules/orange/dist/orange.js"></script>
+		<script src="../node_modules/orange.dom/dist/orange.dom.js"></script>
+		<script src="../node_modules/orange.request/dist/orange.request.js"></script>
+		<script src="../node_modules/collection/dist/collection.js"></script>
+		<script src="../node_modules/templ/dist/templ.js"></script>
+		<script src="../build/stick.js"></script>
   <script>
     var factory = stick.module('app', function($state) {
 
@@ -16,42 +22,40 @@
             name: todo,
             done: false
           });
-          
+          $state.trigger('change', {todos: $state.get('todos')})
         }
         $state.set('todo', '');
         console.log($state);
 
+
       };
 
       this.todoDone = function(model) {
-
         model.set('done', true);
-        console.log('DONE', model)
-
-        //$state.trigger('change');
-
       }
       this.removeTodo = function(model) {
-        console.log(model.collection, $state, model);
         $state.get('todos').on('remove', () => {
           console.log('on remove');
         })
         $state.get('todos').remove(model);
 
       }
-      $state.set('todos', new stick.Collection());
-      $state.set('todo', '')
+      $state.set({
+        todo: '',
+        todos: [] //new collection.Collection()
+      })
 
 
     });
-
-    stick.ready(function() {
+    console.log(orange)
+    orange.dom.domReady(function () {
       factory.create({
         el: document.body
       }).catch(function(e) {
         console.error(e)
       });
     });
+    
   </script>
 </head>
 

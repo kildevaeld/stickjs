@@ -1,5 +1,5 @@
 
-import * as utils from 'utilities'
+import * as utils from 'orange'
 import {Metadata, DIContainer} from 'stick.di'
 
 const paramRegEx = /function[^(]*\(([^)]*)\)/i

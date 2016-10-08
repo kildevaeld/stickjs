@@ -1,7 +1,7 @@
-import { Request } from 'utilities';
+import * as request from 'orange.request';
 export declare class HttpService {
-    get(url: any): Request;
-    post(url: any): Request;
-    put(url: any): Request;
-    del(url: any): Request;
+    get(url: any): request.HttpRequest;
+    post(url: any): request.HttpRequest;
+    put(url: any): request.HttpRequest;
+    del(url: any): request.HttpRequest;
 }
